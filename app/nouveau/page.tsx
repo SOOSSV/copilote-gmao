@@ -31,6 +31,7 @@ const labelStyle = {
 export default function NouveauTicketPage() {
   const router = useRouter();
   const [machines, setMachines] = useState<Machine[]>([]);
+  const [technicienId, setTechnicienId] = useState<string | null>(null);
   const [form, setForm] = useState({
     titre: '',
     description: '',
@@ -45,6 +46,19 @@ export default function NouveauTicketPage() {
     supabase.from('machines').select('*').eq('statut', 'actif').then(({ data }) => {
       setMachines(data || []);
     });
+
+    // Récupérer l'ID du technicien connecté
+    const prenom = localStorage.getItem('tech_prenom');
+    if (prenom) {
+      supabase
+        .from('technicians')
+        .select('id')
+        .ilike('prenom', prenom)
+        .limit(1)
+        .then(({ data }) => {
+          if (data && data.length > 0) setTechnicienId(data[0].id);
+        });
+    }
   }, []);
 
   function set(field: string, value: string) {
@@ -56,6 +70,7 @@ export default function NouveauTicketPage() {
     setStatus('loading');
     const { error } = await supabase.from('tickets').insert({
       ...form,
+      technicien_id: technicienId,
       statut: 'ouvert',
       source: 'web',
     });
@@ -162,7 +177,6 @@ export default function NouveauTicketPage() {
           </div>
         )}
 
-        {/* Bouton */}
         <button
           onClick={submit}
           disabled={!form.titre || !form.machine_id || status === 'loading'}
