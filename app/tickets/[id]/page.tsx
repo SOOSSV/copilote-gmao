@@ -50,10 +50,11 @@ export default function TicketDetailPage() {
     if (!id) return;
     supabase
       .from('tickets')
-      .select('*, machines(nom, localisation, type_machine), technicians(prenom, nom, specialite)')
+      .select('*, machines(nom), technicians(prenom, nom)')
       .eq('id', id)
       .single()
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) console.error('Ticket query error:', error);
         setTicket(data as Ticket | null);
         setLoading(false);
       });
@@ -85,8 +86,8 @@ export default function TicketDetailPage() {
     );
   }
 
-  const machine = ticket.machines as unknown as { nom: string; localisation: string; type_machine: string } | undefined;
-  const tech = ticket.technicians as unknown as { prenom: string; nom: string; specialite: string } | undefined;
+  const machine = ticket.machines as unknown as { nom: string } | undefined;
+  const tech = ticket.technicians as unknown as { prenom: string; nom: string } | undefined;
 
   return (
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', paddingBottom: 100 }}>
@@ -144,12 +145,12 @@ export default function TicketDetailPage() {
           <InfoRow
             icon={<Cpu size={16} />}
             label="Machine"
-            value={machine ? `${machine.nom}${machine.localisation ? ` — ${machine.localisation}` : ''}` : 'Non renseignée'}
+            value={machine?.nom || 'Non renseignée'}
           />
           <InfoRow
             icon={<User size={16} />}
             label="Technicien assigné"
-            value={tech ? `${tech.prenom} ${tech.nom}${tech.specialite ? ` (${tech.specialite})` : ''}` : 'Non assigné'}
+            value={tech ? `${tech.prenom} ${tech.nom}` : 'Non assigné'}
           />
           <InfoRow
             icon={<Wrench size={16} />}
