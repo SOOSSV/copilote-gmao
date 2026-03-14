@@ -57,7 +57,7 @@ export default function NouveauTicketPage() {
     const { error } = await supabase.from('tickets').insert({
       ...form,
       statut: 'ouvert',
-      source: 'web',
+      source: 'manuel',
     });
     if (error) { setStatus('error'); return; }
     setStatus('success');

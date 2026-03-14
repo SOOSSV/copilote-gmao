@@ -8,7 +8,7 @@ import { Search, RefreshCw } from 'lucide-react';
 const statutColor: Record<string, string> = {
   ouvert:   '#6366f1',
   en_cours: '#f59e0b',
-  ferme:    '#22c55e',
+  resolu:   '#22c55e',
 };
 
 export default function ManagerTicketsPage() {
@@ -66,7 +66,7 @@ export default function ManagerTicketsPage() {
           />
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {['tous', 'ouvert', 'en_cours', 'ferme', 'urgente', 'haute'].map(f => (
+          {['tous', 'ouvert', 'en_cours', 'resolu', 'urgente', 'haute'].map(f => (
             <button key={f} onClick={() => setFiltre(f)} style={{
               padding: '8px 14px', borderRadius: 8, border: '1px solid',
               borderColor: filtre === f ? 'var(--accent)' : 'var(--border)',
@@ -74,7 +74,7 @@ export default function ManagerTicketsPage() {
               color: filtre === f ? 'white' : 'var(--text-secondary)',
               fontSize: 12, fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize',
             }}>
-              {f === 'en_cours' ? 'En cours' : f.charAt(0).toUpperCase() + f.slice(1)}
+              {f === 'en_cours' ? 'En cours' : f === 'resolu' ? 'Résolu' : f.charAt(0).toUpperCase() + f.slice(1)}
             </button>
           ))}
         </div>
@@ -108,7 +108,7 @@ export default function ManagerTicketsPage() {
                     background: `${statutColor[t.statut]}22`,
                     color: statutColor[t.statut],
                     borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600,
-                  }}>{t.statut.replace('_', ' ')}</span>
+                  }}>{t.statut === 'resolu' ? 'Résolu' : t.statut === 'en_cours' ? 'En cours' : 'Ouvert'}</span>
                 </td>
                 <td style={{ padding: '12px 16px', fontSize: 12, color: 'var(--text-secondary)' }}>{formatDate(t.created_at)}</td>
                 <td style={{ padding: '12px 16px' }}>
@@ -119,7 +119,7 @@ export default function ManagerTicketsPage() {
                   >
                     <option value="ouvert">Ouvert</option>
                     <option value="en_cours">En cours</option>
-                    <option value="ferme">Fermé</option>
+                    <option value="resolu">Résolu</option>
                   </select>
                 </td>
               </tr>

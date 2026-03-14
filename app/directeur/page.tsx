@@ -64,7 +64,7 @@ export default function DirecteurDashboard() {
         total:       t.length,
         ouverts:     t.filter(x => x.statut === 'ouvert').length,
         en_cours:    t.filter(x => x.statut === 'en_cours').length,
-        fermes:      t.filter(x => x.statut === 'ferme').length,
+        fermes:      t.filter(x => x.statut === 'resolu').length,
         urgents:     t.filter(x => x.priorite === 'urgente').length,
         machines:    machines.data?.length || 0,
         techniciens: techniciens.data?.length || 0,

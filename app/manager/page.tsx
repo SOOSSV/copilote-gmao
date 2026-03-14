@@ -76,7 +76,7 @@ export default function ManagerDashboard() {
       total:       t.length,
       ouverts:     t.filter(x => x.statut === 'ouvert').length,
       en_cours:    t.filter(x => x.statut === 'en_cours').length,
-      fermes:      t.filter(x => x.statut === 'ferme').length,
+      fermes:      t.filter(x => x.statut === 'resolu').length,
       urgents:     t.filter(x => x.priorite === 'urgente').length,
       machines:    machines.data?.length || 0,
       techniciens: techniciens.data?.length || 0,
@@ -169,8 +169,8 @@ export default function ManagerDashboard() {
                     </td>
                     <td style={{ padding: '12px 20px' }}>
                       <span style={{
-                        background: t.statut === 'ferme' ? '#22c55e22' : t.statut === 'en_cours' ? '#f59e0b22' : '#6366f122',
-                        color: t.statut === 'ferme' ? '#22c55e' : t.statut === 'en_cours' ? '#f59e0b' : '#6366f1',
+                        background: t.statut === 'resolu' ? '#22c55e22' : t.statut === 'en_cours' ? '#f59e0b22' : '#6366f122',
+                        color: t.statut === 'resolu' ? '#22c55e' : t.statut === 'en_cours' ? '#f59e0b' : '#6366f1',
                         borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600, textTransform: 'capitalize',
                       }}>{t.statut.replace('_', ' ')}</span>
                     </td>

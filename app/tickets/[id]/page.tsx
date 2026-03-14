@@ -10,13 +10,13 @@ import { useRouter, useParams } from 'next/navigation';
 const statutColor: Record<string, string> = {
   ouvert:   '#6366f1',
   en_cours: '#f59e0b',
-  ferme:    '#22c55e',
+  resolu:   '#22c55e',
 };
 
 const statutLabel: Record<string, string> = {
   ouvert:   'Ouvert',
   en_cours: 'En cours',
-  ferme:    'Fermé',
+  resolu:   'Résolu',
 };
 
 const classificationLabel: Record<string, string> = {

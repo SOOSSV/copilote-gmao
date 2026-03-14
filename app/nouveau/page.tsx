@@ -72,7 +72,7 @@ export default function NouveauTicketPage() {
       ...form,
       technicien_id: technicienId,
       statut: 'ouvert',
-      source: 'web',
+      source: 'manuel',
     });
     if (error) { setStatus('error'); return; }
     setStatus('success');

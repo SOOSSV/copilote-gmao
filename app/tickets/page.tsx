@@ -10,13 +10,13 @@ import Link from 'next/link';
 const statutColor: Record<string, string> = {
   ouvert:   '#6366f1',
   en_cours: '#f59e0b',
-  ferme:    '#22c55e',
+  resolu:   '#22c55e',
 };
 
 export default function TicketsPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filtre, setFiltre] = useState<'tous' | 'ouvert' | 'en_cours' | 'ferme'>('tous');
+  const [filtre, setFiltre] = useState<'tous' | 'ouvert' | 'en_cours' | 'resolu'>('tous');
 
   async function fetchTickets() {
     setLoading(true);
@@ -57,7 +57,7 @@ export default function TicketsPage() {
 
       {/* Filtres */}
       <div style={{ display: 'flex', gap: 8, padding: '12px 16px', overflowX: 'auto' }}>
-        {(['tous', 'ouvert', 'en_cours', 'ferme'] as const).map(f => (
+        {(['tous', 'ouvert', 'en_cours', 'resolu'] as const).map(f => (
           <button key={f} onClick={() => setFiltre(f)} style={{
             padding: '6px 14px', borderRadius: 20, border: '1px solid',
             borderColor: filtre === f ? 'var(--accent)' : 'var(--border)',
@@ -66,7 +66,7 @@ export default function TicketsPage() {
             fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
             textTransform: 'capitalize',
           }}>
-            {f === 'en_cours' ? 'En cours' : f.charAt(0).toUpperCase() + f.slice(1)}
+            {f === 'en_cours' ? 'En cours' : f === 'resolu' ? 'Résolu' : f.charAt(0).toUpperCase() + f.slice(1)}
           </button>
         ))}
       </div>
