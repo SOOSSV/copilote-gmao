@@ -62,35 +62,40 @@ export default function ManagerDashboard() {
   const [stats, setStats] = useState<Stats>({ total: 0, ouverts: 0, en_cours: 0, fermes: 0, urgents: 0, machines: 0, techniciens: 0 });
   const [recents, setRecents] = useState<TicketRecent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+
+  async function load() {
+    const [tickets, machines, techniciens] = await Promise.all([
+      supabase.from('tickets').select('statut, priorite'),
+      supabase.from('machines').select('id').eq('statut', 'actif'),
+      supabase.from('technicians').select('id'),
+    ]);
+
+    const t = tickets.data || [];
+    setStats({
+      total:       t.length,
+      ouverts:     t.filter(x => x.statut === 'ouvert').length,
+      en_cours:    t.filter(x => x.statut === 'en_cours').length,
+      fermes:      t.filter(x => x.statut === 'ferme').length,
+      urgents:     t.filter(x => x.priorite === 'urgente').length,
+      machines:    machines.data?.length || 0,
+      techniciens: techniciens.data?.length || 0,
+    });
+
+    const { data: r } = await supabase
+      .from('tickets')
+      .select('id, titre, priorite, statut, created_at, machines(nom)')
+      .order('created_at', { ascending: false })
+      .limit(8);
+    setRecents((r as unknown as TicketRecent[]) || []);
+    setLoading(false);
+    setLastRefresh(new Date());
+  }
 
   useEffect(() => {
-    async function load() {
-      const [tickets, machines, techniciens] = await Promise.all([
-        supabase.from('tickets').select('statut, priorite'),
-        supabase.from('machines').select('id').eq('statut', 'actif'),
-        supabase.from('technicians').select('id'),
-      ]);
-
-      const t = tickets.data || [];
-      setStats({
-        total:       t.length,
-        ouverts:     t.filter(x => x.statut === 'ouvert').length,
-        en_cours:    t.filter(x => x.statut === 'en_cours').length,
-        fermes:      t.filter(x => x.statut === 'ferme').length,
-        urgents:     t.filter(x => x.priorite === 'urgente').length,
-        machines:    machines.data?.length || 0,
-        techniciens: techniciens.data?.length || 0,
-      });
-
-      const { data: r } = await supabase
-        .from('tickets')
-        .select('id, titre, priorite, statut, created_at, machines(nom)')
-        .order('created_at', { ascending: false })
-        .limit(8);
-      setRecents((r as unknown as TicketRecent[]) || []);
-      setLoading(false);
-    }
     load();
+    const interval = setInterval(load, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   function formatDate(iso: string) {
@@ -102,10 +107,20 @@ export default function ManagerDashboard() {
   return (
     <div style={{ padding: '28px 32px' }}>
       {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Tableau de bord</h1>
-        <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-          {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+      <div style={{ marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Tableau de bord</h1>
+          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+            {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+            Mis à jour à {lastRefresh.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+          </span>
+          <button onClick={load} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Activity size={13} /> Rafraîchir
+          </button>
         </div>
       </div>
 
