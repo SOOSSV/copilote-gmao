@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Lock, Eye, EyeOff, Bot } from 'lucide-react';
+import { Lock, Eye, EyeOff, Bot, ArrowLeft } from 'lucide-react';
 
 const MANAGER_PASSWORD = process.env.NEXT_PUBLIC_MANAGER_PASSWORD || 'copilote2024';
 
@@ -38,6 +38,11 @@ export default function ManagerLoginPage() {
         border: '1px solid var(--border)',
         borderRadius: 20, padding: '36px 32px',
       }}>
+        {/* Retour */}
+        <button onClick={() => router.push('/')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: 13, cursor: 'pointer', padding: '0 0 20px', marginLeft: -4 }}>
+          <ArrowLeft size={15} /> Accueil
+        </button>
+
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{

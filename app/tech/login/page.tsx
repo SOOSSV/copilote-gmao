@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { HardHat, ArrowRight } from 'lucide-react';
+import { HardHat, ArrowRight, ArrowLeft } from 'lucide-react';
 
 export default function TechLoginPage() {
   const router = useRouter();
@@ -26,6 +26,11 @@ export default function TechLoginPage() {
         border: '1px solid var(--border)',
         borderRadius: 20, padding: '36px 32px',
       }}>
+        {/* Retour */}
+        <button onClick={() => router.push('/')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: 13, cursor: 'pointer', padding: '0 0 20px', marginLeft: -4 }}>
+          <ArrowLeft size={15} /> Accueil
+        </button>
+
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{
