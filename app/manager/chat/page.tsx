@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2, Trash2, Plus, Clock, X, MessageCircle } from 'lucide-react';
+import { Send, Bot, User, Loader2, Trash2, Plus, Clock, X, MessageCircle, ArrowLeft } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import { useRouter } from 'next/navigation';
 
 type Message = {
   id: string;
@@ -55,6 +56,7 @@ function formatDate(iso: string) {
 }
 
 export default function ChatPage() {
+  const router = useRouter();
   const [sessions, setSessions] = useState<Session[]>(() => {
     const s = loadSessions();
     return s.length > 0 ? s : [createNewSession()];
@@ -137,6 +139,9 @@ export default function ChatPage() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg-primary)' }}>
       {/* Header */}
       <div style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+        <button onClick={() => router.push('/manager')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          <ArrowLeft size={20} />
+        </button>
         <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <Bot size={18} color="white" />
         </div>
