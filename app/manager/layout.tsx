@@ -18,7 +18,6 @@ const navTerrain = [
   { href: '/manager/nouveau', icon: PlusCircle,    label: 'Nouveau' },
 ];
 
-const allNav = [...navManager, ...navTerrain];
 
 export default function ManagerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -46,21 +45,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
-      <style>{`
-        @media (max-width: 768px) {
-          .mgr-sidebar { display: none !important; }
-          .mgr-main { margin-left: 0 !important; padding-bottom: 72px !important; }
-          .mgr-bottom-nav { display: flex !important; position: fixed; bottom: 0; left: 0; right: 0;
-            background: var(--bg-secondary); border-top: 1px solid var(--border); z-index: 200; padding: 6px 0; }
-        }
-        @media (min-width: 769px) {
-          .mgr-sidebar { display: flex !important; }
-          .mgr-bottom-nav { display: none !important; }
-          .mgr-main { margin-left: 220px !important; }
-        }
-      `}</style>
-
-      {/* Sidebar — visible desktop, masquée mobile via CSS */}
+      {/* Sidebar — visible desktop ≥1025px, masquée mobile/tablette via CSS */}
       <aside className="mgr-sidebar">
         <div style={{ padding: '0 20px 24px', borderBottom: '1px solid var(--border)' }}>
           <div style={{ fontSize: 18, fontWeight: 800, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>COPILOTE</div>
@@ -117,30 +102,6 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
         {children}
       </main>
 
-      {/* Bottom nav — visible mobile, masquée desktop via CSS */}
-      <nav className="mgr-bottom-nav">
-        {allNav.map(({ href, icon: Icon, label }) => {
-          const active = isActive(href);
-          return (
-            <Link key={href} href={href} style={{
-              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-              gap: 3, padding: '6px 4px',
-              color: active ? 'var(--accent)' : 'var(--text-secondary)',
-              textDecoration: 'none', fontSize: 10, fontWeight: active ? 700 : 400,
-            }}>
-              <Icon size={20} />
-              {label}
-            </Link>
-          );
-        })}
-        <button onClick={handleLogout} style={{
-          flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          gap: 3, padding: '6px 4px', background: 'none', border: 'none', cursor: 'pointer',
-          color: 'var(--danger)', fontSize: 10,
-        }}>
-          <LogOut size={20} /> Sortir
-        </button>
-      </nav>
     </div>
   );
 }
