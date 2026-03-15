@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+html, body { overflow-x: hidden; max-width: 100vw; }
+
 :root {
   --bg-primary: #0f1117;
   --bg-secondary: #1a1d27;
