@@ -54,7 +54,12 @@ body {
 .mgr-table-wrap { overflow-x: auto; }
 .mgr-header { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-start; }
 
+.tickets-mobile { display: none; }
+.tickets-desktop { display: block; }
+
 @media (max-width: 1024px) {
+  .tickets-mobile { display: block; }
+  .tickets-desktop { display: none; }
   .mgr-sidebar { display: none; }
   .mgr-main { margin-left: 0; padding-bottom: 0; }
   .mgr-bottom-nav { display: none; }
