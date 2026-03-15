@@ -99,13 +99,13 @@ export default function ManagerTicketsPage() {
           {/* Vue mobile : cartes */}
           <div className="tickets-mobile">
             {filtered.map(t => (
-              <div key={t.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 12px', marginBottom: 8 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titre}</div>
-                <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 8, alignItems: 'center' }}>
-                  <span style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{(t.machines as { nom: string } | null)?.nom || '—'}</span>
-                  <span style={{ fontSize: 10, color: 'var(--text-secondary)' }}>· {(t.technicians as { prenom: string } | null)?.prenom || '—'}</span>
+              <div key={t.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', marginBottom: 6 }}>
+                <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titre}</div>
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 6, alignItems: 'center' }}>
+                  <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{(t.machines as { nom: string } | null)?.nom || '—'}</span>
+                  <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>· {(t.technicians as { prenom: string } | null)?.prenom || '—'}</span>
                   <PrioriteBadge priorite={t.priorite} />
-                  <span style={{ background: `${statutColor[t.statut]}22`, color: statutColor[t.statut], borderRadius: 5, padding: '1px 6px', fontSize: 9, fontWeight: 600 }}>
+                  <span style={{ background: `${statutColor[t.statut]}22`, color: statutColor[t.statut], borderRadius: 4, padding: '1px 5px', fontSize: 9, fontWeight: 600 }}>
                     {statutLabel(t.statut)}
                   </span>
                   <span style={{ fontSize: 9, color: 'var(--text-secondary)', marginLeft: 'auto' }}>{formatDate(t.created_at)}</span>
@@ -113,7 +113,7 @@ export default function ManagerTicketsPage() {
                 <select
                   value={t.statut}
                   onChange={e => updateStatut(t.id, e.target.value)}
-                  style={{ width: '100%', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 8px', color: 'var(--text-primary)', fontSize: 12, cursor: 'pointer' }}
+                  style={{ width: '100%', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 6, padding: '5px 8px', color: 'var(--text-primary)', fontSize: 11, cursor: 'pointer' }}
                 >
                   <option value="ouvert">Ouvert</option>
                   <option value="en_cours">En cours</option>
