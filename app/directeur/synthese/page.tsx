@@ -3,18 +3,21 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { AlertTriangle, TrendingUp, CheckCircle2, Clock, Zap, ArrowLeft } from 'lucide-react';
+import { AlertTriangle, TrendingUp, CheckCircle2, Clock, Zap, ArrowLeft, Activity, Wrench } from 'lucide-react';
 
 type Stats = {
   total: number; ouverts: number; en_cours: number; fermes: number;
   urgents: number; machines: number; techniciens: number;
 };
 
-function KpiMini({ label, value, color, sub }: { label: string; value: string | number; color: string; sub?: string }) {
+function KpiMini({ label, value, color, sub, icon: Icon }: { label: string; value: string | number; color: string; sub?: string; icon: React.ElementType }) {
   return (
-    <div style={{ background: 'var(--bg-card)', border: `1px solid ${color}33`, borderRadius: 14, padding: '18px 16px' }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>{label}</div>
-      <div style={{ fontSize: 32, fontWeight: 900, color }}>{value}</div>
+    <div style={{ background: 'var(--bg-card)', border: `1px solid ${color}33`, borderRadius: 14, padding: '16px' }}>
+      <div style={{ width: 34, height: 34, borderRadius: 9, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+        <Icon size={17} color={color} />
+      </div>
+      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 30, fontWeight: 900, color }}>{value}</div>
       {sub && <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>{sub}</div>}
     </div>
   );
@@ -70,12 +73,12 @@ export default function SynthesePage() {
 
       {loading ? <div style={{ color: 'var(--text-secondary)', padding: 20 }}>Chargement...</div> : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
-          <KpiMini label="Taux résolution" value={`${tauxResolution}%`} color="#22c55e" sub={`${stats.fermes}/${stats.total} tickets`} />
-          <KpiMini label="Charge" value={`${charge}%`} color="#6366f1" sub={`${stats.ouverts} ouverts`} />
-          <KpiMini label="Urgents" value={stats.urgents} color="#ef4444" />
-          <KpiMini label="En cours" value={stats.en_cours} color="#f59e0b" />
-          <KpiMini label="Machines" value={stats.machines} color="#0ea5e9" />
-          <KpiMini label="Techniciens" value={stats.techniciens} color="#8b5cf6" />
+          <KpiMini label="Taux résolution" value={`${tauxResolution}%`} color="#22c55e" sub={`${stats.fermes}/${stats.total}`} icon={TrendingUp} />
+          <KpiMini label="Charge" value={`${charge}%`} color="#6366f1" sub={`${stats.ouverts} ouverts`} icon={Zap} />
+          <KpiMini label="Urgents" value={stats.urgents} color="#ef4444" icon={AlertTriangle} />
+          <KpiMini label="En cours" value={stats.en_cours} color="#f59e0b" icon={Activity} />
+          <KpiMini label="Machines" value={stats.machines} color="#0ea5e9" icon={Wrench} />
+          <KpiMini label="Techniciens" value={stats.techniciens} color="#8b5cf6" icon={CheckCircle2} />
         </div>
       )}
     </div>

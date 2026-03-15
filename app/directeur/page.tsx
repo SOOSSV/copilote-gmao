@@ -28,10 +28,13 @@ function KpiCard({ label, value, sub, icon: Icon, color, big }: {
   );
 }
 
-function KpiMini({ label, value, color }: { label: string; value: string | number; color: string }) {
+function KpiMini({ label, value, color, icon: Icon }: { label: string; value: string | number; color: string; icon: React.ElementType }) {
   return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 12px', textAlign: 'center' }}>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+    <div style={{ background: 'var(--bg-card)', border: `1px solid ${color}33`, borderRadius: 12, padding: '14px 12px' }}>
+      <div style={{ width: 32, height: 32, borderRadius: 8, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+        <Icon size={16} color={color} />
+      </div>
+      <div style={{ fontSize: 24, fontWeight: 800, color }}>{value}</div>
       <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{label}</div>
     </div>
   );
@@ -90,10 +93,10 @@ export default function DirecteurDashboard() {
 
           {/* KPI rapides */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 20 }}>
-            <KpiMini label="Taux résolution" value={`${tauxResolution}%`} color="#22c55e" />
-            <KpiMini label="Charge" value={`${charge}%`} color="#6366f1" />
-            <KpiMini label="Urgents" value={stats.urgents} color="#ef4444" />
-            <KpiMini label="Techniciens" value={stats.techniciens} color="#0ea5e9" />
+            <KpiMini label="Taux résolution" value={`${tauxResolution}%`} color="#22c55e" icon={TrendingUp} />
+            <KpiMini label="Charge" value={`${charge}%`} color="#6366f1" icon={Zap} />
+            <KpiMini label="Urgents" value={stats.urgents} color="#ef4444" icon={AlertTriangle} />
+            <KpiMini label="Techniciens" value={stats.techniciens} color="#0ea5e9" icon={Clock} />
           </div>
 
           {/* Cartes navigation */}
