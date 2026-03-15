@@ -59,9 +59,19 @@ body {
 .tickets-mobile { display: none; }
 .tickets-desktop { display: block; }
 
+/* Directeur responsive */
+.dir-sidebar { display: flex; flex-direction: column; width: 220px; background: var(--bg-secondary); border-right: 1px solid var(--border); padding: 24px 0; flex-shrink: 0; position: fixed; top: 0; bottom: 0; left: 0; overflow-y: auto; z-index: 100; }
+.dir-main { margin-left: 220px; flex: 1; min-height: 100vh; }
+.dir-mobile-home { display: none; }
+.dir-desktop-home { display: block; }
+
 @media (max-width: 1024px) {
   .tickets-mobile { display: block; }
   .tickets-desktop { display: none; }
+  .dir-sidebar { display: none; }
+  .dir-main { margin-left: 0; }
+  .dir-mobile-home { display: block; }
+  .dir-desktop-home { display: none; }
   .mgr-sidebar { display: none; }
   .mgr-main { margin-left: 0; padding-bottom: 0; }
   .mgr-bottom-nav { display: none; }

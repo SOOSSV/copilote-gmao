@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { BarChart3, Brain, ChevronDown, ChevronUp } from 'lucide-react';
+import { BarChart3, Brain, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type Analyse = {
   id: string;
@@ -21,6 +22,7 @@ const typeConfig: Record<string, { label: string; color: string }> = {
 };
 
 export default function DirecteurRapportsPage() {
+  const router = useRouter();
   const [analyses, setAnalyses] = useState<Analyse[]>([]);
   const [loading, setLoading] = useState(true);
   const [ouvert, setOuvert] = useState<string | null>(null);
@@ -43,10 +45,13 @@ export default function DirecteurRapportsPage() {
   }
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 800 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
-        <BarChart3 size={22} color="#0ea5e9" />
-        <h1 style={{ fontSize: 22, fontWeight: 800 }}>Rapports IA</h1>
+    <div style={{ padding: '16px', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}>
+          <ArrowLeft size={22} />
+        </button>
+        <BarChart3 size={20} color="#0ea5e9" />
+        <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Rapports IA</h1>
       </div>
 
       {loading ? (
