@@ -105,9 +105,24 @@ export default function ManagerDashboard() {
   const tauxResolution = stats.total > 0 ? Math.round((stats.fermes / stats.total) * 100) : 0;
 
   return (
-    <div style={{ padding: '28px 32px' }}>
+    <div className="mgr-dashboard">
+      <style>{`
+        .mgr-dashboard { padding: 28px 32px; }
+        .mgr-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+        .mgr-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 28px; }
+        .mgr-table-wrap { overflow-x: auto; }
+        .mgr-header { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-start; }
+        @media (max-width: 768px) {
+          .mgr-dashboard { padding: 16px; }
+          .mgr-grid-4 { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+          .mgr-grid-2 { gap: 10px; margin-bottom: 16px; }
+          .mgr-header { flex-direction: column; gap: 10px; }
+          .mgr-header h1 { font-size: 18px !important; }
+          .mgr-refresh-info { display: none; }
+        }
+      `}</style>
       {/* Header */}
-      <div style={{ marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="mgr-header">
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Tableau de bord</h1>
           <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
@@ -115,7 +130,7 @@ export default function ManagerDashboard() {
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+          <span className="mgr-refresh-info" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
             Mis à jour à {lastRefresh.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
           </span>
           <button onClick={load} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -129,14 +144,14 @@ export default function ManagerDashboard() {
       ) : (
         <>
           {/* Stats grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 28 }}>
+          <div className="mgr-grid-4">
             <StatCard label="Tickets ouverts"  value={stats.ouverts}  icon={Clock}         color="#6366f1" />
             <StatCard label="En cours"         value={stats.en_cours} icon={Activity}      color="#f59e0b" />
             <StatCard label="Urgents"          value={stats.urgents}  icon={AlertTriangle} color="#ef4444" />
             <StatCard label="Taux résolution"  value={`${tauxResolution}%`} icon={TrendingUp} color="#22c55e" sub={`${stats.fermes} / ${stats.total} tickets`} />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 28 }}>
+          <div className="mgr-grid-2">
             <StatCard label="Machines actives"  value={stats.machines}    icon={Wrench}       color="#8b5cf6" />
             <StatCard label="Techniciens"        value={stats.techniciens} icon={CheckCircle}  color="#06b6d4" />
           </div>
@@ -146,7 +161,8 @@ export default function ManagerDashboard() {
             <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 700, fontSize: 14 }}>
               Tickets récents
             </div>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div className="mgr-table-wrap">
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
                   {['Titre', 'Machine', 'Priorité', 'Statut', 'Date'].map(h => (
@@ -179,6 +195,7 @@ export default function ManagerDashboard() {
                 ))}
               </tbody>
             </table>
+          </div>
           </div>
         </>
       )}
