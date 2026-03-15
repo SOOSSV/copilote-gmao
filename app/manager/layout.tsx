@@ -66,43 +66,6 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
 
   return (
     <>
-      <style>{`
-        .mgr-sidebar {
-          display: flex;
-          width: 220px;
-          background: var(--bg-secondary);
-          border-right: 1px solid var(--border);
-          flex-direction: column;
-          padding: 24px 0;
-          flex-shrink: 0;
-          position: fixed;
-          top: 0; bottom: 0; left: 0;
-          overflow-y: auto;
-          z-index: 100;
-        }
-        .mgr-main {
-          margin-left: 220px;
-          flex: 1;
-          min-height: 100vh;
-        }
-        .mgr-bottom-nav {
-          display: none;
-        }
-        @media (max-width: 768px) {
-          .mgr-sidebar { display: none !important; }
-          .mgr-main { margin-left: 0 !important; padding-bottom: 72px; }
-          .mgr-bottom-nav {
-            display: flex;
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
-            z-index: 200;
-            padding: 6px 0 env(safe-area-inset-bottom, 6px);
-          }
-        }
-      `}</style>
-
       <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
         {/* Sidebar desktop */}
         <aside className="mgr-sidebar">

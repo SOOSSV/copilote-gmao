@@ -106,21 +106,6 @@ export default function ManagerDashboard() {
 
   return (
     <div className="mgr-dashboard">
-      <style>{`
-        .mgr-dashboard { padding: 28px 32px; }
-        .mgr-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
-        .mgr-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 28px; }
-        .mgr-table-wrap { overflow-x: auto; }
-        .mgr-header { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-start; }
-        @media (max-width: 768px) {
-          .mgr-dashboard { padding: 16px; }
-          .mgr-grid-4 { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-          .mgr-grid-2 { gap: 10px; margin-bottom: 16px; }
-          .mgr-header { flex-direction: column; gap: 10px; }
-          .mgr-header h1 { font-size: 18px !important; }
-          .mgr-refresh-info { display: none; }
-        }
-      `}</style>
       {/* Header */}
       <div className="mgr-header">
         <div>
