@@ -14,7 +14,7 @@ export type Ticket = {
   type_intervention: 'corrective' | 'preventive';
   priorite: 'basse' | 'normale' | 'haute' | 'urgente';
   classification: string;
-  statut: 'ouvert' | 'en_cours' | 'ferme';
+  statut: 'ouvert' | 'en_cours' | 'resolu' | 'ferme';
   source: string;
   created_at: string;
   machines?: { nom: string };
