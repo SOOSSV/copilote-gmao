@@ -53,7 +53,7 @@ export default function ManagerTicketsPage() {
   const filtreLabel = (f: string) => f === 'en_cours' ? 'En Cours' : f === 'resolu' ? 'Résolu' : f.charAt(0).toUpperCase() + f.slice(1);
 
   return (
-    <div style={{ padding: '14px 10px', maxWidth: '100%', boxSizing: 'border-box' }}>
+    <div style={{ padding: '10px 6px', maxWidth: '100%', boxSizing: 'border-box' }}>
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -99,21 +99,18 @@ export default function ManagerTicketsPage() {
           {/* Vue mobile : cartes */}
           <div className="tickets-mobile">
             {filtered.map(t => (
-              <div key={t.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', marginBottom: 6 }}>
-                <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titre}</div>
-                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 6, alignItems: 'center' }}>
-                  <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{(t.machines as { nom: string } | null)?.nom || '—'}</span>
-                  <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>· {(t.technicians as { prenom: string } | null)?.prenom || '—'}</span>
+              <div key={t.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 7, padding: '6px 8px', marginBottom: 5 }}>
+                <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titre}</div>
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 5, alignItems: 'center' }}>
+                  <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{(t.machines as { nom: string } | null)?.nom || '—'} · {(t.technicians as { prenom: string } | null)?.prenom || '—'}</span>
                   <PrioriteBadge priorite={t.priorite} />
-                  <span style={{ background: `${statutColor[t.statut]}22`, color: statutColor[t.statut], borderRadius: 4, padding: '1px 5px', fontSize: 9, fontWeight: 600 }}>
-                    {statutLabel(t.statut)}
-                  </span>
+                  <span style={{ background: `${statutColor[t.statut]}22`, color: statutColor[t.statut], borderRadius: 4, padding: '1px 5px', fontSize: 9, fontWeight: 600 }}>{statutLabel(t.statut)}</span>
                   <span style={{ fontSize: 9, color: 'var(--text-secondary)', marginLeft: 'auto' }}>{formatDate(t.created_at)}</span>
                 </div>
                 <select
                   value={t.statut}
                   onChange={e => updateStatut(t.id, e.target.value)}
-                  style={{ width: '100%', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 6, padding: '5px 8px', color: 'var(--text-primary)', fontSize: 11, cursor: 'pointer' }}
+                  style={{ width: '100%', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 5, padding: '4px 6px', color: 'var(--text-primary)', fontSize: 11, cursor: 'pointer' }}
                 >
                   <option value="ouvert">Ouvert</option>
                   <option value="en_cours">En cours</option>
