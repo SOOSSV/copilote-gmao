@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { AlertTriangle, TrendingUp, CheckCircle2, Clock, Zap, ArrowLeft, Activity, Wrench } from 'lucide-react';
+import { AlertTriangle, TrendingUp, CheckCircle2, ArrowLeft, Target, Battery, ShieldAlert, Users, Wrench, Cpu } from 'lucide-react';
 
 type Stats = {
   total: number; ouverts: number; en_cours: number; fermes: number;
@@ -73,12 +73,12 @@ export default function SynthesePage() {
 
       {loading ? <div style={{ color: 'var(--text-secondary)', padding: 20 }}>Chargement...</div> : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
-          <KpiMini label="Taux résolution" value={`${tauxResolution}%`} color="#22c55e" sub={`${stats.fermes}/${stats.total}`} icon={TrendingUp} />
-          <KpiMini label="Charge" value={`${charge}%`} color="#6366f1" sub={`${stats.ouverts} ouverts`} icon={Zap} />
-          <KpiMini label="Urgents" value={stats.urgents} color="#ef4444" icon={AlertTriangle} />
-          <KpiMini label="En cours" value={stats.en_cours} color="#f59e0b" icon={Activity} />
-          <KpiMini label="Machines" value={stats.machines} color="#0ea5e9" icon={Wrench} />
-          <KpiMini label="Techniciens" value={stats.techniciens} color="#8b5cf6" icon={CheckCircle2} />
+          <KpiMini label="Taux résolution" value={`${tauxResolution}%`} color="#22c55e" sub={`${stats.fermes}/${stats.total}`} icon={Target} />
+          <KpiMini label="Charge" value={`${charge}%`} color="#6366f1" sub={`${stats.ouverts} ouverts`} icon={Battery} />
+          <KpiMini label="Urgents" value={stats.urgents} color="#ef4444" icon={ShieldAlert} />
+          <KpiMini label="En cours" value={stats.en_cours} color="#f59e0b" icon={Wrench} />
+          <KpiMini label="Machines" value={stats.machines} color="#0ea5e9" icon={Cpu} />
+          <KpiMini label="Techniciens" value={stats.techniciens} color="#8b5cf6" icon={Users} />
         </div>
       )}
     </div>

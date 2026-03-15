@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { AlertTriangle, TrendingUp, CheckCircle2, Clock, Zap, BarChart3, LogOut } from 'lucide-react';
+import { AlertTriangle, TrendingUp, CheckCircle2, Clock, Zap, BarChart3, LogOut, Target, Battery, ShieldAlert, Users } from 'lucide-react';
 
 type Stats = {
   total: number; ouverts: number; en_cours: number; fermes: number;
@@ -93,10 +93,10 @@ export default function DirecteurDashboard() {
 
           {/* KPI rapides */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 20 }}>
-            <KpiMini label="Taux résolution" value={`${tauxResolution}%`} color="#22c55e" icon={TrendingUp} />
-            <KpiMini label="Charge" value={`${charge}%`} color="#6366f1" icon={Zap} />
-            <KpiMini label="Urgents" value={stats.urgents} color="#ef4444" icon={AlertTriangle} />
-            <KpiMini label="Techniciens" value={stats.techniciens} color="#0ea5e9" icon={Clock} />
+            <KpiMini label="Taux résolution" value={`${tauxResolution}%`} color="#22c55e" icon={Target} />
+            <KpiMini label="Charge" value={`${charge}%`} color="#6366f1" icon={Battery} />
+            <KpiMini label="Urgents" value={stats.urgents} color="#ef4444" icon={ShieldAlert} />
+            <KpiMini label="Techniciens" value={stats.techniciens} color="#0ea5e9" icon={Users} />
           </div>
 
           {/* Cartes navigation */}
