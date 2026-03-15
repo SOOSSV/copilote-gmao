@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BottomNav from '@/components/BottomNav';
-import { User, Info, LogOut } from 'lucide-react';
+import { User, Info, LogOut, ArrowLeft } from 'lucide-react';
 
 const rowStyle = {
   display: 'flex',
@@ -39,6 +39,9 @@ export default function ProfilPage() {
         padding: '16px 20px',
         display: 'flex', alignItems: 'center', gap: 10,
       }}>
+        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center', marginRight: 4 }}>
+          <ArrowLeft size={20} />
+        </button>
         <User size={20} color="var(--accent)" />
         <span style={{ fontWeight: 700, fontSize: 16 }}>Profil</span>
       </div>
