@@ -63,6 +63,14 @@ export default function ManagerDashboard() {
   const [recents, setRecents] = useState<TicketRecent[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    function check() { setIsMobile(window.innerWidth <= 768); }
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   async function load() {
     const [tickets, machines, techniciens] = await Promise.all([
@@ -105,9 +113,9 @@ export default function ManagerDashboard() {
   const tauxResolution = stats.total > 0 ? Math.round((stats.fermes / stats.total) * 100) : 0;
 
   return (
-    <div className="mgr-dashboard">
+    <div style={{ padding: isMobile ? '16px' : '28px 32px' }}>
       {/* Header */}
-      <div className="mgr-header">
+      <div style={{ marginBottom: 28, display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'flex-start', gap: isMobile ? 10 : 0 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Tableau de bord</h1>
           <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
@@ -129,14 +137,14 @@ export default function ManagerDashboard() {
       ) : (
         <>
           {/* Stats grid */}
-          <div className="mgr-grid-4">
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 10 : 16, marginBottom: isMobile ? 16 : 28 }}>
             <StatCard label="Tickets ouverts"  value={stats.ouverts}  icon={Clock}         color="#6366f1" />
             <StatCard label="En cours"         value={stats.en_cours} icon={Activity}      color="#f59e0b" />
             <StatCard label="Urgents"          value={stats.urgents}  icon={AlertTriangle} color="#ef4444" />
             <StatCard label="Taux résolution"  value={`${tauxResolution}%`} icon={TrendingUp} color="#22c55e" sub={`${stats.fermes} / ${stats.total} tickets`} />
           </div>
 
-          <div className="mgr-grid-2">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: isMobile ? 10 : 16, marginBottom: isMobile ? 16 : 28 }}>
             <StatCard label="Machines actives"  value={stats.machines}    icon={Wrench}       color="#8b5cf6" />
             <StatCard label="Techniciens"        value={stats.techniciens} icon={CheckCircle}  color="#06b6d4" />
           </div>

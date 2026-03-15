@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { LayoutDashboard, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut } from 'lucide-react';
 
 const navManager = [
@@ -23,16 +23,22 @@ const allNav = [...navManager, ...navTerrain];
 export default function ManagerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [isMobile, setIsMobile] = useState(false);
 
   const isLoginPage = pathname === '/manager/login';
+
+  useEffect(() => {
+    function check() { setIsMobile(window.innerWidth <= 768); }
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   useEffect(() => {
     if (isLoginPage) return;
     if (typeof window !== 'undefined') {
       const auth = sessionStorage.getItem('manager_auth');
-      if (auth !== 'true') {
-        router.replace('/manager/login');
-      }
+      if (auth !== 'true') router.replace('/manager/login');
     }
   }, [isLoginPage, router]);
 
@@ -65,76 +71,64 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
   }
 
   return (
-    <>
-      <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
-        {/* Sidebar desktop */}
-        <aside className="mgr-sidebar">
-          {/* Logo */}
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
+
+      {/* Sidebar — desktop uniquement */}
+      {!isMobile && (
+        <aside style={{
+          width: 220, background: 'var(--bg-secondary)', borderRight: '1px solid var(--border)',
+          display: 'flex', flexDirection: 'column', padding: '24px 0', flexShrink: 0,
+          position: 'fixed', top: 0, bottom: 0, left: 0, overflowY: 'auto', zIndex: 100,
+        }}>
           <div style={{ padding: '0 20px 24px', borderBottom: '1px solid var(--border)' }}>
-            <div style={{
-              fontSize: 18, fontWeight: 800,
-              background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            }}>COPILOTE</div>
+            <div style={{ fontSize: 18, fontWeight: 800, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>COPILOTE</div>
             <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Espace Manager</div>
           </div>
 
-          {/* Nav Manager */}
           <nav style={{ padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', padding: '4px 12px 8px' }}>
-              Supervision
-            </div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', padding: '4px 12px 8px' }}>Supervision</div>
             {navManager.map(item => <NavLink key={item.href} {...item} />)}
           </nav>
 
           <div style={{ borderTop: '1px solid var(--border)', margin: '0 12px' }} />
 
           <nav style={{ padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', padding: '4px 12px 8px' }}>
-              Mode Terrain
-            </div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', padding: '4px 12px 8px' }}>Mode Terrain</div>
             {navTerrain.map(item => <NavLink key={item.href} {...item} />)}
           </nav>
 
           <div style={{ padding: '16px 12px', borderTop: '1px solid var(--border)' }}>
-            <button
-              onClick={handleLogout}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                width: '100%', padding: '10px 12px', borderRadius: 10,
-                background: 'transparent', border: 'none',
-                color: 'var(--text-secondary)', fontSize: 14, cursor: 'pointer',
-                transition: 'all 0.15s',
-              }}
+            <button onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 12px', borderRadius: 10, background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: 14, cursor: 'pointer' }}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.1)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--danger)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'; }}
             >
-              <LogOut size={18} />
-              Déconnexion
+              <LogOut size={18} /> Déconnexion
             </button>
-            <div style={{ fontSize: 11, color: 'var(--text-secondary)', padding: '8px 12px 0' }}>
-              COPILOTE v1.0
-            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)', padding: '8px 12px 0' }}>COPILOTE v1.0</div>
           </div>
         </aside>
+      )}
 
-        {/* Main */}
-        <main className="mgr-main">
-          {children}
-        </main>
+      {/* Main */}
+      <main style={{ marginLeft: isMobile ? 0 : 220, flex: 1, minHeight: '100vh', paddingBottom: isMobile ? 72 : 0 }}>
+        {children}
+      </main>
 
-        {/* Bottom nav mobile */}
-        <nav className="mgr-bottom-nav">
+      {/* Bottom nav — mobile uniquement */}
+      {isMobile && (
+        <nav style={{
+          position: 'fixed', bottom: 0, left: 0, right: 0,
+          background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)',
+          display: 'flex', zIndex: 200, padding: '6px 0',
+        }}>
           {allNav.map(({ href, icon: Icon, label }) => {
             const active = isActive(href);
             return (
               <Link key={href} href={href} style={{
-                flex: 1,
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                 gap: 3, padding: '6px 4px',
                 color: active ? 'var(--accent)' : 'var(--text-secondary)',
                 textDecoration: 'none', fontSize: 10, fontWeight: active ? 700 : 400,
-                transition: 'color 0.15s',
               }}>
                 <Icon size={20} />
                 {label}
@@ -142,17 +136,14 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
             );
           })}
           <button onClick={handleLogout} style={{
-            flex: 1,
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            gap: 3, padding: '6px 4px',
-            background: 'none', border: 'none', cursor: 'pointer',
+            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            gap: 3, padding: '6px 4px', background: 'none', border: 'none', cursor: 'pointer',
             color: 'var(--danger)', fontSize: 10,
           }}>
-            <LogOut size={20} />
-            Sortir
+            <LogOut size={20} /> Sortir
           </button>
         </nav>
-      </div>
-    </>
+      )}
+    </div>
   );
 }
