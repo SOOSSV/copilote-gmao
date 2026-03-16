@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2, Trash2, Plus, Clock, X, MessageCircle } from 'lucide-react';
+import { Send, Bot, User, Loader2, Trash2, Plus, Clock, X, MessageCircle, ArrowLeft } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import { useRouter } from 'next/navigation';
 
 type Message = {
   id: string;
@@ -61,6 +62,7 @@ function formatDate(iso: string) {
 }
 
 export default function ChatPage() {
+  const router = useRouter();
   const [sessions, setSessions] = useState<Session[]>(() => {
     const s = loadSessions();
     return s.length > 0 ? s : [createNewSession()];
@@ -160,6 +162,9 @@ export default function ChatPage() {
             {current?.title || 'Nouvelle conversation'}
           </div>
         </div>
+        <button onClick={() => router.back()} title="Retour" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 6 }}>
+          <ArrowLeft size={18} />
+        </button>
         <button onClick={() => setShowHistory(true)} title="Historique" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 6 }}>
           <Clock size={18} />
         </button>
