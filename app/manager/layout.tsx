@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { LayoutDashboard, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut, Package, CalendarClock } from 'lucide-react';
 import PushNotifSetup from '@/components/PushNotifSetup';
+import { supabase } from '@/lib/supabase';
 
 const navManager = [
   { href: '/manager',             icon: LayoutDashboard, label: 'Dashboard' },
@@ -26,6 +27,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const router = useRouter();
   const isLoginPage = pathname === '/manager/login';
+  const [stockAlertes, setStockAlertes] = useState(0);
 
   useEffect(() => {
     if (isLoginPage) return;
@@ -34,6 +36,14 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
       if (auth !== 'true') router.replace('/manager/login');
     }
   }, [isLoginPage, router]);
+
+  useEffect(() => {
+    if (isLoginPage) return;
+    supabase.from('stocks').select('quantite_actuelle, seuil_minimum').eq('actif', true)
+      .then(({ data }) => {
+        setStockAlertes((data || []).filter(s => s.quantite_actuelle <= s.seuil_minimum).length);
+      });
+  }, [isLoginPage]);
 
   if (isLoginPage) return <>{children}</>;
 
@@ -59,6 +69,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
           <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', padding: '4px 12px 8px' }}>Supervision</div>
           {navManager.map(({ href, icon: Icon, label }) => {
             const active = isActive(href);
+            const badge = href === '/manager/stocks' && stockAlertes > 0 ? stockAlertes : 0;
             return (
               <Link key={href} href={href} style={{
                 display: 'flex', alignItems: 'center', gap: 10,
@@ -66,7 +77,10 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
                 background: active ? 'rgba(99,102,241,0.15)' : 'transparent',
                 color: active ? 'var(--accent)' : 'var(--text-secondary)',
                 textDecoration: 'none', fontSize: 14, fontWeight: active ? 600 : 400,
-              }}><Icon size={18} />{label}</Link>
+              }}>
+                <Icon size={18} />{label}
+                {badge > 0 && <span style={{ marginLeft: 'auto', background: '#ef4444', color: '#fff', borderRadius: 10, padding: '1px 6px', fontSize: 10, fontWeight: 700 }}>{badge}</span>}
+              </Link>
             );
           })}
         </nav>

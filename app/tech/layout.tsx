@@ -1,14 +1,16 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { LayoutDashboard, ClipboardList, MessageCircle, LogOut } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function TechLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const isLogin = pathname === '/tech/login';
+  const [ticketActifs, setTicketActifs] = useState(0);
 
   useEffect(() => {
     if (isLogin) return;
@@ -16,6 +18,16 @@ export default function TechLayout({ children }: { children: React.ReactNode }) 
       router.replace('/tech/login');
     }
   }, [isLogin, router]);
+
+  useEffect(() => {
+    if (isLogin) return;
+    const id = typeof window !== 'undefined' ? localStorage.getItem('tech_id') : null;
+    if (!id) return;
+    supabase.from('tickets').select('*', { count: 'exact', head: true })
+      .eq('technicien_id', id)
+      .in('statut', ['ouvert', 'en_cours'])
+      .then(({ count }) => setTicketActifs(count || 0));
+  }, [isLogin]);
 
   if (isLogin) return <>{children}</>;
 
@@ -53,9 +65,15 @@ export default function TechLayout({ children }: { children: React.ReactNode }) 
       <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--bg-card)', borderTop: '1px solid var(--border)', display: 'flex', zIndex: 100 }}>
         {nav.map(({ href, icon: Icon, label }) => {
           const active = pathname === href || (href !== '/tech' && pathname.startsWith(href));
+          const badge = href === '/tech' && ticketActifs > 0 ? ticketActifs : 0;
           return (
-            <Link key={href} href={href} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '10px 0 12px', textDecoration: 'none', color: active ? '#22c55e' : 'var(--text-secondary)' }}>
-              <Icon size={20} />
+            <Link key={href} href={href} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '10px 0 12px', textDecoration: 'none', color: active ? '#22c55e' : 'var(--text-secondary)', position: 'relative' }}>
+              <div style={{ position: 'relative', display: 'inline-flex' }}>
+                <Icon size={20} />
+                {badge > 0 && (
+                  <span style={{ position: 'absolute', top: -6, right: -8, background: '#ef4444', color: '#fff', borderRadius: 8, padding: '0 4px', fontSize: 9, fontWeight: 700, minWidth: 14, textAlign: 'center' }}>{badge}</span>
+                )}
+              </div>
               <span style={{ fontSize: 10, fontWeight: active ? 700 : 400 }}>{label}</span>
             </Link>
           );

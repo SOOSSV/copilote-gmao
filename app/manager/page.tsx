@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { AlertTriangle, CheckCircle, Clock, Wrench, TrendingUp, Activity, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut, Bell, Package } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, Wrench, TrendingUp, Activity, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut, Bell, Package, ShoppingCart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import PushNotifSetup from '@/components/PushNotifSetup';
 
 type Stats = {
   total: number; ouverts: number; en_cours: number; fermes: number;
-  urgents: number; machines: number; techniciens: number;
+  urgents: number; machines: number; techniciens: number; stockAlertes: number;
 };
 
 type TicketRecent = {
@@ -43,18 +43,20 @@ function StatCard({ label, value, icon: Icon, color, sub, href }: {
 
 export default function ManagerDashboard() {
   const router = useRouter();
-  const [stats, setStats] = useState<Stats>({ total: 0, ouverts: 0, en_cours: 0, fermes: 0, urgents: 0, machines: 0, techniciens: 0 });
+  const [stats, setStats] = useState<Stats>({ total: 0, ouverts: 0, en_cours: 0, fermes: 0, urgents: 0, machines: 0, techniciens: 0, stockAlertes: 0 });
   const [recents, setRecents] = useState<TicketRecent[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
   async function load() {
-    const [tickets, machines, techniciens] = await Promise.all([
+    const [tickets, machines, techniciens, stocks] = await Promise.all([
       supabase.from('tickets').select('statut, priorite'),
       supabase.from('machines').select('id').eq('statut', 'actif'),
       supabase.from('technicians').select('id'),
+      supabase.from('stocks').select('quantite_actuelle, seuil_minimum').eq('actif', true),
     ]);
     const t = tickets.data || [];
+    const stockAlertes = (stocks.data || []).filter(s => s.quantite_actuelle <= s.seuil_minimum).length;
     setStats({
       total: t.length, ouverts: t.filter(x => x.statut === 'ouvert').length,
       en_cours: t.filter(x => x.statut === 'en_cours').length,
@@ -62,6 +64,7 @@ export default function ManagerDashboard() {
       urgents: t.filter(x => x.priorite === 'urgente').length,
       machines: machines.data?.length || 0,
       techniciens: techniciens.data?.length || 0,
+      stockAlertes,
     });
     const { data: r } = await supabase.from('tickets')
       .select('id, titre, priorite, statut, created_at, machines(nom)')
@@ -112,9 +115,16 @@ export default function ManagerDashboard() {
 
           {/* Alertes urgentes */}
           {stats.urgents > 0 && (
-            <div style={{ background: '#ef444418', border: '1px solid #ef444433', borderRadius: 12, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ background: '#ef444418', border: '1px solid #ef444433', borderRadius: 12, padding: '12px 16px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
               <AlertTriangle size={18} color="#ef4444" />
               <span style={{ color: '#ef4444', fontWeight: 600, fontSize: 14 }}>{stats.urgents} ticket{stats.urgents > 1 ? 's' : ''} urgent{stats.urgents > 1 ? 's' : ''} en attente</span>
+            </div>
+          )}
+          {/* Alertes stocks */}
+          {stats.stockAlertes > 0 && (
+            <div style={{ background: '#f59e0b18', border: '1px solid #f59e0b33', borderRadius: 12, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <ShoppingCart size={18} color="#f59e0b" />
+              <span style={{ color: '#f59e0b', fontWeight: 600, fontSize: 14 }}>{stats.stockAlertes} pièce{stats.stockAlertes > 1 ? 's' : ''} en rupture de stock</span>
             </div>
           )}
 
@@ -187,6 +197,15 @@ export default function ManagerDashboard() {
           </div>
         </div>
 
+        {!loading && stats.stockAlertes > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 12, padding: '14px 18px', marginBottom: 20 }}>
+            <ShoppingCart size={20} color="#f59e0b" />
+            <div>
+              <span style={{ fontWeight: 700, color: '#f59e0b' }}>{stats.stockAlertes} pièce{stats.stockAlertes > 1 ? 's' : ''} en rupture</span>
+              <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}> — stock sous le seuil minimum</span>
+            </div>
+          </div>
+        )}
         {loading ? <div style={{ color: 'var(--text-secondary)' }}>Chargement...</div> : (
           <>
             <div className="mgr-grid-4">

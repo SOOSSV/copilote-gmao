@@ -47,8 +47,18 @@ export default function TechDashboard() {
 
   const actifs = tickets.filter(t => t.statut !== 'resolu' && t.statut !== 'clos');
   const resolus = tickets.filter(t => t.statut === 'resolu' || t.statut === 'clos');
-  const displayed = filter === 'actifs' ? actifs : resolus;
   const urgents = actifs.filter(t => t.priorite === 'urgente').length;
+
+  const prioriteOrder: Record<string, number> = { urgente: 0, haute: 1, normale: 2, basse: 3 };
+  const displayed = [...(filter === 'actifs' ? actifs : resolus)].sort((a, b) =>
+    (prioriteOrder[a.priorite] ?? 2) - (prioriteOrder[b.priorite] ?? 2)
+  );
+
+  async function demarrer(e: React.MouseEvent, id: string) {
+    e.preventDefault();
+    await supabase.from('tickets').update({ statut: 'en_cours' }).eq('id', id);
+    setTickets(prev => prev.map(t => t.id === id ? { ...t, statut: 'en_cours' } : t));
+  }
 
   return (
     <div style={{ padding: '16px' }}>
@@ -117,7 +127,14 @@ export default function TechDashboard() {
                     {t.statut === 'resolu' ? <CheckCircle size={13} color="#22c55e" /> : t.statut === 'en_cours' ? <Clock size={13} color="#f59e0b" /> : <AlertTriangle size={13} color="#6366f1" />}
                     <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{t.statut === 'en_cours' ? 'En cours' : t.statut === 'resolu' ? 'Résolu' : 'Ouvert'}</span>
                   </div>
-                  <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {t.statut === 'ouvert' && (
+                      <button onClick={e => demarrer(e, t.id)} style={{ background: '#f59e0b22', border: '1px solid #f59e0b44', borderRadius: 6, padding: '3px 10px', color: '#f59e0b', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                        ▶ Démarrer
+                      </button>
+                    )}
+                    <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}</span>
+                  </div>
                 </div>
               </Link>
             );
