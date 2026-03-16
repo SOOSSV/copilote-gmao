@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { supabase, Ticket } from '@/lib/supabase';
 import PrioriteBadge from '@/components/PrioriteBadge';
-import { Search, RefreshCw, ChevronRight } from 'lucide-react';
+import { Search, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 
 const statutColor: Record<string, string> = {
@@ -18,11 +17,16 @@ function statutLabel(s: string) {
 }
 
 export default function ManagerTicketsPage() {
-  const searchParams = useSearchParams();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [filtre, setFiltre] = useState(searchParams.get('filtre') || 'tous');
+  const [filtre, setFiltre] = useState('tous');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const f = params.get('filtre');
+    if (f) setFiltre(f);
+  }, []);
 
   async function fetchTickets() {
     setLoading(true);
