@@ -21,7 +21,8 @@ self.addEventListener('push', function(event) {
 
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  const url = event.notification.data?.url || '/manager/tickets';
+  const rawUrl = event.notification.data?.url || '/manager/tickets';
+  const url = rawUrl.startsWith('http') ? rawUrl : self.location.origin + rawUrl;
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
       for (const client of clientList) {
