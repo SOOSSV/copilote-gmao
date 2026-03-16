@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Factory, CheckCircle, XCircle, AlertCircle, Cpu } from 'lucide-react';
+import Link from 'next/link';
 
 type Machine = {
   id: string;
@@ -88,9 +89,10 @@ export default function MachinesPage() {
             const StatIcon = cfg.icon;
             const critColor = criticiteColor[m.criticite] || '#6366f1';
             return (
-              <div key={m.id} style={{
+              <Link key={m.id} href={`/manager/machines/${m.id}`} style={{
                 background: 'var(--bg-card)', border: '1px solid var(--border)',
                 borderTop: `3px solid ${critColor}`, borderRadius: 14, padding: '16px 18px',
+                display: 'block', textDecoration: 'none', color: 'inherit', cursor: 'pointer',
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -123,7 +125,7 @@ export default function MachinesPage() {
                     </span>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

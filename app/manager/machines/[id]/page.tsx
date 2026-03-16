@@ -1,0 +1,184 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { ArrowLeft, Wrench, MapPin, AlertTriangle, CheckCircle, Clock, Calendar, TrendingUp, Package } from 'lucide-react';
+
+type Machine = {
+  id: string; external_id: string; nom: string; type_equipement: string;
+  localisation: string; criticite: string; statut: string;
+};
+
+type Ticket = {
+  id: string; titre: string; priorite: string; statut: string;
+  type_intervention: string; created_at: string; resolu_le: string | null;
+  technicians: { prenom: string; nom: string } | null;
+};
+
+type HistEntry = {
+  id: string; type_action: string; description: string;
+  pieces_changees: { nom: string; quantite: number; unite: string }[] | null;
+  realise_le: string;
+  technicians: { prenom: string; nom: string } | null;
+};
+
+const prioriteColor: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e' };
+const criticiteColor: Record<string, string> = { critique: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e' };
+
+function daysBetween(a: string, b: string | null) {
+  if (!b) return null;
+  return Math.round((new Date(b).getTime() - new Date(a).getTime()) / (1000 * 60 * 60 * 24));
+}
+
+export default function MachineDetailPage() {
+  const router = useRouter();
+  const params = useParams();
+  const [machine, setMachine] = useState<Machine | null>(null);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [history, setHistory] = useState<HistEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<'pannes' | 'historique'>('pannes');
+
+  useEffect(() => {
+    async function load() {
+      const [{ data: m }, { data: t }, { data: h }] = await Promise.all([
+        supabase.from('machines').select('*').eq('id', params.id).single(),
+        supabase.from('tickets').select('id, titre, priorite, statut, type_intervention, created_at, resolu_le, technicians(prenom, nom)')
+          .eq('machine_id', params.id).order('created_at', { ascending: false }).limit(30),
+        supabase.from('maintenance_history').select('id, type_action, description, pieces_changees, realise_le, technicians(prenom, nom)')
+          .eq('machine_id', params.id).order('realise_le', { ascending: false }).limit(30),
+      ]);
+      setMachine(m as Machine);
+      setTickets((t as unknown as Ticket[]) || []);
+      setHistory((h as unknown as HistEntry[]) || []);
+      setLoading(false);
+    }
+    if (params.id) load();
+  }, [params.id]);
+
+  if (loading) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Chargement...</div>;
+  if (!machine) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Machine introuvable</div>;
+
+  const critColor = criticiteColor[machine.criticite] || '#6366f1';
+  const totalTickets = tickets.length;
+  const resolus = tickets.filter(t => t.statut === 'resolu').length;
+  const ouverts = tickets.filter(t => t.statut === 'ouvert' || t.statut === 'en_cours').length;
+  const urgents = tickets.filter(t => t.priorite === 'urgente').length;
+  const durees = tickets.filter(t => t.resolu_le).map(t => daysBetween(t.created_at, t.resolu_le)).filter(d => d !== null) as number[];
+  const mttr = durees.length > 0 ? Math.round(durees.reduce((a, b) => a + b, 0) / durees.length) : null;
+
+  return (
+    <div style={{ padding: '14px', maxWidth: '100%', boxSizing: 'border-box' }}>
+
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4 }}>
+          <ArrowLeft size={22} />
+        </button>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h1 style={{ fontSize: 16, fontWeight: 800, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{machine.nom}</h1>
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{machine.external_id} · {machine.type_equipement}</div>
+        </div>
+        <span style={{ background: `${critColor}22`, color: critColor, border: `1px solid ${critColor}44`, borderRadius: 6, padding: '3px 10px', fontSize: 11, fontWeight: 700, textTransform: 'capitalize', flexShrink: 0 }}>
+          {machine.criticite}
+        </span>
+      </div>
+
+      {/* Infos */}
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 14px', marginBottom: 14 }}>
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <MapPin size={13} color="var(--text-secondary)" />
+            <span style={{ fontSize: 13 }}>{machine.localisation || '—'}</span>
+          </div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <Wrench size={13} color="var(--text-secondary)" />
+            <span style={{ fontSize: 13, textTransform: 'capitalize' }}>{machine.statut}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* KPI */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 14 }}>
+        {[
+          { label: 'Total', value: totalTickets, color: '#6366f1' },
+          { label: 'Ouverts', value: ouverts, color: ouverts > 0 ? '#f59e0b' : 'var(--text-secondary)' },
+          { label: 'Urgents', value: urgents, color: urgents > 0 ? '#ef4444' : 'var(--text-secondary)' },
+          { label: mttr !== null ? `MTTR ${mttr}j` : 'MTTR —', value: resolus, color: '#22c55e' },
+        ].map(({ label, value, color }) => (
+          <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 12px', textAlign: 'center' }}>
+            <div style={{ fontSize: 20, fontWeight: 800, color }}>{value}</div>
+            <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>{label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Onglets */}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 14, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 4, width: 'fit-content' }}>
+        {(['pannes', 'historique'] as const).map(v => (
+          <button key={v} onClick={() => setTab(v)} style={{ padding: '7px 16px', borderRadius: 7, fontSize: 13, fontWeight: tab === v ? 700 : 400, cursor: 'pointer', background: tab === v ? '#6366f1' : 'transparent', color: tab === v ? '#fff' : 'var(--text-secondary)', border: 'none' }}>
+            {v === 'pannes' ? `Tickets (${totalTickets})` : `Historique (${history.length})`}
+          </button>
+        ))}
+      </div>
+
+      {/* Tickets */}
+      {tab === 'pannes' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {tickets.length === 0 ? (
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>Aucun ticket</div>
+          ) : tickets.map(t => {
+            const pc = prioriteColor[t.priorite] || '#6366f1';
+            const duree = daysBetween(t.created_at, t.resolu_le);
+            return (
+              <div key={t.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, flex: 1, paddingRight: 8 }}>{t.titre}</div>
+                  <span style={{ background: `${pc}22`, color: pc, borderRadius: 5, padding: '2px 7px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', flexShrink: 0 }}>{t.priorite}</span>
+                </div>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 11, color: t.statut === 'resolu' ? '#22c55e' : t.statut === 'en_cours' ? '#f59e0b' : '#6366f1', fontWeight: 600 }}>
+                    {t.statut === 'resolu' ? '✓ Résolu' : t.statut === 'en_cours' ? '⏳ En cours' : '● Ouvert'}
+                  </span>
+                  {t.technicians && <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{(t.technicians as { prenom: string; nom: string }).prenom}</span>}
+                  {duree !== null && <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>résolu en {duree}j</span>}
+                  <span style={{ fontSize: 11, color: 'var(--text-secondary)', marginLeft: 'auto' }}>{new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Historique interventions */}
+      {tab === 'historique' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {history.length === 0 ? (
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>Aucune intervention enregistrée</div>
+          ) : history.map(h => (
+            <div key={h.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, background: '#6366f122', color: '#6366f1', borderRadius: 5, padding: '2px 8px' }}>
+                  {h.type_action === 'preventive' || h.type_action === 'inspection' ? 'Préventif' : 'Correctif'}
+                </span>
+                <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{new Date(h.realise_le).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+              </div>
+              {h.description && <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 6, lineHeight: 1.5 }}>{h.description.substring(0, 100)}{h.description.length > 100 ? '...' : ''}</div>}
+              {h.pieces_changees && h.pieces_changees.length > 0 && (
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {h.pieces_changees.map((p, i) => (
+                    <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 5, padding: '2px 7px', fontSize: 11 }}>
+                      <Package size={10} /> {p.quantite} {p.unite} · {p.nom}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {h.technicians && <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 6 }}>par {(h.technicians as { prenom: string; nom: string }).prenom}</div>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
