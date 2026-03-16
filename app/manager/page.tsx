@@ -155,7 +155,7 @@ export default function ManagerDashboard() {
                 <Bell size={22} color="#6366f1" />
               </div>
               <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Notifications</div>
-              <PushNotifSetup role="manager" />
+              <PushNotifSetup role="manager" fullCard={true} />
             </div>
           </div>
 

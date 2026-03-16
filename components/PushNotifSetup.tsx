@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Bell, BellOff } from 'lucide-react';
+import { Bell, BellOff, Smartphone } from 'lucide-react';
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -10,7 +10,7 @@ function urlBase64ToUint8Array(base64String: string) {
   return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
 }
 
-export default function PushNotifSetup({ role = 'manager' }: { role?: string }) {
+export default function PushNotifSetup({ role = 'manager', fullCard = false }: { role?: string; fullCard?: boolean }) {
   const [mounted, setMounted] = useState(false);
   const [supported, setSupported] = useState(false);
   const [status, setStatus] = useState<'idle' | 'granted' | 'denied' | 'loading'>('idle');
@@ -62,27 +62,42 @@ export default function PushNotifSetup({ role = 'manager' }: { role?: string }) 
     setStatus('idle');
   }
 
-  if (!mounted || !supported) return null;
+  if (!mounted) return null;
+
+  // Navigateur ne supporte pas les push (iOS sans PWA)
+  if (!supported) {
+    if (!fullCard) return (
+      <span style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 10px', color: 'var(--text-secondary)', fontSize: 11 }}>
+        <Smartphone size={12} /> Installer l&apos;app
+      </span>
+    );
+    return (
+      <div style={{ background: '#f59e0b18', border: '1px solid #f59e0b33', borderRadius: 10, padding: '10px 12px', fontSize: 12, color: '#f59e0b', lineHeight: 1.5 }}>
+        <div style={{ fontWeight: 700, marginBottom: 4 }}>📱 iPhone : installer l&apos;appli</div>
+        <div style={{ color: 'var(--text-secondary)', fontSize: 11 }}>Safari → icône partage → &quot;Sur l&apos;écran d&apos;accueil&quot; → relancer</div>
+      </div>
+    );
+  }
 
   if (status === 'granted') {
     return (
-      <button onClick={unsubscribe} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: '#22c55e22', border: '1px solid #22c55e44', borderRadius: 8, color: '#22c55e', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
-        <Bell size={13} /> Notifs ON
+      <button onClick={unsubscribe} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: '#22c55e22', border: '1px solid #22c55e55', borderRadius: 10, color: '#22c55e', fontSize: 13, fontWeight: 700, cursor: 'pointer', width: fullCard ? '100%' : 'auto', justifyContent: fullCard ? 'center' : 'flex-start' }}>
+        <Bell size={14} /> Notifs activées ✓
       </button>
     );
   }
 
   if (status === 'denied') {
     return (
-      <span style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 10px', color: 'var(--text-secondary)', fontSize: 11, flexShrink: 0 }}>
-        <BellOff size={13} /> Bloqué
+      <span style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 10px', color: 'var(--text-secondary)', fontSize: 11 }}>
+        <BellOff size={12} /> Bloqué dans les réglages
       </span>
     );
   }
 
   return (
-    <button onClick={subscribe} disabled={status === 'loading'} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
-      <Bell size={13} /> {status === 'loading' ? '...' : 'Notifs'}
+    <button onClick={subscribe} disabled={status === 'loading'} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: '#6366f1', border: 'none', borderRadius: 10, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', width: fullCard ? '100%' : 'auto', justifyContent: fullCard ? 'center' : 'flex-start' }}>
+      <Bell size={14} /> {status === 'loading' ? 'Activation...' : 'Activer les notifs'}
     </button>
   );
 }
