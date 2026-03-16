@@ -28,9 +28,9 @@ function KpiCard({ label, value, sub, icon: Icon, color, big }: {
   );
 }
 
-function KpiMini({ label, value, color, icon: Icon }: { label: string; value: string | number; color: string; icon: React.ElementType }) {
-  return (
-    <div style={{ background: 'var(--bg-card)', border: `1px solid ${color}33`, borderRadius: 12, padding: '14px 12px' }}>
+function KpiMini({ label, value, color, icon: Icon, href }: { label: string; value: string | number; color: string; icon: React.ElementType; href?: string }) {
+  const inner = (
+    <div style={{ background: 'var(--bg-card)', border: `1px solid ${color}33`, borderRadius: 12, padding: '14px 12px', cursor: href ? 'pointer' : 'default', textDecoration: 'none', display: 'block' }}>
       <div style={{ width: 32, height: 32, borderRadius: 8, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
         <Icon size={16} color={color} />
       </div>
@@ -38,6 +38,7 @@ function KpiMini({ label, value, color, icon: Icon }: { label: string; value: st
       <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{label}</div>
     </div>
   );
+  return href ? <Link href={href} style={{ textDecoration: 'none' }}>{inner}</Link> : inner;
 }
 
 export default function DirecteurDashboard() {
@@ -93,10 +94,10 @@ export default function DirecteurDashboard() {
 
           {/* KPI rapides */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 20 }}>
-            <KpiMini label="Taux résolution" value={`${tauxResolution}%`} color="#22c55e" icon={Target} />
-            <KpiMini label="Charge" value={`${charge}%`} color="#6366f1" icon={Battery} />
-            <KpiMini label="Urgents" value={stats.urgents} color="#ef4444" icon={ShieldAlert} />
-            <KpiMini label="Techniciens" value={stats.techniciens} color="#0ea5e9" icon={Users} />
+            <KpiMini label="Taux résolution" value={`${tauxResolution}%`} color="#22c55e" icon={Target} href="/directeur/tickets?filtre=resolu" />
+            <KpiMini label="Charge" value={`${charge}%`} color="#6366f1" icon={Battery} href="/directeur/tickets?filtre=ouvert" />
+            <KpiMini label="Urgents" value={stats.urgents} color="#ef4444" icon={ShieldAlert} href="/directeur/tickets?filtre=urgente" />
+            <KpiMini label="Techniciens" value={stats.techniciens} color="#0ea5e9" icon={Users} href="/directeur/techniciens" />
           </div>
 
           {/* Cartes navigation */}
