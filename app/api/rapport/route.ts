@@ -103,10 +103,11 @@ Réponds en JSON avec exactement ce format :
     let contenu = rawOutput;
     let recommandations: string[] = [];
     try {
-      const jsonMatch = rawOutput.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/) ||
-                        rawOutput.match(/(\{[\s\S]*"contenu"[\s\S]*\})/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[1]);
+      const firstBrace = rawOutput.indexOf('{');
+      const lastBrace = rawOutput.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1) {
+        const jsonStr = rawOutput.substring(firstBrace, lastBrace + 1);
+        const parsed = JSON.parse(jsonStr);
         contenu = parsed.contenu || rawOutput;
         recommandations = parsed.recommandations || [];
       }
