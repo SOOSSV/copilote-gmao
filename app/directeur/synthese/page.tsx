@@ -55,7 +55,7 @@ export default function SynthesePage() {
       // Top machines avec le + de tickets ouverts
       const machineMap: Record<string, MachineStat> = {};
       for (const ticket of (openTicketsRes.data || [])) {
-        const nom = (ticket.machines as { nom: string } | null)?.nom;
+        const nom = (ticket.machines as unknown as { nom: string } | null)?.nom;
         if (!nom || !ticket.machine_id) continue;
         if (!machineMap[ticket.machine_id]) machineMap[ticket.machine_id] = { nom, count: 0 };
         machineMap[ticket.machine_id].count++;
@@ -65,7 +65,7 @@ export default function SynthesePage() {
       // Top techs par tickets résolus
       const techMap: Record<string, TechStat> = {};
       for (const ticket of (resolvedTicketsRes.data || [])) {
-        const tech = ticket.technicians as { prenom: string; nom: string } | null;
+        const tech = ticket.technicians as unknown as { prenom: string; nom: string } | null;
         if (!tech || !ticket.technicien_id) continue;
         if (!techMap[ticket.technicien_id]) techMap[ticket.technicien_id] = { prenom: tech.prenom, nom: tech.nom, resolus: 0 };
         techMap[ticket.technicien_id].resolus++;
