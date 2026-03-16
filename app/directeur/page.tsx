@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { AlertTriangle, TrendingUp, CheckCircle2, Clock, Zap, BarChart3, LogOut, Target, Battery, ShieldAlert, Users } from 'lucide-react';
+import { AlertTriangle, TrendingUp, CheckCircle2, Clock, Zap, BarChart3, LogOut, Target, Battery, ShieldAlert, Users, Ticket, Factory, Package } from 'lucide-react';
 
 type Stats = {
   total: number; ouverts: number; en_cours: number; fermes: number;
@@ -100,25 +100,23 @@ export default function DirecteurDashboard() {
           </div>
 
           {/* Cartes navigation */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
-            <Link href="/directeur/synthese" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '20px 16px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#22c55e20', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <TrendingUp size={22} color="#22c55e" />
-              </div>
-              <div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>Vue synthèse</div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>KPIs & indicateurs clés</div>
-              </div>
-            </Link>
-            <Link href="/directeur/rapports" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '20px 16px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#0ea5e920', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <BarChart3 size={22} color="#0ea5e9" />
-              </div>
-              <div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>Rapports IA</div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>Analyses & recommandations</div>
-              </div>
-            </Link>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 20 }}>
+            {[
+              { href: '/directeur/synthese',     icon: TrendingUp, color: '#22c55e', label: 'Vue synthèse',   sub: 'KPIs & indicateurs' },
+              { href: '/directeur/tickets',       icon: Ticket,     color: '#f59e0b', label: 'Tickets',        sub: `${stats.urgents > 0 ? stats.urgents + ' urgents' : 'Tous les tickets'}` },
+              { href: '/directeur/machines',      icon: Factory,    color: '#8b5cf6', label: 'Machines',       sub: `${stats.machines} actives` },
+              { href: '/directeur/techniciens',   icon: Users,      color: '#0ea5e9', label: 'Techniciens',    sub: `${stats.techniciens} au total` },
+              { href: '/directeur/stocks',        icon: Package,    color: '#10b981', label: 'Stocks',         sub: 'Niveaux & alertes' },
+              { href: '/directeur/rapports',      icon: BarChart3,  color: '#6366f1', label: 'Rapports IA',   sub: 'Analyses & recommandations' },
+            ].map(card => (
+              <Link key={card.href} href={card.href} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '16px', textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: `${card.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <card.icon size={20} color={card.color} />
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{card.label}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{card.sub}</div>
+              </Link>
+            ))}
           </div>
 
           <button onClick={handleLogout} style={{ width: '100%', padding: '14px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--text-secondary)', fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>

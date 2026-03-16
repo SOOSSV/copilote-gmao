@@ -3,11 +3,15 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { LayoutDashboard, BarChart3, LogOut } from 'lucide-react';
+import { LayoutDashboard, BarChart3, LogOut, Ticket, Factory, Users, Package } from 'lucide-react';
 
 const nav = [
-  { href: '/directeur',          icon: LayoutDashboard, label: 'Vue synthèse' },
-  { href: '/directeur/rapports', icon: BarChart3,        label: 'Rapports IA' },
+  { href: '/directeur',               icon: LayoutDashboard, label: 'Vue synthèse' },
+  { href: '/directeur/tickets',       icon: Ticket,          label: 'Tickets' },
+  { href: '/directeur/machines',      icon: Factory,         label: 'Machines' },
+  { href: '/directeur/techniciens',   icon: Users,           label: 'Techniciens' },
+  { href: '/directeur/stocks',        icon: Package,         label: 'Stocks' },
+  { href: '/directeur/rapports',      icon: BarChart3,       label: 'Rapports IA' },
 ];
 
 export default function DirecteurLayout({ children }: { children: React.ReactNode }) {
