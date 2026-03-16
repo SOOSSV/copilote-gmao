@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { AlertTriangle, CheckCircle, Clock, Wrench, TrendingUp, Activity, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
 type Stats = {
   total: number; ouverts: number; en_cours: number; fermes: number;
@@ -19,11 +20,11 @@ const prioriteColor: Record<string, string> = {
   urgente: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e',
 };
 
-function StatCard({ label, value, icon: Icon, color, sub }: {
-  label: string; value: number | string; icon: React.ElementType; color: string; sub?: string;
+function StatCard({ label, value, icon: Icon, color, sub, href }: {
+  label: string; value: number | string; icon: React.ElementType; color: string; sub?: string; href?: string;
 }) {
-  return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '18px 16px' }}>
+  const inner = (
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '18px 16px', cursor: href ? 'pointer' : 'default' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <div style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>{label}</div>
@@ -36,6 +37,7 @@ function StatCard({ label, value, icon: Icon, color, sub }: {
       </div>
     </div>
   );
+  return href ? <Link href={href} style={{ textDecoration: 'none' }}>{inner}</Link> : inner;
 }
 
 export default function DashboardPage() {
@@ -102,10 +104,10 @@ export default function DashboardPage() {
       {loading ? <div style={{ color: 'var(--text-secondary)', padding: 20 }}>Chargement...</div> : (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 12 }}>
-            <StatCard label="Ouverts"   value={stats.ouverts}  icon={Clock}         color="#6366f1" />
-            <StatCard label="En cours"  value={stats.en_cours} icon={Activity}      color="#f59e0b" />
-            <StatCard label="Urgents"   value={stats.urgents}  icon={AlertTriangle} color="#ef4444" />
-            <StatCard label="Résolution" value={`${tauxResolution}%`} icon={TrendingUp} color="#22c55e" sub={`${stats.fermes}/${stats.total}`} />
+            <StatCard label="Ouverts"   value={stats.ouverts}  icon={Clock}         color="#6366f1" href="/manager/tickets?filtre=ouvert" />
+            <StatCard label="En cours"  value={stats.en_cours} icon={Activity}      color="#f59e0b" href="/manager/tickets?filtre=en_cours" />
+            <StatCard label="Urgents"   value={stats.urgents}  icon={AlertTriangle} color="#ef4444" href="/manager/tickets?filtre=urgente" />
+            <StatCard label="Résolution" value={`${tauxResolution}%`} icon={TrendingUp} color="#22c55e" sub={`${stats.fermes}/${stats.total}`} href="/manager/tickets?filtre=resolu" />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 20 }}>
             <StatCard label="Machines"    value={stats.machines}    icon={Wrench}       color="#8b5cf6" />
@@ -116,14 +118,14 @@ export default function DashboardPage() {
           <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>Tickets récents</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {recents.map(t => (
-              <div key={t.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px' }}>
+              <Link key={t.id} href={`/manager/tickets/${t.id}`} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px', textDecoration: 'none', color: 'inherit', display: 'block' }}>
                 <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>{t.titre}</div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{t.machines?.nom || '—'}</span>
                   <span style={{ background: `${prioriteColor[t.priorite]}22`, color: prioriteColor[t.priorite], border: `1px solid ${prioriteColor[t.priorite]}44`, borderRadius: 6, padding: '1px 7px', fontSize: 10, fontWeight: 600, textTransform: 'uppercase' }}>{t.priorite}</span>
                   <span style={{ fontSize: 11, color: 'var(--text-secondary)', marginLeft: 'auto' }}>{formatDate(t.created_at)}</span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </>
