@@ -61,7 +61,7 @@ export default function NouveauTicketPage() {
     });
     if (error) { setStatus('error'); return; }
     setStatus('success');
-    setTimeout(() => router.push('/tickets'), 1500);
+    setTimeout(() => router.push('/manager/tickets'), 1500);
   }
 
   if (status === 'success') {

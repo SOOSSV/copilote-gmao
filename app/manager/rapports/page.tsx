@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { BarChart3, Brain, ChevronDown, ChevronUp, Sparkles, RefreshCw } from 'lucide-react';
+import { BarChart3, Brain, ChevronDown, ChevronUp, Sparkles, RefreshCw, Trash2 } from 'lucide-react';
 
 type Analyse = {
   id: string;
@@ -33,6 +33,13 @@ export default function RapportsPage() {
   const [generating, setGenerating] = useState(false);
   const [selectedType, setSelectedType] = useState('rapport_hebdo');
   const [error, setError] = useState('');
+
+  async function deleteAnalyse(id: string) {
+    if (!confirm('Supprimer ce rapport ?')) return;
+    await supabase.from('ai_analyses').delete().eq('id', id);
+    setAnalyses(prev => prev.filter(a => a.id !== id));
+    if (ouvert === id) setOuvert(null);
+  }
 
   async function fetchAnalyses() {
     const { data } = await supabase
@@ -135,13 +142,20 @@ export default function RapportsPage() {
                 background: 'var(--bg-card)', border: '1px solid var(--border)',
                 borderLeft: `3px solid ${cfg.color}`, borderRadius: 12, overflow: 'hidden',
               }}>
-                <div onClick={() => setOuvert(isOpen ? null : a.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', cursor: 'pointer' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px' }}>
+                <div onClick={() => setOuvert(isOpen ? null : a.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flex: 1, cursor: 'pointer' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                     <span style={{ background: `${cfg.color}22`, color: cfg.color, borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>{cfg.label}</span>
                     <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{formatDate(a.created_at)}</span>
                     {a.periode_analysee && <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>· {a.periode_analysee}</span>}
                   </div>
                   {isOpen ? <ChevronUp size={16} color="var(--text-secondary)" /> : <ChevronDown size={16} color="var(--text-secondary)" />}
+                </div>
+                <button onClick={() => deleteAnalyse(a.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: '4px', marginLeft: 8, flexShrink: 0 }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}>
+                  <Trash2 size={14} />
+                </button>
                 </div>
 
                 {isOpen && (

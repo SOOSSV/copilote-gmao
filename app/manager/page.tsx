@@ -21,11 +21,11 @@ const prioriteColor: Record<string, string> = {
   urgente: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e',
 };
 
-function StatCard({ label, value, icon: Icon, color, sub }: {
-  label: string; value: number | string; icon: React.ElementType; color: string; sub?: string;
+function StatCard({ label, value, icon: Icon, color, sub, href }: {
+  label: string; value: number | string; icon: React.ElementType; color: string; sub?: string; href?: string;
 }) {
-  return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 22px' }}>
+  const inner = (
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 22px', cursor: href ? 'pointer' : 'default' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <div style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>{label}</div>
@@ -38,6 +38,7 @@ function StatCard({ label, value, icon: Icon, color, sub }: {
       </div>
     </div>
   );
+  return href ? <Link href={href} style={{ textDecoration: 'none' }}>{inner}</Link> : inner;
 }
 
 export default function ManagerDashboard() {
@@ -189,10 +190,10 @@ export default function ManagerDashboard() {
         {loading ? <div style={{ color: 'var(--text-secondary)' }}>Chargement...</div> : (
           <>
             <div className="mgr-grid-4">
-              <StatCard label="Tickets ouverts" value={stats.ouverts}  icon={Clock}         color="#6366f1" />
-              <StatCard label="En cours"        value={stats.en_cours} icon={Activity}      color="#f59e0b" />
-              <StatCard label="Urgents"         value={stats.urgents}  icon={AlertTriangle} color="#ef4444" />
-              <StatCard label="Taux résolution" value={`${tauxResolution}%`} icon={TrendingUp} color="#22c55e" sub={`${stats.fermes} / ${stats.total} tickets`} />
+              <StatCard label="Tickets ouverts" value={stats.ouverts}  icon={Clock}         color="#6366f1" href="/manager/tickets?filtre=ouvert" />
+              <StatCard label="En cours"        value={stats.en_cours} icon={Activity}      color="#f59e0b" href="/manager/tickets?filtre=en_cours" />
+              <StatCard label="Urgents"         value={stats.urgents}  icon={AlertTriangle} color="#ef4444" href="/manager/tickets?filtre=urgente" />
+              <StatCard label="Taux résolution" value={`${tauxResolution}%`} icon={TrendingUp} color="#22c55e" sub={`${stats.fermes} / ${stats.total} tickets`} href="/manager/tickets?filtre=resolu" />
             </div>
             <div className="mgr-grid-2">
               <StatCard label="Machines actives" value={stats.machines}    icon={Wrench}      color="#8b5cf6" />
