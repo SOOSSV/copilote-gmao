@@ -42,7 +42,7 @@ export default function DirecteurMachineDetailPage() {
   const ouverts = tickets.filter(t => t.statut !== 'resolu').length;
 
   return (
-    <div style={{ padding: '20px 24px', maxWidth: 800 }}>
+    <div style={{ padding: 'clamp(14px, 3vw, 24px)', maxWidth: 800, boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}>
           <ArrowLeft size={22} />

@@ -74,7 +74,20 @@ export default function DirecteurLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      <main className="dir-main">{children}</main>
+      <main className="dir-main" style={{ paddingBottom: 0 }}>{children}</main>
+
+      {/* Bottom nav mobile uniquement */}
+      <nav className="dir-bottom-nav">
+        {nav.map(({ href, icon: Icon, label }) => {
+          const active = isActive(href);
+          return (
+            <Link key={href} href={href} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '8px 0 10px', textDecoration: 'none', color: active ? '#0ea5e9' : 'var(--text-secondary)', minWidth: 0 }}>
+              <Icon size={18} />
+              <span style={{ fontSize: 9, fontWeight: active ? 700 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', textAlign: 'center' }}>{label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

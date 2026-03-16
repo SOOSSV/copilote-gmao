@@ -41,7 +41,7 @@ export default function DirecteurMachinesPage() {
   const filtered = filtre === 'tous' ? machines : machines.filter(m => m.criticite === filtre);
 
   return (
-    <div style={{ padding: '20px 24px', maxWidth: 1100 }}>
+    <div style={{ padding: 'clamp(14px, 3vw, 24px)', maxWidth: 1100, boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
         <Factory size={20} color="#0ea5e9" />
         <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Parc Machines</h1>

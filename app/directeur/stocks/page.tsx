@@ -29,7 +29,7 @@ export default function DirecteurStocksPage() {
   });
 
   return (
-    <div style={{ padding: '20px 24px', maxWidth: 1100 }}>
+    <div style={{ padding: 'clamp(14px, 3vw, 24px)', maxWidth: 1100, boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
         <Package size={20} color="#0ea5e9" />
         <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Stocks & Pièces</h1>
@@ -63,8 +63,8 @@ export default function DirecteurStocksPage() {
       </div>
 
       {loading ? <div style={{ color: 'var(--text-secondary)' }}>Chargement...</div> : (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 580 }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
                 {['Statut', 'Référence', 'Nom', 'Catégorie', 'Qté actuelle', 'Seuil mini', 'Emplacement'].map(h => (

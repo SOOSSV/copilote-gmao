@@ -68,6 +68,7 @@ body {
 .dir-main { margin-left: 220px; flex: 1; min-height: 100vh; }
 .dir-mobile-home { display: none; }
 .dir-desktop-home { display: block; }
+.dir-bottom-nav { display: none; }
 
 @media (max-width: 1024px) {
   .tickets-mobile { display: block; }
@@ -77,9 +78,10 @@ body {
   .preventif-mobile { display: block; }
   .preventif-desktop { display: none; }
   .dir-sidebar { display: none; }
-  .dir-main { margin-left: 0; }
+  .dir-main { margin-left: 0; padding-bottom: 70px; }
   .dir-mobile-home { display: block; }
   .dir-desktop-home { display: none; }
+  .dir-bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-card); border-top: 1px solid var(--border); z-index: 100; overflow-x: auto; }
   .mgr-sidebar { display: none; }
   .mgr-main { margin-left: 0; padding-bottom: 0; }
   .mgr-bottom-nav { display: none; }
