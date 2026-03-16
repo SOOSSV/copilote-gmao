@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Package, AlertTriangle, CheckCircle, Plus, Pencil, Trash2, X, Save } from 'lucide-react';
+import { Package, AlertTriangle, CheckCircle, Plus, Pencil, Trash2, X, Save, BarChart2 } from 'lucide-react';
+
+type ConsoPiece = { nom: string; total: number; unite: string };
+type ConsoJour = { date: string; total: number };
 
 type Stock = {
   id: string;
@@ -32,6 +35,10 @@ export default function StocksPage() {
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
   const [filterAlerte, setFilterAlerte] = useState(false);
+  const [view, setView] = useState<'stocks' | 'stats'>('stocks');
+  const [consoTop, setConsoTop] = useState<ConsoPiece[]>([]);
+  const [consoJours, setConsoJours] = useState<ConsoJour[]>([]);
+  const [statsLoading, setStatsLoading] = useState(false);
 
   async function load() {
     const { data } = await supabase.from('stocks').select('*').eq('actif', true).order('nom');
@@ -40,6 +47,49 @@ export default function StocksPage() {
   }
 
   useEffect(() => { load(); }, []);
+
+  async function loadStats() {
+    setStatsLoading(true);
+    const since = new Date();
+    since.setDate(since.getDate() - 30);
+    const { data } = await supabase
+      .from('maintenance_history')
+      .select('pieces_changees, realise_le')
+      .gte('realise_le', since.toISOString())
+      .not('pieces_changees', 'is', null);
+
+    const totals: Record<string, ConsoPiece> = {};
+    const parJour: Record<string, number> = {};
+
+    for (const row of (data || [])) {
+      const pieces = row.pieces_changees as { nom: string; quantite: number; unite: string }[] | null;
+      if (!pieces || !Array.isArray(pieces)) continue;
+      const jour = row.realise_le?.substring(0, 10);
+      let jourTotal = 0;
+      for (const p of pieces) {
+        if (!p?.nom) continue;
+        if (!totals[p.nom]) totals[p.nom] = { nom: p.nom, total: 0, unite: p.unite || 'pcs' };
+        totals[p.nom].total += Number(p.quantite) || 0;
+        jourTotal += Number(p.quantite) || 0;
+      }
+      if (jour) parJour[jour] = (parJour[jour] || 0) + jourTotal;
+    }
+
+    const top = Object.values(totals).sort((a, b) => b.total - a.total).slice(0, 10);
+    setConsoTop(top);
+
+    // Générer les 30 derniers jours
+    const days: ConsoJour[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const key = d.toISOString().substring(0, 10);
+      days.push({ date: key, total: parJour[key] || 0 });
+    }
+    setConsoJours(days);
+    setStatsLoading(false);
+  }
+
+  useEffect(() => { if (view === 'stats') loadStats(); }, [view]);
 
   function openAdd() {
     setEditing(null);
@@ -100,6 +150,15 @@ export default function StocksPage() {
 
   const alertes = stocks.filter(s => s.quantite_actuelle <= s.seuil_minimum).length;
 
+  const maxBar = Math.max(...consoTop.map(c => c.total), 1);
+  const maxLine = Math.max(...consoJours.map(c => c.total), 1);
+  const lineW = 600; const lineH = 120;
+  const points = consoJours.map((d, i) => {
+    const x = (i / (consoJours.length - 1)) * lineW;
+    const y = lineH - (d.total / maxLine) * lineH;
+    return `${x},${y}`;
+  }).join(' ');
+
   return (
     <div style={{ padding: 'clamp(16px, 4vw, 32px)', maxWidth: 1100, boxSizing: 'border-box' }}>
       {/* Header */}
@@ -108,9 +167,21 @@ export default function StocksPage() {
           <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Stocks & Pièces</h1>
           <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{stocks.length} article{stocks.length > 1 ? 's' : ''} · {alertes} en alerte</div>
         </div>
-        <button onClick={openAdd} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#6366f1', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
-          <Plus size={16} /> Ajouter
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={openAdd} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#6366f1', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+            <Plus size={16} /> Ajouter
+          </button>
+        </div>
+      </div>
+
+      {/* Onglets */}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 20, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 4, width: 'fit-content' }}>
+        {(['stocks', 'stats'] as const).map(v => (
+          <button key={v} onClick={() => setView(v)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 7, fontSize: 13, fontWeight: view === v ? 700 : 400, cursor: 'pointer', background: view === v ? '#6366f1' : 'transparent', color: view === v ? '#fff' : 'var(--text-secondary)', border: 'none' }}>
+            {v === 'stocks' ? <Package size={14} /> : <BarChart2 size={14} />}
+            {v === 'stocks' ? 'Articles' : 'Consommation'}
+          </button>
+        ))}
       </div>
 
       {/* KPI */}
@@ -129,6 +200,74 @@ export default function StocksPage() {
         </div>
       </div>
 
+      {view === 'stats' && (
+        <div>
+          {statsLoading ? (
+            <div style={{ color: 'var(--text-secondary)', padding: 40, textAlign: 'center' }}>Chargement des stats...</div>
+          ) : (
+            <>
+              {/* Évolution 30 jours */}
+              <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px', marginBottom: 16 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16 }}>Pièces consommées — 30 derniers jours</div>
+                {maxLine === 0 ? (
+                  <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Aucune consommation enregistrée</div>
+                ) : (
+                  <div style={{ overflowX: 'auto' }}>
+                    <svg viewBox={`0 0 ${lineW} ${lineH + 20}`} style={{ width: '100%', minWidth: 300, height: 'auto' }}>
+                      {/* Grille */}
+                      {[0, 0.25, 0.5, 0.75, 1].map(r => (
+                        <line key={r} x1={0} y1={lineH * (1 - r)} x2={lineW} y2={lineH * (1 - r)} stroke="var(--border)" strokeWidth={0.5} />
+                      ))}
+                      {/* Aire */}
+                      <defs>
+                        <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#6366f1" stopOpacity="0.3" />
+                          <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+                        </linearGradient>
+                      </defs>
+                      <polygon points={`0,${lineH} ${points} ${lineW},${lineH}`} fill="url(#grad)" />
+                      <polyline points={points} fill="none" stroke="#6366f1" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                      {/* Labels dates */}
+                      {[0, 7, 14, 21, 29].map(i => (
+                        <text key={i} x={(i / 29) * lineW} y={lineH + 16} textAnchor="middle" fontSize={9} fill="var(--text-secondary)">
+                          {new Date(consoJours[i]?.date || '').toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                        </text>
+                      ))}
+                    </svg>
+                  </div>
+                )}
+              </div>
+
+              {/* Top 10 pièces */}
+              <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16 }}>Top pièces consommées (30j)</div>
+                {consoTop.length === 0 ? (
+                  <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Aucune donnée</div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {consoTop.map((c, i) => (
+                      <div key={c.nom} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{ fontSize: 11, color: 'var(--text-secondary)', width: 16, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                            <span style={{ fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.nom}</span>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: '#6366f1', flexShrink: 0, marginLeft: 8 }}>{c.total} {c.unite}</span>
+                          </div>
+                          <div style={{ height: 6, background: 'var(--bg-primary)', borderRadius: 3, overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${(c.total / maxBar) * 100}%`, background: i === 0 ? '#6366f1' : i === 1 ? '#8b5cf6' : '#a78bfa', borderRadius: 3, transition: 'width 0.4s ease' }} />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {view === 'stocks' && <>
       {/* Filtres */}
       <div style={{ display: 'flex', gap: 10, marginBottom: 18 }}>
         <input
@@ -225,6 +364,8 @@ export default function StocksPage() {
           </div>
         </>
       )}
+
+      </>}
 
       {/* Modal formulaire */}
       {showForm && (
