@@ -102,11 +102,14 @@ export default function TechDashboard() {
 
       {/* Liste */}
       {loading ? (
-        <div style={{ color: 'var(--text-secondary)', padding: 20, textAlign: 'center' }}>Chargement...</div>
+        <div>
+          {[1,2,3].map(i => <div key={i} className="skeleton skeleton-card" />)}
+        </div>
       ) : displayed.length === 0 ? (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>
-          <Wrench size={28} style={{ opacity: 0.3, marginBottom: 10 }} />
-          <div>{filter === 'actifs' ? 'Aucun ticket actif' : 'Aucun ticket résolu'}</div>
+        <div className="empty-state" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14 }}>
+          <div className="empty-state-icon">🔧</div>
+          <div className="empty-state-title">{filter === 'actifs' ? 'Aucun ticket actif' : 'Aucun ticket résolu'}</div>
+          <div className="empty-state-sub">{filter === 'actifs' ? 'Profite — aucune intervention en attente.' : 'Les tickets résolus apparaîtront ici.'}</div>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

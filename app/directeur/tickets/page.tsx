@@ -81,9 +81,15 @@ export default function DirecteurTicketsPage() {
       </div>
 
       {loading ? (
-        <div style={{ color: 'var(--text-secondary)', padding: 32, textAlign: 'center' }}>Chargement...</div>
+        <div>
+          {[1,2,3,4].map(i => <div key={i} className="skeleton skeleton-row" style={{ borderRadius: 4 }} />)}
+        </div>
       ) : filtered.length === 0 ? (
-        <div style={{ color: 'var(--text-secondary)', padding: 32, textAlign: 'center' }}>Aucun ticket trouvé</div>
+        <div className="empty-state">
+          <div className="empty-state-icon">🎫</div>
+          <div className="empty-state-title">Aucun ticket trouvé</div>
+          <div className="empty-state-sub">Essaie un autre filtre ou une autre recherche.</div>
+        </div>
       ) : (
         <>
           {/* Vue mobile : cartes */}
