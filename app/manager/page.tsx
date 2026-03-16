@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { AlertTriangle, CheckCircle, Clock, Wrench, TrendingUp, Activity, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, Wrench, TrendingUp, Activity, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut, Bell } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import PushNotifSetup from '@/components/PushNotifSetup';
 
@@ -105,7 +105,6 @@ export default function ManagerDashboard() {
                 <div style={{ fontSize: 22, fontWeight: 800, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: 2 }}>COPILOTE</div>
                 <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Espace Manager · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
               </div>
-              <PushNotifSetup role="manager" />
             </div>
           </div>
 
@@ -151,6 +150,13 @@ export default function ManagerDashboard() {
                 )}
               </Link>
             ))}
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#6366f120', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Bell size={22} color="#6366f1" />
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Notifications</div>
+              <PushNotifSetup role="manager" />
+            </div>
           </div>
 
           {/* Déconnexion */}
