@@ -68,7 +68,7 @@ export default function RapportsPage() {
   }
 
   return (
-    <div style={{ padding: 'clamp(16px, 4vw, 32px)', maxWidth: 820, boxSizing: 'border-box' }}>
+    <div style={{ padding: '14px', maxWidth: '100%', boxSizing: 'border-box', overflowX: 'hidden' }}>
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
@@ -82,7 +82,7 @@ export default function RapportsPage() {
       </div>
 
       {/* Générateur */}
-      <div style={{ background: 'var(--bg-card)', border: '1px solid #6366f133', borderRadius: 14, padding: '20px 24px', marginBottom: 28 }}>
+      <div style={{ background: 'var(--bg-card)', border: '1px solid #6366f133', borderRadius: 14, padding: '14px', marginBottom: 20 }}>
         <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
           <Sparkles size={15} color="#6366f1" /> Générer un nouveau rapport
         </div>
@@ -128,7 +128,7 @@ export default function RapportsPage() {
                 background: 'var(--bg-card)', border: '1px solid var(--border)',
                 borderLeft: `3px solid ${cfg.color}`, borderRadius: 12, overflow: 'hidden',
               }}>
-                <div onClick={() => setOuvert(isOpen ? null : a.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', cursor: 'pointer' }}>
+                <div onClick={() => setOuvert(isOpen ? null : a.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', cursor: 'pointer' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                     <span style={{ background: `${cfg.color}22`, color: cfg.color, borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>{cfg.label}</span>
                     <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{formatDate(a.created_at)}</span>
@@ -138,18 +138,18 @@ export default function RapportsPage() {
                 </div>
 
                 {isOpen && (
-                  <div style={{ borderTop: '1px solid var(--border)', padding: '20px 24px' }}>
+                  <div style={{ borderTop: '1px solid var(--border)', padding: '14px' }}>
                     {a.contenu && (
-                      <div style={{ fontSize: 14, lineHeight: 1.8, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', marginBottom: a.recommandations?.length ? 20 : 0 }}>
+                      <div style={{ fontSize: 13, lineHeight: 1.7, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'break-word', marginBottom: a.recommandations?.length ? 16 : 0 }}>
                         {a.contenu}
                       </div>
                     )}
                     {a.recommandations && a.recommandations.length > 0 && (
                       <div>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 10 }}>Recommandations</div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>Recommandations</div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                           {a.recommandations.map((r, i) => (
-                            <div key={i} style={{ background: 'var(--bg-secondary)', borderRadius: 8, padding: '10px 14px', fontSize: 13, lineHeight: 1.5, display: 'flex', gap: 10 }}>
+                            <div key={i} style={{ background: 'var(--bg-secondary)', borderRadius: 8, padding: '10px 12px', fontSize: 13, lineHeight: 1.5, display: 'flex', gap: 8, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               <span style={{ color: cfg.color, fontWeight: 700, flexShrink: 0 }}>{i + 1}.</span>
                               {r}
                             </div>
