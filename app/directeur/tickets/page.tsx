@@ -33,6 +33,12 @@ export default function DirecteurTicketsPage() {
 
   useEffect(() => { load(); }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const f = params.get('filtre');
+    if (f) setFiltre(f);
+  }, []);
+
   const filtres = ['tous', 'ouvert', 'en_cours', 'resolu', 'urgente', 'haute'];
   const filtreLabel = (f: string) => f === 'en_cours' ? 'En cours' : f === 'resolu' ? 'Résolu' : f.charAt(0).toUpperCase() + f.slice(1);
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { CheckCircle, Calendar, Wrench, Package } from 'lucide-react';
+import { CheckCircle, Calendar, Wrench, Package, TrendingUp } from 'lucide-react';
 
 type HistEntry = {
   id: string;
@@ -16,6 +16,7 @@ type HistEntry = {
 
 export default function TechHistorique() {
   const [history, setHistory] = useState<HistEntry[]>([]);
+  const [resolus, setResolus] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,23 +27,48 @@ export default function TechHistorique() {
   }, []);
 
   async function load(id: string) {
-    const { data } = await supabase
-      .from('maintenance_history')
-      .select('id, type_action, description, pieces_utilisees, realise_le, tickets(titre, priorite), machines(nom)')
-      .eq('technicien_id', id)
-      .order('realise_le', { ascending: false })
-      .limit(50);
-    setHistory((data as unknown as HistEntry[]) || []);
+    const [{ data: hist }, { count }] = await Promise.all([
+      supabase.from('maintenance_history')
+        .select('id, type_action, description, pieces_utilisees, realise_le, tickets(titre, priorite), machines(nom)')
+        .eq('technicien_id', id).order('realise_le', { ascending: false }).limit(50),
+      supabase.from('tickets').select('*', { count: 'exact', head: true })
+        .eq('technicien_id', id).eq('statut', 'resolu'),
+    ]);
+    setHistory((hist as unknown as HistEntry[]) || []);
+    setResolus(count || 0);
     setLoading(false);
   }
 
+  const now = new Date();
+  const debutSemaine = new Date(now); debutSemaine.setDate(now.getDate() - now.getDay());
+  const debutMois = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const cetteSemaine = history.filter(h => new Date(h.realise_le) >= debutSemaine).length;
+  const ceMois = history.filter(h => new Date(h.realise_le) >= debutMois).length;
+
   return (
     <div style={{ padding: 16 }}>
-      <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>Mes interventions</h1>
-        <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{history.length} intervention{history.length > 1 ? 's' : ''} enregistrée{history.length > 1 ? 's' : ''}</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+        <TrendingUp size={18} color="#22c55e" />
+        <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Mes stats</h1>
+      </div>
+      <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>{history.length} intervention{history.length > 1 ? 's' : ''} enregistrée{history.length > 1 ? 's' : ''}</div>
+
+      {/* KPI stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 24 }}>
+        {[
+          { label: 'Cette semaine', value: cetteSemaine, color: '#0ea5e9' },
+          { label: 'Ce mois', value: ceMois, color: '#6366f1' },
+          { label: 'Total résolus', value: resolus, color: '#22c55e' },
+        ].map(k => (
+          <div key={k.label} style={{ background: 'var(--bg-card)', border: `1px solid ${k.color}33`, borderRadius: 12, padding: '14px 12px', textAlign: 'center' }}>
+            <div style={{ fontSize: 26, fontWeight: 800, color: k.color }}>{k.value}</div>
+            <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>{k.label}</div>
+          </div>
+        ))}
       </div>
 
+      {/* Liste interventions */}
       {loading ? (
         <div style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: 40 }}>Chargement...</div>
       ) : history.length === 0 ? (

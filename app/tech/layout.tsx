@@ -23,10 +23,34 @@ export default function TechLayout({ children }: { children: React.ReactNode }) 
     if (isLogin) return;
     const id = typeof window !== 'undefined' ? localStorage.getItem('tech_id') : null;
     if (!id) return;
+
+    // Comptage initial
     supabase.from('tickets').select('*', { count: 'exact', head: true })
-      .eq('technicien_id', id)
-      .in('statut', ['ouvert', 'en_cours'])
+      .eq('technicien_id', id).in('statut', ['ouvert', 'en_cours'])
       .then(({ count }) => setTicketActifs(count || 0));
+
+    // Demande permission notifications
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    // Écoute real-time nouveaux tickets assignés
+    const channel = supabase.channel('tech-tickets-' + id)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'tickets',
+        filter: `technicien_id=eq.${id}`,
+      }, (payload) => {
+        setTicketActifs(n => n + 1);
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          new Notification('Nouveau ticket assigné', {
+            body: (payload.new as { titre?: string }).titre || 'Un ticket vous a été assigné',
+            icon: '/favicon.ico',
+          });
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, [isLogin]);
 
   if (isLogin) return <>{children}</>;
