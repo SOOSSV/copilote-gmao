@@ -11,25 +11,23 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export default function PushNotifSetup({ role = 'manager' }: { role?: string }) {
+  const [mounted, setMounted] = useState(false);
+  const [supported, setSupported] = useState(false);
   const [status, setStatus] = useState<'idle' | 'granted' | 'denied' | 'loading'>('idle');
 
   useEffect(() => {
+    setMounted(true);
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-    // Enregistrer le SW
+    setSupported(true);
     navigator.serviceWorker.register('/sw.js').catch(() => {});
-    // Vérifier permission actuelle
     if (Notification.permission === 'granted') {
-      checkSubscription();
+      navigator.serviceWorker.ready.then(reg =>
+        reg.pushManager.getSubscription().then(sub => setStatus(sub ? 'granted' : 'idle'))
+      );
     } else if (Notification.permission === 'denied') {
       setStatus('denied');
     }
   }, []);
-
-  async function checkSubscription() {
-    const reg = await navigator.serviceWorker.ready;
-    const sub = await reg.pushManager.getSubscription();
-    setStatus(sub ? 'granted' : 'idle');
-  }
 
   async function subscribe() {
     setStatus('loading');
@@ -64,27 +62,27 @@ export default function PushNotifSetup({ role = 'manager' }: { role?: string }) 
     setStatus('idle');
   }
 
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return null;
+  if (!mounted || !supported) return null;
 
   if (status === 'granted') {
     return (
-      <button onClick={unsubscribe} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: '#22c55e22', border: '1px solid #22c55e44', borderRadius: 8, color: '#22c55e', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-        <Bell size={13} /> Notifs activées
+      <button onClick={unsubscribe} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: '#22c55e22', border: '1px solid #22c55e44', borderRadius: 8, color: '#22c55e', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+        <Bell size={13} /> Notifs ON
       </button>
     );
   }
 
   if (status === 'denied') {
     return (
-      <span style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', color: 'var(--text-secondary)', fontSize: 12 }}>
-        <BellOff size={13} /> Notifs bloquées
+      <span style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 10px', color: 'var(--text-secondary)', fontSize: 11, flexShrink: 0 }}>
+        <BellOff size={13} /> Bloqué
       </span>
     );
   }
 
   return (
-    <button onClick={subscribe} disabled={status === 'loading'} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-      <Bell size={13} /> {status === 'loading' ? '...' : 'Activer notifs'}
+    <button onClick={subscribe} disabled={status === 'loading'} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+      <Bell size={13} /> {status === 'loading' ? '...' : 'Notifs'}
     </button>
   );
 }
