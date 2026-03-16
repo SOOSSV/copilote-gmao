@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { AlertTriangle, CheckCircle, Clock, Wrench, TrendingUp, Activity, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import PushNotifSetup from '@/components/PushNotifSetup';
 
 type Stats = {
   total: number; ouverts: number; en_cours: number; fermes: number;
@@ -99,8 +100,13 @@ export default function ManagerDashboard() {
         <div style={{ padding: '24px 16px 100px' }}>
           {/* Header */}
           <div style={{ marginBottom: 24 }}>
-            <div style={{ fontSize: 22, fontWeight: 800, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: 2 }}>COPILOTE</div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Espace Manager · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 800, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: 2 }}>COPILOTE</div>
+                <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Espace Manager · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
+              </div>
+              <PushNotifSetup role="manager" />
+            </div>
           </div>
 
           {/* Alertes urgentes */}
