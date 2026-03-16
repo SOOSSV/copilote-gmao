@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { LayoutDashboard, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut } from 'lucide-react';
+import PushNotifSetup from '@/components/PushNotifSetup';
 
 const navManager = [
   { href: '/manager',             icon: LayoutDashboard, label: 'Dashboard' },
@@ -93,6 +94,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
           >
             <LogOut size={18} /> Déconnexion
           </button>
+            <div style={{ padding: '8px 4px 0' }}><PushNotifSetup role="manager" /></div>
           <div style={{ fontSize: 11, color: 'var(--text-secondary)', padding: '8px 12px 0' }}>COPILOTE v1.0</div>
         </div>
       </aside>
