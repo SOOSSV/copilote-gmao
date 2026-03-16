@@ -112,7 +112,7 @@ export default function ManagerTicketsPage() {
                   value={t.statut}
                   onChange={e => updateStatut(t.id, e.target.value)}
                   style={{ width: '100%', maxWidth: '100%', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 5, padding: '4px 6px', color: 'var(--text-primary)', fontSize: 11, cursor: 'pointer', boxSizing: 'border-box' }}
-                  onClick={e => e.preventDefault()}
+                  onClick={e => e.stopPropagation()}
                 >
                   <option value="ouvert">Ouvert</option>
                   <option value="en_cours">En cours</option>
@@ -135,7 +135,9 @@ export default function ManagerTicketsPage() {
               <tbody>
                 {filtered.map((t, i) => (
                   <tr key={t.id} style={{ borderBottom: i < filtered.length - 1 ? '1px solid var(--border)' : 'none' }}>
-                    <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 500, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titre}</td>
+                    <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 500, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <Link href={`/manager/tickets/${t.id}`} style={{ color: 'inherit', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')} onMouseLeave={e => (e.currentTarget.style.color = 'inherit')}>{t.titre}</Link>
+                    </td>
                     <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-secondary)' }}>{(t.machines as { nom: string } | null)?.nom || '—'}</td>
                     <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-secondary)' }}>{(t.technicians as { prenom: string; nom: string } | null)?.prenom || '—'}</td>
                     <td style={{ padding: '12px 16px' }}><PrioriteBadge priorite={t.priorite} /></td>

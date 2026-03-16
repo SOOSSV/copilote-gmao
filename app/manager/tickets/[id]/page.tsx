@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { ArrowLeft, Wrench, MapPin, User, Calendar, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { ArrowLeft, Wrench, MapPin, User, Calendar, AlertTriangle, CheckCircle, Clock, UserCheck } from 'lucide-react';
 
 type Ticket = {
   id: string;
@@ -14,9 +14,12 @@ type Ticket = {
   type_intervention: string;
   classification: string;
   created_at: string;
+  technicien_id: string | null;
   machines: { nom: string; localisation: string; type_equipement: string } | null;
   technicians: { prenom: string; nom: string; specialites: string[] } | null;
 };
+
+type Technician = { id: string; prenom: string; nom: string; specialites: string[] };
 
 const prioriteColor: Record<string, string> = {
   urgente: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e',
@@ -31,19 +34,31 @@ export default function TicketDetailPage() {
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [techs, setTechs] = useState<Technician[]>([]);
+  const [selectedTech, setSelectedTech] = useState('');
+  const [assigning, setAssigning] = useState(false);
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
-        .from('tickets')
-        .select('*, machines(nom, localisation, type_equipement), technicians(prenom, nom, specialites)')
-        .eq('id', params.id)
-        .single();
-      setTicket(data as Ticket);
+      const [{ data: t }, { data: techList }] = await Promise.all([
+        supabase.from('tickets').select('*, machines(nom, localisation, type_equipement), technicians(prenom, nom, specialites)').eq('id', params.id).single(),
+        supabase.from('technicians').select('id, prenom, nom, specialites').eq('actif', true).order('prenom'),
+      ]);
+      setTicket(t as Ticket);
+      setTechs((techList as Technician[]) || []);
+      setSelectedTech((t as Ticket)?.technicien_id || '');
       setLoading(false);
     }
     if (params.id) load();
   }, [params.id]);
+
+  async function assignTech() {
+    setAssigning(true);
+    await supabase.from('tickets').update({ technicien_id: selectedTech || null }).eq('id', params.id as string);
+    const found = techs.find(t => t.id === selectedTech) || null;
+    setTicket(prev => prev ? { ...prev, technicien_id: selectedTech || null, technicians: found } : prev);
+    setAssigning(false);
+  }
 
   async function updateStatut(statut: string) {
     setSaving(true);
@@ -140,6 +155,20 @@ export default function TicketDetailPage() {
               <div style={{ fontSize: 13 }}>{formatDate(ticket.created_at)}</div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Assigner technicien */}
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px', marginBottom: 12 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 12 }}>Assigner un technicien</div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <select value={selectedTech} onChange={e => setSelectedTech(e.target.value)} style={{ flex: 1, background: 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 8, padding: '9px 12px', color: 'var(--text-primary)', fontSize: 13 }}>
+            <option value="">— Non assigné —</option>
+            {techs.map(t => <option key={t.id} value={t.id}>{t.prenom} {t.nom}</option>)}
+          </select>
+          <button onClick={assignTech} disabled={assigning} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 16px', cursor: 'pointer', fontWeight: 600, fontSize: 13, opacity: assigning ? 0.6 : 1, whiteSpace: 'nowrap' }}>
+            <UserCheck size={15} /> {assigning ? '...' : 'Assigner'}
+          </button>
         </div>
       </div>
 

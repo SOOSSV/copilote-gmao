@@ -92,7 +92,7 @@ export default function PreventifPage() {
   });
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 1000 }}>
+    <div style={{ padding: 'clamp(16px, 4vw, 32px)', maxWidth: 1000, boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Maintenance Préventive</h1>
@@ -129,11 +129,45 @@ export default function PreventifPage() {
       </div>
 
       {/* Liste */}
-      {loading ? <div style={{ color: 'var(--text-secondary)' }}>Chargement...</div> : (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
-          {filtered.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>Aucun plan trouvé</div>
-          ) : (
+      {loading ? <div style={{ color: 'var(--text-secondary)' }}>Chargement...</div> : filtered.length === 0 ? (
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>Aucun plan trouvé</div>
+      ) : (
+        <>
+          {/* Vue mobile : cartes */}
+          <div className="preventif-mobile" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {filtered.map(p => {
+              const days = getDaysLeft(p.prochaine_exec);
+              const st = getStatus(days);
+              const StatusIcon = st.icon;
+              return (
+                <div key={p.id} style={{ background: 'var(--bg-card)', border: `1px solid ${days < 0 ? '#ef444433' : days <= 7 ? '#f59e0b33' : 'var(--border)'}`, borderRadius: 10, padding: '12px 14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                    <div style={{ flex: 1, paddingRight: 8 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700 }}>{p.titre}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{p.machines?.nom || '—'}</div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
+                      <StatusIcon size={13} color={st.color} />
+                      <span style={{ fontSize: 12, color: st.color, fontWeight: 700 }}>{days < 0 ? `${Math.abs(days)}j retard` : st.label}</span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Tous les {p.frequence_jours}j</span>
+                      <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>· {new Date(p.prochaine_exec).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button onClick={() => markDone(p)} style={{ background: '#22c55e18', border: 'none', borderRadius: 6, padding: '5px 10px', cursor: 'pointer', color: '#22c55e', fontSize: 12, fontWeight: 600 }}>✓ Fait</button>
+                      <button onClick={() => remove(p.id)} style={{ background: '#ef444418', border: 'none', borderRadius: 6, padding: '5px 8px', cursor: 'pointer', color: '#ef4444' }}><X size={12} /></button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Vue desktop : tableau */}
+          <div className="preventif-desktop" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
@@ -169,7 +203,7 @@ export default function PreventifPage() {
                       </td>
                       <td style={{ padding: '12px 16px' }}>
                         <div style={{ display: 'flex', gap: 6 }}>
-                          <button onClick={() => markDone(p)} title="Marquer fait" style={{ background: '#22c55e18', border: 'none', borderRadius: 6, padding: '6px 10px', cursor: 'pointer', color: '#22c55e', fontSize: 12, fontWeight: 600 }}>✓ Fait</button>
+                          <button onClick={() => markDone(p)} style={{ background: '#22c55e18', border: 'none', borderRadius: 6, padding: '6px 10px', cursor: 'pointer', color: '#22c55e', fontSize: 12, fontWeight: 600 }}>✓ Fait</button>
                           <button onClick={() => remove(p.id)} style={{ background: '#ef444418', border: 'none', borderRadius: 6, padding: '6px', cursor: 'pointer', color: '#ef4444' }}><X size={13} /></button>
                         </div>
                       </td>
@@ -178,8 +212,8 @@ export default function PreventifPage() {
                 })}
               </tbody>
             </table>
-          )}
-        </div>
+          </div>
+        </>
       )}
 
       {/* Modal */}

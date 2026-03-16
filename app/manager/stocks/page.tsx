@@ -101,9 +101,9 @@ export default function StocksPage() {
   const alertes = stocks.filter(s => s.quantite_actuelle <= s.seuil_minimum).length;
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 1100 }}>
+    <div style={{ padding: 'clamp(16px, 4vw, 32px)', maxWidth: 1100, boxSizing: 'border-box' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Stocks & Pièces</h1>
           <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{stocks.length} article{stocks.length > 1 ? 's' : ''} · {alertes} en alerte</div>
@@ -155,47 +155,75 @@ export default function StocksPage() {
           <div>Aucun article trouvé</div>
         </div>
       ) : (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Statut', 'Référence', 'Nom', 'Catégorie', 'Qté actuelle', 'Seuil mini', 'Emplacement', ''].map(h => (
-                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((s, i) => {
-                const alerte = s.quantite_actuelle <= s.seuil_minimum;
-                return (
-                  <tr key={s.id} style={{ borderBottom: i < filtered.length - 1 ? '1px solid var(--border)' : 'none', background: alerte ? '#ef444408' : 'transparent' }}>
-                    <td style={{ padding: '12px 16px' }}>
-                      {alerte
-                        ? <AlertTriangle size={16} color="#ef4444" />
-                        : <CheckCircle size={16} color="#22c55e" />}
-                    </td>
-                    <td style={{ padding: '12px 16px', fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{s.reference}</td>
-                    <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 600 }}>{s.nom}</td>
-                    <td style={{ padding: '12px 16px', fontSize: 12, color: 'var(--text-secondary)' }}>{s.categorie || '—'}</td>
-                    <td style={{ padding: '12px 16px', fontSize: 14, fontWeight: 800, color: alerte ? '#ef4444' : '#22c55e', whiteSpace: 'nowrap' }}>
-                      {s.quantite_actuelle} <span style={{ fontSize: 11, fontWeight: 400 }}>{s.unite}</span>
-                    </td>
-                    <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
-                      {s.seuil_minimum} {s.unite}
-                    </td>
-                    <td style={{ padding: '12px 16px', fontSize: 12, color: 'var(--text-secondary)' }}>{s.emplacement || '—'}</td>
-                    <td style={{ padding: '12px 16px' }}>
-                      <div style={{ display: 'flex', gap: 6 }}>
-                        <button onClick={() => openEdit(s)} style={{ background: '#6366f118', border: 'none', borderRadius: 6, padding: '6px', cursor: 'pointer', color: '#6366f1' }}><Pencil size={13} /></button>
-                        <button onClick={() => remove(s)} style={{ background: '#ef444418', border: 'none', borderRadius: 6, padding: '6px', cursor: 'pointer', color: '#ef4444' }}><Trash2 size={13} /></button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {/* Vue mobile : cartes */}
+          <div className="stocks-mobile" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {filtered.map(s => {
+              const alerte = s.quantite_actuelle <= s.seuil_minimum;
+              return (
+                <div key={s.id} style={{ background: 'var(--bg-card)', border: `1px solid ${alerte ? '#ef444433' : 'var(--border)'}`, borderRadius: 10, padding: '12px 14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                    <div style={{ flex: 1, paddingRight: 8 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700 }}>{s.nom}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{s.reference}{s.categorie ? ` · ${s.categorie}` : ''}</div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                      <button onClick={() => openEdit(s)} style={{ background: '#6366f118', border: 'none', borderRadius: 6, padding: '6px', cursor: 'pointer', color: '#6366f1' }}><Pencil size={13} /></button>
+                      <button onClick={() => remove(s)} style={{ background: '#ef444418', border: 'none', borderRadius: 6, padding: '6px', cursor: 'pointer', color: '#ef4444' }}><Trash2 size={13} /></button>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                      {alerte ? <AlertTriangle size={13} color="#ef4444" /> : <CheckCircle size={13} color="#22c55e" />}
+                      <span style={{ fontSize: 14, fontWeight: 800, color: alerte ? '#ef4444' : '#22c55e' }}>{s.quantite_actuelle} <span style={{ fontSize: 11, fontWeight: 400 }}>{s.unite}</span></span>
+                    </div>
+                    <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>seuil : {s.seuil_minimum} {s.unite}</span>
+                    {s.emplacement && <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>📍 {s.emplacement}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Vue desktop : tableau */}
+          <div className="stocks-desktop" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  {['Statut', 'Référence', 'Nom', 'Catégorie', 'Qté actuelle', 'Seuil mini', 'Emplacement', ''].map(h => (
+                    <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((s, i) => {
+                  const alerte = s.quantite_actuelle <= s.seuil_minimum;
+                  return (
+                    <tr key={s.id} style={{ borderBottom: i < filtered.length - 1 ? '1px solid var(--border)' : 'none', background: alerte ? '#ef444408' : 'transparent' }}>
+                      <td style={{ padding: '12px 16px' }}>
+                        {alerte ? <AlertTriangle size={16} color="#ef4444" /> : <CheckCircle size={16} color="#22c55e" />}
+                      </td>
+                      <td style={{ padding: '12px 16px', fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{s.reference}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 600 }}>{s.nom}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 12, color: 'var(--text-secondary)' }}>{s.categorie || '—'}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 14, fontWeight: 800, color: alerte ? '#ef4444' : '#22c55e', whiteSpace: 'nowrap' }}>
+                        {s.quantite_actuelle} <span style={{ fontSize: 11, fontWeight: 400 }}>{s.unite}</span>
+                      </td>
+                      <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{s.seuil_minimum} {s.unite}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 12, color: 'var(--text-secondary)' }}>{s.emplacement || '—'}</td>
+                      <td style={{ padding: '12px 16px' }}>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button onClick={() => openEdit(s)} style={{ background: '#6366f118', border: 'none', borderRadius: 6, padding: '6px', cursor: 'pointer', color: '#6366f1' }}><Pencil size={13} /></button>
+                          <button onClick={() => remove(s)} style={{ background: '#ef444418', border: 'none', borderRadius: 6, padding: '6px', cursor: 'pointer', color: '#ef4444' }}><Trash2 size={13} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {/* Modal formulaire */}
