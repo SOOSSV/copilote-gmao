@@ -92,14 +92,6 @@ export default function DirecteurDashboard() {
             </div>
           )}
 
-          {/* KPI rapides */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 20 }}>
-            <KpiMini label="Taux résolution" value={`${tauxResolution}%`} color="#22c55e" icon={Target} href="/directeur/tickets?filtre=resolu" />
-            <KpiMini label="Charge" value={`${charge}%`} color="#6366f1" icon={Battery} href="/directeur/tickets?filtre=ouvert" />
-            <KpiMini label="Urgents" value={stats.urgents} color="#ef4444" icon={ShieldAlert} href="/directeur/tickets?filtre=urgente" />
-            <KpiMini label="Techniciens" value={stats.techniciens} color="#0ea5e9" icon={Users} href="/directeur/techniciens" />
-          </div>
-
           {/* Cartes navigation */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 20 }}>
             {[
