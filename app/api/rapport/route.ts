@@ -97,20 +97,21 @@ Réponds en JSON avec exactement ce format :
     const aiData = await aiRes.json();
     const rawOutput = aiData?.output || aiData?.text || aiData?.message || aiData?.response || '';
 
-    // Parse JSON depuis la réponse
+    // Parse JSON depuis la réponse (gère les blocs ```json ... ```)
     let contenu = rawOutput;
     let recommandations: string[] = [];
     try {
-      const jsonMatch = rawOutput.match(/\{[\s\S]*\}/);
+      const jsonMatch = rawOutput.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/) ||
+                        rawOutput.match(/(\{[\s\S]*"contenu"[\s\S]*\})/);
       if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
+        const parsed = JSON.parse(jsonMatch[1]);
         contenu = parsed.contenu || rawOutput;
         recommandations = parsed.recommandations || [];
       }
     } catch { /* garder rawOutput comme contenu */ }
 
     // Sauvegarder dans ai_analyses
-    const { data: saved } = await supabase.from('ai_analyses').insert({
+    const { data: saved, error: insertError } = await supabase.from('ai_analyses').insert({
       type_analyse: type,
       contenu,
       recommandations,
@@ -118,7 +119,20 @@ Réponds en JSON avec exactement ce format :
       modele_llm: 'n8n-ai',
     }).select().single();
 
-    return NextResponse.json({ success: true, analyse: saved });
+    // Si l'insert échoue, on retourne quand même le contenu généré
+    const analyse = saved || {
+      id: `temp-${Date.now()}`,
+      type_analyse: type,
+      contenu,
+      recommandations,
+      periode_analysee: `30 derniers jours — ${total} tickets`,
+      modele_llm: 'n8n-ai',
+      created_at: new Date().toISOString(),
+    };
+
+    if (insertError) console.error('Supabase insert error:', insertError);
+
+    return NextResponse.json({ success: true, analyse });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: 'Erreur génération rapport' }, { status: 500 });
