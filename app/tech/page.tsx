@@ -56,6 +56,7 @@ export default function TechDashboard() {
 
   async function demarrer(e: React.MouseEvent, id: string) {
     e.preventDefault();
+    e.stopPropagation();
     await supabase.from('tickets').update({ statut: 'en_cours' }).eq('id', id);
     setTickets(prev => prev.map(t => t.id === id ? { ...t, statut: 'en_cours' } : t));
   }
