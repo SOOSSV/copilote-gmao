@@ -119,20 +119,12 @@ Réponds en JSON avec exactement ce format :
       modele_llm: 'n8n-ai',
     }).select().single();
 
-    // Si l'insert échoue, on retourne quand même le contenu généré
-    const analyse = saved || {
-      id: `temp-${Date.now()}`,
-      type_analyse: type,
-      contenu,
-      recommandations,
-      periode_analysee: `30 derniers jours — ${total} tickets`,
-      modele_llm: 'n8n-ai',
-      created_at: new Date().toISOString(),
-    };
+    if (insertError) {
+      console.error('Supabase insert error:', insertError);
+      return NextResponse.json({ error: `Erreur sauvegarde : ${insertError.message}` }, { status: 500 });
+    }
 
-    if (insertError) console.error('Supabase insert error:', insertError);
-
-    return NextResponse.json({ success: true, analyse });
+    return NextResponse.json({ success: true, analyse: saved });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: 'Erreur génération rapport' }, { status: 500 });
