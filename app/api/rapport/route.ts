@@ -92,7 +92,7 @@ Réponds en JSON avec exactement ce format :
     const aiRes = await fetch(N8N_CHAT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: prompt, sessionId: 'rapport-ia' }),
+      body: JSON.stringify({ chatInput: prompt, sessionId: 'rapport-ia' }),
     });
     const aiData = await aiRes.json();
     const rawOutput = aiData?.output || aiData?.text || aiData?.message || aiData?.response || '';

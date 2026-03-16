@@ -32,6 +32,7 @@ export default function RapportsPage() {
   const [ouvert, setOuvert] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [selectedType, setSelectedType] = useState('rapport_hebdo');
+  const [error, setError] = useState('');
 
   async function fetchAnalyses() {
     const { data } = await supabase
@@ -48,6 +49,7 @@ export default function RapportsPage() {
 
   async function generate() {
     setGenerating(true);
+    setError('');
     try {
       const res = await fetch('/api/rapport', {
         method: 'POST',
@@ -58,8 +60,12 @@ export default function RapportsPage() {
       if (data.analyse) {
         setAnalyses(prev => [data.analyse, ...prev]);
         setOuvert(data.analyse.id);
+      } else {
+        setError(data.error || 'Erreur inconnue');
       }
-    } catch { /* silent */ }
+    } catch (e) {
+      setError('Erreur de connexion');
+    }
     setGenerating(false);
   }
 
@@ -98,6 +104,7 @@ export default function RapportsPage() {
             </button>
           ))}
         </div>
+        {error && <div style={{ background: '#ef444418', border: '1px solid #ef444433', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#ef4444', marginBottom: 12 }}>⚠️ {error}</div>}
         <button onClick={generate} disabled={generating} style={{
           display: 'flex', alignItems: 'center', gap: 8,
           background: generating ? '#6366f177' : '#6366f1',
