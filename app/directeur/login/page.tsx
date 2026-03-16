@@ -17,7 +17,7 @@ export default function DirecteurLoginPage() {
     setLoading(true);
     setTimeout(() => {
       if (password === DIRECTEUR_PASSWORD) {
-        sessionStorage.setItem('directeur_auth', 'true');
+        localStorage.setItem('directeur_auth', 'true');
         router.push('/directeur');
       } else {
         setError(true);

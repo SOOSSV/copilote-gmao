@@ -32,7 +32,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (isLoginPage) return;
     if (typeof window !== 'undefined') {
-      const auth = sessionStorage.getItem('manager_auth');
+      const auth = localStorage.getItem('manager_auth');
       if (auth !== 'true') router.replace('/manager/login');
     }
   }, [isLoginPage, router]);
@@ -52,7 +52,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
   }
 
   function handleLogout() {
-    sessionStorage.removeItem('manager_auth');
+    localStorage.removeItem('manager_auth');
     router.replace('/manager/login');
   }
 

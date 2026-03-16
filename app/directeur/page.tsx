@@ -68,7 +68,7 @@ export default function DirecteurDashboard() {
   }, []);
 
   function handleLogout() {
-    sessionStorage.removeItem('directeur_auth');
+    localStorage.removeItem('directeur_auth');
     router.replace('/directeur/login');
   }
 

@@ -17,7 +17,7 @@ export default function ManagerLoginPage() {
     setLoading(true);
     setTimeout(() => {
       if (password === MANAGER_PASSWORD) {
-        sessionStorage.setItem('manager_auth', 'true');
+        localStorage.setItem('manager_auth', 'true');
         router.push('/manager');
       } else {
         setError(true);

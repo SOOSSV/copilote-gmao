@@ -81,7 +81,7 @@ export default function ManagerDashboard() {
   }
 
   function handleLogout() {
-    sessionStorage.removeItem('manager_auth');
+    localStorage.removeItem('manager_auth');
     router.replace('/manager/login');
   }
 

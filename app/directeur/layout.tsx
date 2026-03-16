@@ -22,7 +22,7 @@ export default function DirecteurLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     if (isLoginPage) return;
     if (typeof window !== 'undefined') {
-      const auth = sessionStorage.getItem('directeur_auth');
+      const auth = localStorage.getItem('directeur_auth');
       if (auth !== 'true') router.replace('/directeur/login');
     }
   }, [isLoginPage, router]);
@@ -34,7 +34,7 @@ export default function DirecteurLayout({ children }: { children: React.ReactNod
   }
 
   function handleLogout() {
-    sessionStorage.removeItem('directeur_auth');
+    localStorage.removeItem('directeur_auth');
     router.replace('/directeur/login');
   }
 
