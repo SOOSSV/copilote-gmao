@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { LayoutDashboard, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut } from 'lucide-react';
+import { LayoutDashboard, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut, Package } from 'lucide-react';
 import PushNotifSetup from '@/components/PushNotifSetup';
 
 const navManager = [
@@ -11,6 +11,7 @@ const navManager = [
   { href: '/manager/tickets',     icon: Ticket,          label: 'Tickets' },
   { href: '/manager/machines',    icon: Factory,         label: 'Machines' },
   { href: '/manager/techniciens', icon: Users,           label: 'Techniciens' },
+  { href: '/manager/stocks',      icon: Package,         label: 'Stocks' },
   { href: '/manager/rapports',    icon: BarChart3,       label: 'Rapports IA' },
 ];
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { AlertTriangle, CheckCircle, Clock, Wrench, TrendingUp, Activity, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut, Bell } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, Wrench, TrendingUp, Activity, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut, Bell, Package } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import PushNotifSetup from '@/components/PushNotifSetup';
 
@@ -88,6 +88,7 @@ export default function ManagerDashboard() {
     { href: '/manager/tickets',   icon: Ticket,        label: 'Tickets',         color: '#f59e0b', badge: stats.ouverts > 0 ? `${stats.ouverts} ouverts` : null, badgeColor: '#f59e0b' },
     { href: '/manager/machines',  icon: Factory,       label: 'Machines',        color: '#8b5cf6', badge: null, badgeColor: '' },
     { href: '/manager/techniciens', icon: Users,       label: 'Techniciens',     color: '#06b6d4', badge: `${stats.techniciens}`, badgeColor: '#06b6d4' },
+    { href: '/manager/stocks',    icon: Package,       label: 'Stocks',          color: '#f59e0b', badge: null, badgeColor: '' },
     { href: '/manager/rapports',  icon: BarChart3,     label: 'Rapports IA',     color: '#22c55e', badge: null, badgeColor: '' },
     { href: '/manager/chat',      icon: MessageCircle, label: 'Chat IA',         color: '#a855f7', badge: null, badgeColor: '' },
     { href: '/manager/nouveau',   icon: PlusCircle,    label: 'Nouveau ticket',  color: '#10b981', badge: null, badgeColor: '' },
