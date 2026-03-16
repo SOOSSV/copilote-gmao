@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { supabase, Ticket } from '@/lib/supabase';
 import PrioriteBadge from '@/components/PrioriteBadge';
-import { Search, RefreshCw } from 'lucide-react';
+import { Search, RefreshCw, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 
 const statutColor: Record<string, string> = {
   ouvert:   '#6366f1',
@@ -99,7 +100,7 @@ export default function ManagerTicketsPage() {
           {/* Vue mobile : cartes */}
           <div className="tickets-mobile">
             {filtered.map(t => (
-              <div key={t.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 7, padding: '6px 8px', marginBottom: 5, overflow: 'hidden', minWidth: 0 }}>
+              <Link key={t.id} href={`/manager/tickets/${t.id}`} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 7, padding: '6px 8px', marginBottom: 5, overflow: 'hidden', minWidth: 0, display: 'block', textDecoration: 'none', color: 'inherit' }}>
                 <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titre}</div>
                 <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 5, alignItems: 'center' }}>
                   <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{(t.machines as { nom: string } | null)?.nom || '—'} · {(t.technicians as { prenom: string } | null)?.prenom || '—'}</span>
@@ -111,12 +112,13 @@ export default function ManagerTicketsPage() {
                   value={t.statut}
                   onChange={e => updateStatut(t.id, e.target.value)}
                   style={{ width: '100%', maxWidth: '100%', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 5, padding: '4px 6px', color: 'var(--text-primary)', fontSize: 11, cursor: 'pointer', boxSizing: 'border-box' }}
+                  onClick={e => e.preventDefault()}
                 >
                   <option value="ouvert">Ouvert</option>
                   <option value="en_cours">En cours</option>
                   <option value="resolu">Résolu</option>
                 </select>
-              </div>
+              </Link>
             ))}
           </div>
 

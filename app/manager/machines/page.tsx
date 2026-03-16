@@ -1,31 +1,48 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase, Machine } from '@/lib/supabase';
-import { Factory, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { Factory, CheckCircle, XCircle, AlertCircle, Cpu } from 'lucide-react';
+
+type Machine = {
+  id: string;
+  external_id: string;
+  nom: string;
+  type_equipement: string;
+  localisation: string;
+  criticite: string;
+  statut: string;
+  ticket_count?: number;
+};
 
 const statutConfig: Record<string, { color: string; icon: React.ElementType; label: string }> = {
-  actif:        { color: '#22c55e', icon: CheckCircle,  label: 'Actif' },
-  inactif:      { color: '#f59e0b', icon: AlertCircle,  label: 'Inactif' },
-  hors_service: { color: '#ef4444', icon: XCircle,      label: 'Hors service' },
+  actif:        { color: '#22c55e', icon: CheckCircle, label: 'Actif' },
+  inactif:      { color: '#f59e0b', icon: AlertCircle, label: 'Inactif' },
+  hors_service: { color: '#ef4444', icon: XCircle,     label: 'Hors service' },
+};
+
+const criticiteColor: Record<string, string> = {
+  critique: '#ef4444',
+  haute:    '#f59e0b',
+  normale:  '#6366f1',
+  basse:    '#22c55e',
 };
 
 export default function MachinesPage() {
-  const [machines, setMachines] = useState<(Machine & { ticket_count?: number })[]>([]);
+  const [machines, setMachines] = useState<Machine[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filtre, setFiltre] = useState('tous');
 
   useEffect(() => {
     async function load() {
       const { data: m } = await supabase.from('machines').select('*').order('nom');
       if (!m) { setLoading(false); return; }
 
-      // Compter tickets ouverts par machine
       const withCounts = await Promise.all(m.map(async machine => {
-        const { count } = await supabase
-          .from('tickets')
+        const { count } = await supabase.from('tickets')
           .select('*', { count: 'exact', head: true })
           .eq('machine_id', machine.id)
-          .neq('statut', 'ferme');
+          .in('statut', ['ouvert', 'en_cours']);
         return { ...machine, ticket_count: count || 0 };
       }));
 
@@ -35,50 +52,73 @@ export default function MachinesPage() {
     load();
   }, []);
 
+  const filtered = filtre === 'tous' ? machines : machines.filter(m => m.criticite === filtre);
+
   return (
-    <div style={{ padding: '28px 32px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
-        <Factory size={22} color="var(--accent)" />
-        <h1 style={{ fontSize: 22, fontWeight: 800 }}>Parc Machines</h1>
+    <div style={{ padding: '20px 16px', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+        <Factory size={20} color="var(--accent)" />
+        <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Parc Machines</h1>
+        <span style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '2px 10px', fontSize: 12, color: 'var(--text-secondary)' }}>
+          {machines.length}
+        </span>
+      </div>
+
+      {/* Filtres criticité */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'none' }}>
+        {['tous', 'critique', 'haute', 'normale'].map(f => (
+          <button key={f} onClick={() => setFiltre(f)} style={{
+            padding: '6px 14px', borderRadius: 8, border: '1px solid', whiteSpace: 'nowrap', flexShrink: 0,
+            borderColor: filtre === f ? (criticiteColor[f] || 'var(--accent)') : 'var(--border)',
+            background: filtre === f ? (criticiteColor[f] ? `${criticiteColor[f]}22` : 'var(--accent)') : 'var(--bg-card)',
+            color: filtre === f ? (criticiteColor[f] || 'white') : 'var(--text-secondary)',
+            fontSize: 12, fontWeight: 600, cursor: 'pointer',
+          }}>
+            {f.charAt(0).toUpperCase() + f.slice(1)}
+          </button>
+        ))}
       </div>
 
       {loading ? (
-        <div style={{ color: 'var(--text-secondary)' }}>Chargement...</div>
+        <div style={{ color: 'var(--text-secondary)', padding: 20 }}>Chargement...</div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
-          {machines.map(m => {
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+          {filtered.map(m => {
             const cfg = statutConfig[m.statut] || statutConfig.inactif;
-            const Icon = cfg.icon;
+            const StatIcon = cfg.icon;
+            const critColor = criticiteColor[m.criticite] || '#6366f1';
             return (
               <div key={m.id} style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                borderTop: `3px solid ${cfg.color}`,
-                borderRadius: 14, padding: '18px 20px',
+                background: 'var(--bg-card)', border: '1px solid var(--border)',
+                borderTop: `3px solid ${critColor}`, borderRadius: 14, padding: '16px 18px',
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>{m.nom}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{m.reference}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nom}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{m.external_id}</div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: cfg.color, fontSize: 12, fontWeight: 600 }}>
-                    <Icon size={14} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: cfg.color, fontSize: 11, fontWeight: 600, flexShrink: 0, marginLeft: 8 }}>
+                    <StatIcon size={13} />
                     {cfg.label}
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Localisation</span>
-                    <span>{m.localisation || '—'}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Type</span>
-                    <span style={{ textTransform: 'capitalize' }}>{m.type_machine || '—'}</span>
+                    <span style={{ textAlign: 'right', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.type_equipement || '—'}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Localisation</span>
+                    <span style={{ textAlign: 'right' }}>{m.localisation || '—'}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Criticité</span>
+                    <span style={{ color: critColor, fontWeight: 600, textTransform: 'capitalize' }}>{m.criticite}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, borderTop: '1px solid var(--border)', paddingTop: 8, marginTop: 2 }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Tickets ouverts</span>
-                    <span style={{ color: (m.ticket_count || 0) > 0 ? '#f59e0b' : 'var(--success)', fontWeight: 600 }}>
+                    <span style={{ fontWeight: 700, color: (m.ticket_count || 0) > 0 ? '#f59e0b' : 'var(--text-secondary)' }}>
                       {m.ticket_count || 0}
                     </span>
                   </div>
@@ -88,6 +128,7 @@ export default function MachinesPage() {
           })}
         </div>
       )}
+      {!loading && <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-secondary)' }}>{filtered.length} machine(s)</div>}
     </div>
   );
 }
