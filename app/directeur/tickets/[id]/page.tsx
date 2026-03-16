@@ -37,7 +37,7 @@ export default function DirecteurTicketDetailPage() {
   const statutLabel = ticket.statut === 'resolu' ? 'Résolu' : ticket.statut === 'en_cours' ? 'En cours' : 'Ouvert';
 
   return (
-    <div style={{ padding: 'clamp(14px, 3vw, 24px)', maxWidth: 760, boxSizing: 'border-box' }}>
+    <div style={{ padding: 'clamp(14px, 3vw, 22px)', maxWidth: 760, boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}>
           <ArrowLeft size={22} />

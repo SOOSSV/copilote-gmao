@@ -37,7 +37,7 @@ export default function DirecteurTechniciensPage() {
   }, []);
 
   return (
-    <div style={{ padding: 'clamp(14px, 3vw, 24px)', maxWidth: 1100, boxSizing: 'border-box' }}>
+    <div style={{ padding: 'clamp(14px, 3vw, 22px)', maxWidth: 1100, boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
         <Users size={20} color="#0ea5e9" />
         <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Techniciens</h1>
