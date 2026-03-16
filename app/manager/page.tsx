@@ -121,14 +121,14 @@ export default function ManagerDashboard() {
           {/* KPI rapides */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 24 }}>
             {[
-              { label: 'Ouverts', value: stats.ouverts, color: '#6366f1' },
-              { label: 'En cours', value: stats.en_cours, color: '#f59e0b' },
-              { label: 'Résolus', value: stats.fermes, color: '#22c55e' },
+              { label: 'Ouverts', value: stats.ouverts, color: '#6366f1', filtre: 'ouvert' },
+              { label: 'En cours', value: stats.en_cours, color: '#f59e0b', filtre: 'en_cours' },
+              { label: 'Résolus', value: stats.fermes, color: '#22c55e', filtre: 'resolu' },
             ].map(k => (
-              <div key={k.label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 12px', textAlign: 'center' }}>
+              <Link key={k.label} href={`/manager/tickets?filtre=${k.filtre}`} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 12px', textAlign: 'center', textDecoration: 'none', display: 'block' }}>
                 <div style={{ fontSize: 26, fontWeight: 800, color: k.color }}>{k.value}</div>
                 <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{k.label}</div>
-              </div>
+              </Link>
             ))}
           </div>
 
