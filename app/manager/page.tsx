@@ -178,8 +178,30 @@ export default function ManagerDashboard() {
             ))}
           </div>
 
-          {/* Cards denses — Machines + Techniciens */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+          {/* Tableau de bord + Tickets */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+            <Link href="/manager/dashboard" style={{ background: 'var(--bg-card)', border: `1px solid ${stats.urgents > 0 ? '#ef444433' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <BarChart3 size={14} color="#2563eb" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb' }}>Tableau de bord</span>
+              </div>
+              {stats.urgents > 0
+                ? <><div style={{ fontSize: 24, fontWeight: 800, color: '#ef4444', marginBottom: 2 }}>{stats.urgents}</div><div style={{ fontSize: 11, color: '#ef4444' }}>urgent{stats.urgents > 1 ? 's' : ''}</div></>
+                : <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>Aucune urgence</div>
+              }
+            </Link>
+            <Link href="/manager/tickets" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <Ticket size={14} color="#f59e0b" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b' }}>Tickets</span>
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: '#f59e0b', marginBottom: 2 }}>{stats.ouverts}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>ouverts · {stats.en_cours} en cours</div>
+            </Link>
+          </div>
+
+          {/* Machines + Techniciens */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
             <Link href="/manager/machines" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
                 <Factory size={14} color="#7c3aed" />
@@ -261,8 +283,15 @@ export default function ManagerDashboard() {
             </Link>
           </div>
 
-          {/* Chat IA + Nouveau ticket */}
+          {/* Préventif + Chat IA */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+            <Link href="/manager/preventif" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <CheckCircle size={14} color="#06b6d4" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#06b6d4' }}>Préventif</span>
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Plans maintenance</div>
+            </Link>
             <Link href="/manager/chat" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
                 <MessageCircle size={14} color="#0ea5e9" />
@@ -270,12 +299,16 @@ export default function ManagerDashboard() {
               </div>
               <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Copilote assistant</div>
             </Link>
-            <Link href="/manager/nouveau" style={{ background: '#10b98112', border: '1px solid #10b98133', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+          </div>
+
+          {/* Nouveau ticket */}
+          <div style={{ marginBottom: 10 }}>
+            <Link href="/manager/nouveau" style={{ background: '#10b98112', border: '1px solid #10b98133', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit', display: 'block' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <PlusCircle size={14} color="#10b981" />
                 <span style={{ fontSize: 12, fontWeight: 700, color: '#10b981' }}>Nouveau ticket</span>
+                <span style={{ marginLeft: 'auto', fontSize: 13, color: '#10b981', fontWeight: 700 }}>+ Créer</span>
               </div>
-              <div style={{ fontSize: 11, color: '#10b981', fontWeight: 600 }}>+ Créer</div>
             </Link>
           </div>
 

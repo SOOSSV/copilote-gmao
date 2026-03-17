@@ -11,12 +11,12 @@ type Stats = {
   urgents: number; machines: number; techniciens: number; stockAlertes: number;
 };
 
-function KpiCard({ label, value, sub, icon: Icon, color, big }: {
+function KpiCard({ label, value, sub, icon: Icon, color, big, href }: {
   label: string; value: string | number; sub?: string;
-  icon: React.ElementType; color: string; big?: boolean;
+  icon: React.ElementType; color: string; big?: boolean; href?: string;
 }) {
-  return (
-    <div style={{ background: 'var(--bg-card)', border: `1px solid ${color}33`, borderRadius: 16, padding: big ? '28px' : '22px 24px', position: 'relative', overflow: 'hidden' }}>
+  const inner = (
+    <div style={{ background: 'var(--bg-card)', border: `1px solid ${color}33`, borderRadius: 16, padding: big ? '28px' : '22px 24px', position: 'relative', overflow: 'hidden', cursor: href ? 'pointer' : 'default' }}>
       <div style={{ position: 'absolute', top: -16, right: -16, width: 80, height: 80, borderRadius: '50%', background: `${color}0d` }} />
       <div style={{ width: 40, height: 40, borderRadius: 12, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
         <Icon size={20} color={color} />
@@ -26,6 +26,7 @@ function KpiCard({ label, value, sub, icon: Icon, color, big }: {
       {sub && <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 6 }}>{sub}</div>}
     </div>
   );
+  return href ? <Link href={href} style={{ textDecoration: 'none' }}>{inner}</Link> : inner;
 }
 
 function KpiMini({ label, value, color, icon: Icon, href }: { label: string; value: string | number; color: string; icon: React.ElementType; href?: string }) {
@@ -200,13 +201,34 @@ export default function DirecteurDashboard() {
         {loading ? <div style={{ color: 'var(--text-secondary)' }}>Chargement...</div> : (
           <>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-              <KpiCard label="Taux de résolution" value={`${tauxResolution}%`} sub={`${stats.fermes} résolus sur ${stats.total} au total`} icon={TrendingUp} color="#22c55e" big />
-              <KpiCard label="Charge en cours" value={`${charge}%`} sub={`${stats.ouverts} ouverts · ${stats.en_cours} en traitement`} icon={Zap} color="#2563eb" big />
+              <KpiCard label="Taux de résolution" value={`${tauxResolution}%`} sub={`${stats.fermes} résolus sur ${stats.total} au total`} icon={TrendingUp} color="#22c55e" big href="/directeur/synthese" />
+              <KpiCard label="Charge en cours" value={`${charge}%`} sub={`${stats.ouverts} ouverts · ${stats.en_cours} en traitement`} icon={Zap} color="#2563eb" big href="/directeur/tickets" />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-              <KpiCard label="Tickets urgents"  value={stats.urgents}     icon={AlertTriangle} color="#ef4444" />
-              <KpiCard label="Machines actives" value={stats.machines}    icon={CheckCircle2}  color="#0ea5e9" />
-              <KpiCard label="Techniciens"       value={stats.techniciens} icon={Clock}         color="#7c3aed" />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>
+              <KpiCard label="Tickets urgents"  value={stats.urgents}     icon={AlertTriangle} color="#ef4444" href="/directeur/tickets?filtre=urgente" />
+              <KpiCard label="Machines actives" value={stats.machines}    icon={CheckCircle2}  color="#0ea5e9" href="/directeur/machines" />
+              <KpiCard label="Techniciens"       value={stats.techniciens} icon={Clock}         color="#7c3aed" href="/directeur/techniciens" />
+            </div>
+            {/* Nav dense desktop — toutes les sections */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+              {[
+                { href: '/directeur/synthese',    label: 'Vue synthèse',  sub: `${tauxResolution}% résolution`,              icon: TrendingUp,  color: '#22c55e' },
+                { href: '/directeur/tickets',     label: 'Tickets',       sub: `${stats.ouverts} ouverts · ${stats.urgents} urgents`, icon: Ticket,      color: '#f59e0b' },
+                { href: '/directeur/machines',    label: 'Machines',      sub: `${stats.machines} actives`,                  icon: Factory,     color: '#7c3aed' },
+                { href: '/directeur/techniciens', label: 'Techniciens',   sub: `${stats.techniciens} actifs`,                icon: Users,       color: '#0ea5e9' },
+                { href: '/directeur/stocks',      label: 'Stocks',        sub: stats.stockAlertes > 0 ? `${stats.stockAlertes} rupture${stats.stockAlertes > 1 ? 's' : ''}` : 'Niveaux OK', icon: Package, color: stats.stockAlertes > 0 ? '#f59e0b' : '#10b981' },
+                { href: '/directeur/rapports',    label: 'Rapports IA',   sub: 'Analyses & recommandations',                 icon: BarChart3,   color: '#2563eb' },
+              ].map(card => (
+                <Link key={card.href} href={card.href} style={{ textDecoration: 'none', background: 'var(--bg-card)', border: `1px solid ${card.color}33`, borderRadius: 12, padding: '16px 18px', display: 'block' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <div style={{ width: 30, height: 30, borderRadius: 8, background: `${card.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <card.icon size={15} color={card.color} />
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{card.label}</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{card.sub}</div>
+                </Link>
+              ))}
             </div>
           </>
         )}
