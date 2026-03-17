@@ -10,124 +10,97 @@ const supabase = createClient(
 
 const N8N_CHAT_URL = process.env.N8N_CHAT_URL || '';
 
+function extractJson(text: string) {
+  // Essai 1 : JSON direct entre accolades
+  try {
+    const first = text.indexOf('{');
+    const last = text.lastIndexOf('}');
+    if (first !== -1 && last !== -1) return JSON.parse(text.substring(first, last + 1));
+  } catch { /* continue */ }
+  // Essai 2 : bloc ```json ... ```
+  try {
+    const m = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (m) return JSON.parse(m[1].trim());
+  } catch { /* continue */ }
+  return null;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { ticket_id } = await req.json();
     if (!ticket_id) return NextResponse.json({ error: 'ticket_id requis' }, { status: 400 });
 
-    // Récupérer le ticket complet avec la machine
     const { data: ticket, error: ticketErr } = await supabase
       .from('tickets')
       .select('id, titre, description, priorite, statut, type_intervention, classification, machine_id, machines(nom, type_equipement, localisation)')
       .eq('id', ticket_id)
       .single();
 
-    if (ticketErr || !ticket) {
-      return NextResponse.json({ error: 'Ticket introuvable' }, { status: 404 });
-    }
+    if (ticketErr || !ticket) return NextResponse.json({ error: 'Ticket introuvable' }, { status: 404 });
 
     const machine = ticket.machines as unknown as { nom: string; type_equipement: string; localisation: string } | null;
 
-    // Historique des 5 derniers tickets sur la même machine
-    const { data: historique } = machine
-      ? await supabase
-          .from('tickets')
-          .select('titre, description, statut, classification, created_at')
-          .eq('machine_id', ticket.machine_id)
-          .neq('id', ticket_id)
-          .order('created_at', { ascending: false })
-          .limit(5)
-      : { data: [] };
-
-    // Historique maintenance sur cette machine
-    const { data: maintenance } = machine
-      ? await supabase
-          .from('maintenance_history')
-          .select('type_action, description, observations, realise_le')
-          .eq('machine_id', ticket.machine_id)
-          .order('realise_le', { ascending: false })
-          .limit(5)
-      : { data: [] };
+    const [{ data: historique }, { data: maintenance }] = await Promise.all([
+      supabase.from('tickets').select('titre, statut, classification, created_at')
+        .eq('machine_id', ticket.machine_id).neq('id', ticket_id)
+        .order('created_at', { ascending: false }).limit(5),
+      supabase.from('maintenance_history').select('type_action, description, realise_le')
+        .eq('machine_id', ticket.machine_id)
+        .order('realise_le', { ascending: false }).limit(5),
+    ]);
 
     const historiqueText = (historique || []).length > 0
       ? (historique || []).map(h => `- [${h.classification}] ${h.titre} (${h.statut}) — ${new Date(h.created_at).toLocaleDateString('fr-FR')}`).join('\n')
-      : '- Aucun incident antérieur enregistré';
+      : '- Aucun incident antérieur';
 
     const maintenanceText = (maintenance || []).length > 0
-      ? (maintenance || []).map(m => `- ${m.type_action} : ${m.description || m.observations || 'sans détail'} (${new Date(m.realise_le).toLocaleDateString('fr-FR')})`).join('\n')
-      : '- Aucune maintenance enregistrée';
+      ? (maintenance || []).map(m => `- ${m.type_action} : ${m.description || 'sans détail'} (${new Date(m.realise_le).toLocaleDateString('fr-FR')})`).join('\n')
+      : '- Aucune maintenance';
 
-    const prompt = `Tu es un expert GMAO spécialisé en maintenance industrielle boulangère.
+    const prompt = `Tu es un expert GMAO en maintenance industrielle boulangère. Analyse ce ticket et réponds UNIQUEMENT en JSON valide, sans texte autour.
 
-TICKET EN COURS :
-- Titre : ${ticket.titre}
-- Description : ${ticket.description || 'Non renseignée'}
-- Classification : ${ticket.classification}
-- Type : ${ticket.type_intervention}
-- Priorité : ${ticket.priorite}
+TICKET : ${ticket.titre} | ${ticket.classification} | ${ticket.priorite}
+DESCRIPTION : ${ticket.description || 'Non renseignée'}
+MACHINE : ${machine?.nom || 'Inconnue'} (${machine?.type_equipement || 'type inconnu'})
+HISTORIQUE MACHINE : ${historiqueText}
+MAINTENANCE : ${maintenanceText}
 
-MACHINE CONCERNÉE :
-- Nom : ${machine?.nom || 'Inconnue'}
-- Type : ${machine?.type_equipement || 'Non renseigné'}
-- Localisation : ${machine?.localisation || 'Non renseignée'}
+JSON ATTENDU (respecte exactement ce format) :
+{"cause_probable":"texte","actions_recommandees":["action1","action2","action3"],"niveau_urgence":"critique","pieces_probables":["piece1"],"temps_estime":"1h"}
 
-HISTORIQUE DES INCIDENTS SUR CETTE MACHINE (5 derniers) :
-${historiqueText}
+niveau_urgence doit être exactement : critique, élevé, modéré ou faible`;
 
-HISTORIQUE MAINTENANCE (5 dernières) :
-${maintenanceText}
+    if (!N8N_CHAT_URL) return NextResponse.json({ error: 'N8N_CHAT_URL non configurée sur le serveur' }, { status: 500 });
 
-Analyse ce ticket et réponds UNIQUEMENT en JSON avec ce format exact :
-{
-  "cause_probable": "Explication concise de la cause probable (2-3 phrases max)",
-  "actions_recommandees": ["Action 1 précise et actionnable", "Action 2", "Action 3"],
-  "niveau_urgence": "critique|élevé|modéré|faible",
-  "pieces_probables": ["Pièce ou composant 1", "Pièce 2"],
-  "temps_estime": "Estimation du temps d'intervention"
-}`;
-
-    // Appel IA via n8n
     const aiRes = await fetch(N8N_CHAT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chatInput: prompt, sessionId: `diag-${ticket_id}` }),
     });
 
-    if (!aiRes.ok) {
-      return NextResponse.json({ error: 'Erreur appel IA' }, { status: 502 });
-    }
+    if (!aiRes.ok) return NextResponse.json({ error: `n8n erreur ${aiRes.status}` }, { status: 502 });
 
     const aiData = await aiRes.json();
     const rawOutput = aiData?.output || aiData?.text || aiData?.message || aiData?.response || '';
 
-    // Extraire le JSON
-    let diagnostic: {
-      cause_probable: string;
-      actions_recommandees: string[];
-      niveau_urgence: string;
-      pieces_probables: string[];
-      temps_estime: string;
-    } | null = null;
+    if (!rawOutput) return NextResponse.json({ error: 'n8n a renvoyé une réponse vide — vérifiez que le workflow est actif' }, { status: 500 });
 
-    try {
-      const firstBrace = rawOutput.indexOf('{');
-      const lastBrace = rawOutput.lastIndexOf('}');
-      if (firstBrace !== -1 && lastBrace !== -1) {
-        diagnostic = JSON.parse(rawOutput.substring(firstBrace, lastBrace + 1));
-      }
-    } catch { /* parsing failed */ }
+    const parsed = extractJson(rawOutput);
 
-    if (!diagnostic) {
-      return NextResponse.json({ error: 'Réponse IA invalide', raw: rawOutput }, { status: 500 });
-    }
+    // Fallback : si le JSON ne parse pas, on structure la réponse brute
+    const diagnostic = parsed ?? {
+      cause_probable: rawOutput.substring(0, 400),
+      actions_recommandees: ['Consulter un technicien spécialisé'],
+      niveau_urgence: 'modéré',
+      pieces_probables: [],
+      temps_estime: 'À évaluer sur place',
+    };
 
-    // Sauvegarder dans la colonne diagnostic_ia du ticket
-    const diagnosticJson = JSON.stringify(diagnostic);
-    await supabase.from('tickets').update({ diagnostic_ia: diagnosticJson }).eq('id', ticket_id);
-
+    await supabase.from('tickets').update({ diagnostic_ia: JSON.stringify(diagnostic) }).eq('id', ticket_id);
     return NextResponse.json({ success: true, diagnostic });
+
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+    return NextResponse.json({ error: `Erreur serveur : ${err instanceof Error ? err.message : 'inconnue'}` }, { status: 500 });
   }
 }

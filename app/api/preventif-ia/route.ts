@@ -10,6 +10,19 @@ const supabase = createClient(
 
 const N8N_CHAT_URL = process.env.N8N_CHAT_URL || '';
 
+function extractJson(text: string) {
+  try {
+    const first = text.indexOf('{');
+    const last = text.lastIndexOf('}');
+    if (first !== -1 && last !== -1) return JSON.parse(text.substring(first, last + 1));
+  } catch { /* continue */ }
+  try {
+    const m = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (m) return JSON.parse(m[1].trim());
+  } catch { /* continue */ }
+  return null;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { machine_id } = await req.json();
@@ -54,28 +67,25 @@ Réponds UNIQUEMENT en JSON avec ce format exact :
 
 Fréquences typiques : 7 (hebdo), 30 (mensuel), 90 (trimestriel), 180 (semestriel), 365 (annuel).`;
 
+    if (!N8N_CHAT_URL) return NextResponse.json({ error: 'N8N_CHAT_URL non configurée sur le serveur' }, { status: 500 });
+
     const aiRes = await fetch(N8N_CHAT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chatInput: prompt, sessionId: `preventif-ia-${machine_id}` }),
     });
 
-    if (!aiRes.ok) return NextResponse.json({ error: 'Erreur appel IA' }, { status: 502 });
+    if (!aiRes.ok) return NextResponse.json({ error: `n8n erreur ${aiRes.status}` }, { status: 502 });
 
     const aiData = await aiRes.json();
     const rawOutput = aiData?.output || aiData?.text || aiData?.message || aiData?.response || '';
 
-    let plans: { titre: string; description: string; frequence_jours: number }[] = [];
-    try {
-      const first = rawOutput.indexOf('{');
-      const last = rawOutput.lastIndexOf('}');
-      if (first !== -1 && last !== -1) {
-        const parsed = JSON.parse(rawOutput.substring(first, last + 1));
-        plans = parsed.plans || [];
-      }
-    } catch { /* parsing failed */ }
+    if (!rawOutput) return NextResponse.json({ error: 'n8n a renvoyé une réponse vide — vérifiez que le workflow est actif' }, { status: 500 });
 
-    if (plans.length === 0) return NextResponse.json({ error: 'Réponse IA invalide' }, { status: 500 });
+    const parsed = extractJson(rawOutput);
+    const plans: { titre: string; description: string; frequence_jours: number }[] = parsed?.plans || [];
+
+    if (plans.length === 0) return NextResponse.json({ error: 'Aucune suggestion générée — réessayez' }, { status: 500 });
 
     return NextResponse.json({ success: true, plans, machine: machine.nom });
   } catch (err) {

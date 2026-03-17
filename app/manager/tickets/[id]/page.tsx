@@ -71,9 +71,12 @@ export default function TicketDetailPage() {
   }, [params.id]);
 
   async function assignTech() {
+    const tech = techs.find(t => t.id === selectedTech);
+    const label = tech ? `${tech.prenom} ${tech.nom}` : 'retirer le technicien assigné';
+    if (!window.confirm(`Confirmer : ${label} ?`)) return;
     setAssigning(true);
     await supabase.from('tickets').update({ technicien_id: selectedTech || null }).eq('id', params.id as string);
-    const found = techs.find(t => t.id === selectedTech) || null;
+    const found = tech || null;
     setTicket(prev => prev ? { ...prev, technicien_id: selectedTech || null, technicians: found } : prev);
     setAssigning(false);
   }
