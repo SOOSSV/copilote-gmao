@@ -25,7 +25,7 @@ type HistEntry = {
 };
 
 type PlanPreventif = {
-  id: string; titre: string; description: string | null;
+  id: string; nom: string; description: string | null;
   frequence_jours: number; prochaine_exec: string;
   technicians: { prenom: string; nom: string } | null;
 };
@@ -58,7 +58,7 @@ export default function MachineDetailPage() {
           .eq('machine_id', params.id).order('created_at', { ascending: false }).limit(30),
         supabase.from('maintenance_history').select('id, type_action, description, pieces_changees, realise_le, technicians(prenom, nom)')
           .eq('machine_id', params.id).order('realise_le', { ascending: false }).limit(30),
-        supabase.from('preventive_plans').select('id, titre, description, frequence_jours, prochaine_exec, technicians(prenom, nom)')
+        supabase.from('preventive_plans').select('id, nom, description, frequence_jours, prochaine_exec, technicians(prenom, nom)')
           .eq('machine_id', params.id).eq('actif', true).order('prochaine_exec'),
       ]);
       setMachine(m as Machine);
@@ -224,7 +224,7 @@ export default function MachineDetailPage() {
                 return (
                   <div key={p.id} style={{ background: 'var(--bg-card)', border: `1px solid ${days < 0 ? '#ef444433' : days <= 7 ? '#f59e0b33' : 'var(--border)'}`, borderRadius: 10, padding: '12px 14px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700 }}>{p.titre}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700 }}>{p.nom}</div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, marginLeft: 8 }}>
                         <Icon size={11} color={color} />
                         <span style={{ fontSize: 11, color, fontWeight: 700 }}>{days < 0 ? `${Math.abs(days)}j retard` : `J-${days}`}</span>

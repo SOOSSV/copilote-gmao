@@ -9,15 +9,15 @@ const supabase = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { machine_id, titre, description, frequence_jours, prochaine_exec, technicien_id } = body;
+    const { machine_id, nom, description, frequence_jours, prochaine_exec, technicien_id } = body;
 
-    if (!machine_id || !titre || !prochaine_exec) {
+    if (!machine_id || !nom || !prochaine_exec) {
       return NextResponse.json({ error: 'Champs obligatoires manquants' }, { status: 400 });
     }
 
     const { data, error } = await supabase.rpc('create_preventive_plan', {
       p_machine_id: machine_id,
-      p_titre: titre.trim(),
+      p_nom: nom.trim(),
       p_description: description?.trim() || null,
       p_frequence_jours: parseInt(frequence_jours) || 30,
       p_prochaine_exec: prochaine_exec,

@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 type Plan = {
   id: string;
   machine_id: string;
-  titre: string;
+  nom: string;
   description: string | null;
   frequence_jours: number;
   prochaine_exec: string;
@@ -22,7 +22,7 @@ type Machine = { id: string; nom: string; localisation: string };
 type Tech = { id: string; prenom: string; nom: string };
 type IASuggestion = { titre: string; description: string; frequence_jours: number };
 
-const emptyForm = { machine_id: '', titre: '', description: '', frequence_jours: '30', prochaine_exec: '', technicien_id: '' };
+const emptyForm = { machine_id: '', nom: '', description: '', frequence_jours: '30', prochaine_exec: '', technicien_id: '' };
 
 const inp: React.CSSProperties = { width: '100%', background: 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 8, padding: '9px 12px', color: 'var(--text-primary)', fontSize: 13, boxSizing: 'border-box', outline: 'none' };
 const lbl: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: 5 };
@@ -47,7 +47,7 @@ export default function PreventifPage() {
 
   async function load() {
     const [{ data: p }, { data: m }, { data: t }] = await Promise.all([
-      supabase.from('preventive_plans').select('*, machines(nom, localisation), technicians(prenom, nom)').eq('actif', true).order('prochaine_exec'),
+      supabase.from('preventive_plans').select('id, machine_id, nom, description, frequence_jours, prochaine_exec, actif, technicien_id, machines(nom, localisation), technicians(prenom, nom)').eq('actif', true).order('prochaine_exec'),
       supabase.from('machines').select('id, nom, localisation').eq('statut', 'actif').order('nom'),
       supabase.from('technicians').select('id, prenom, nom').order('prenom'),
     ]);
@@ -70,7 +70,7 @@ export default function PreventifPage() {
   }
 
   async function save() {
-    if (!form.machine_id || !form.titre || !form.prochaine_exec) return;
+    if (!form.machine_id || !form.nom || !form.prochaine_exec) return;
     setSaving(true);
     setSaveError(null);
     try {
@@ -110,8 +110,8 @@ export default function PreventifPage() {
 
       // 2. Créer un ticket préventif résolu pour la traçabilité
       const { data: ticket, error: e2 } = await supabase.from('tickets').insert({
-        titre: plan.titre,
-        description: plan.description || `Maintenance préventive réalisée : ${plan.titre}`,
+        titre: plan.nom,
+        description: plan.description || `Maintenance préventive réalisée : ${plan.nom}`,
         machine_id: plan.machine_id,
         technicien_id: plan.technicien_id || null,
         type_intervention: 'preventive',
@@ -128,13 +128,13 @@ export default function PreventifPage() {
         machine_id: plan.machine_id,
         technicien_id: plan.technicien_id || null,
         type_action: 'inspection',
-        description: plan.titre,
+        description: plan.nom,
         observations: `Plan préventif — fréquence ${plan.frequence_jours}j. Prochaine : ${next.toLocaleDateString('fr-FR')}`,
         realise_le: now,
       });
       if (e3) throw new Error(`Historique: ${e3.message}`);
 
-      setDoneSuccess(`✓ "${plan.titre}" enregistré — prochain dans ${plan.frequence_jours}j`);
+      setDoneSuccess(`✓ "${plan.nom}" enregistré — prochain dans ${plan.frequence_jours}j`);
       setTimeout(() => setDoneSuccess(null), 4000);
       load();
     } catch (err) {
@@ -175,7 +175,7 @@ export default function PreventifPage() {
   }
 
   function applySuggestion(s: IASuggestion) {
-    setForm(f => ({ ...f, titre: s.titre, description: s.description, frequence_jours: String(s.frequence_jours) }));
+    setForm(f => ({ ...f, nom: s.titre, description: s.description, frequence_jours: String(s.frequence_jours) }));
     setIaSuggestions([]);
   }
 
@@ -262,7 +262,7 @@ export default function PreventifPage() {
                 <div key={p.id} style={{ background: 'var(--bg-card)', border: `1px solid ${days < 0 ? '#ef444433' : days <= 7 ? '#f59e0b33' : 'var(--border)'}`, borderRadius: 10, padding: '12px 14px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                     <div style={{ flex: 1, paddingRight: 8 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700 }}>{p.titre}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700 }}>{p.nom}</div>
                       <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
                         {p.machines?.nom || '—'}
                         {p.technicians && <span> · {(p.technicians as { prenom: string; nom: string }).prenom}</span>}
@@ -316,7 +316,7 @@ export default function PreventifPage() {
                       </td>
                       <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 600 }}>{p.machines?.nom || '—'}</td>
                       <td style={{ padding: '12px 16px' }}>
-                        <div style={{ fontSize: 13, fontWeight: 500 }}>{p.titre}</div>
+                        <div style={{ fontSize: 13, fontWeight: 500 }}>{p.nom}</div>
                         {p.description && <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{p.description.substring(0, 60)}{p.description.length > 60 ? '...' : ''}</div>}
                       </td>
                       <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-secondary)' }}>
@@ -399,7 +399,7 @@ export default function PreventifPage() {
               {/* Opération */}
               <div>
                 <label style={lbl}>Opération *</label>
-                <input value={form.titre} onChange={e => setForm(f => ({ ...f, titre: e.target.value }))} placeholder="ex: Vidange huile hydraulique" style={inp} />
+                <input value={form.nom} onChange={e => setForm(f => ({ ...f, nom: e.target.value }))} placeholder="ex: Vidange huile hydraulique" style={inp} />
               </div>
 
               {/* Technicien */}
@@ -435,7 +435,7 @@ export default function PreventifPage() {
             )}
             <div style={{ display: 'flex', gap: 8, marginTop: 14, justifyContent: 'flex-end' }}>
               <button onClick={() => { setShowForm(false); setIaSuggestions([]); setSaveError(null); }} style={{ padding: '9px 16px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 13 }}>Annuler</button>
-              <button onClick={save} disabled={saving || !form.machine_id || !form.titre || !form.prochaine_exec} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', background: '#2563eb', border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: saving || !form.machine_id || !form.titre || !form.prochaine_exec ? 0.6 : 1 }}>
+              <button onClick={save} disabled={saving || !form.machine_id || !form.nom || !form.prochaine_exec} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', background: '#2563eb', border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: saving || !form.machine_id || !form.nom || !form.prochaine_exec ? 0.6 : 1 }}>
                 <Save size={13} /> {saving ? 'Sauvegarde...' : 'Créer'}
               </button>
             </div>
