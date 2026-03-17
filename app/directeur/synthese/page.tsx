@@ -3,13 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { AlertTriangle, ArrowLeft, Target, Battery, ShieldAlert, Users, Wrench, Cpu, Trophy, Factory } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Target, Battery, ShieldAlert, Users, Wrench, Cpu, Trophy, Factory, DollarSign } from 'lucide-react';
+import Link from 'next/link';
 
 type Stats = {
   total: number; ouverts: number; en_cours: number; fermes: number;
   urgents: number; machines: number; techniciens: number;
 };
-type MachineStat = { nom: string; count: number };
+type MachineStat = { id: string; nom: string; count: number; cout_heure_arret?: number | null };
 type TechStat = { prenom: string; nom: string; resolus: number };
 
 function KpiMini({ label, value, color, sub, icon: Icon }: { label: string; value: string | number; color: string; sub?: string; icon: React.ElementType }) {
@@ -34,12 +35,13 @@ export default function SynthesePage() {
 
   useEffect(() => {
     async function load() {
-      const [ticketsRes, machinesRes, techniciensRes, openTicketsRes, resolvedTicketsRes] = await Promise.all([
+      const [ticketsRes, machinesRes, techniciensRes, openTicketsRes, resolvedTicketsRes, machinesCostRes] = await Promise.all([
         supabase.from('tickets').select('statut, priorite'),
         supabase.from('machines').select('id').eq('statut', 'actif'),
         supabase.from('technicians').select('id'),
-        supabase.from('tickets').select('machine_id, machines(nom)').in('statut', ['ouvert', 'en_cours']),
+        supabase.from('tickets').select('machine_id, created_at, machines(nom)').in('statut', ['ouvert', 'en_cours']),
         supabase.from('tickets').select('technicien_id, technicians(prenom, nom)').eq('statut', 'resolu').not('technicien_id', 'is', null),
+        supabase.from('machines').select('id, cout_heure_arret'),
       ]);
 
       const t = ticketsRes.data || [];
@@ -52,12 +54,18 @@ export default function SynthesePage() {
         techniciens: techniciensRes.data?.length || 0,
       });
 
-      // Top machines avec le + de tickets ouverts
+      // Index coût par machine
+      const coutMap: Record<string, number | null> = {};
+      for (const m of (machinesCostRes.data || [])) {
+        coutMap[m.id] = m.cout_heure_arret ?? null;
+      }
+
+      // Top machines avec le + de tickets ouverts + durée arrêt estimée
       const machineMap: Record<string, MachineStat> = {};
       for (const ticket of (openTicketsRes.data || [])) {
         const nom = (ticket.machines as unknown as { nom: string } | null)?.nom;
         if (!nom || !ticket.machine_id) continue;
-        if (!machineMap[ticket.machine_id]) machineMap[ticket.machine_id] = { nom, count: 0 };
+        if (!machineMap[ticket.machine_id]) machineMap[ticket.machine_id] = { id: ticket.machine_id, nom, count: 0, cout_heure_arret: coutMap[ticket.machine_id] };
         machineMap[ticket.machine_id].count++;
       }
       setTopMachines(Object.values(machineMap).sort((a, b) => b.count - a.count).slice(0, 5));
@@ -113,25 +121,49 @@ export default function SynthesePage() {
             <KpiMini label="Techniciens" value={stats.techniciens} color="#7c3aed" icon={Users} />
           </div>
 
-          {/* Top machines en défaut */}
+          {/* Top machines — recommandations actionnables */}
           {topMachines.length > 0 && (
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px', marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                 <Factory size={15} color="#f59e0b" />
-                <span style={{ fontSize: 13, fontWeight: 700 }}>Machines avec le + de tickets ouverts</span>
+                <span style={{ fontSize: 13, fontWeight: 700 }}>Machines critiques — action requise</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {topMachines.map((m, i) => (
-                  <div key={m.nom}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <span style={{ fontSize: 13, fontWeight: 500 }}>{m.nom}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#f59e0b' }}>{m.count} ticket{m.count > 1 ? 's' : ''}</span>
+                {topMachines.map((m, i) => {
+                  const isCritique = i === 0 || m.count >= 3;
+                  const couleur = isCritique ? '#ef4444' : '#f59e0b';
+                  // Estimation impact financier : durée moy 4h par ticket * cout/h
+                  const impactEst = m.cout_heure_arret ? Math.round(m.count * 4 * m.cout_heure_arret) : null;
+                  return (
+                    <div key={m.nom} style={{ background: `${couleur}08`, border: `1px solid ${couleur}33`, borderRadius: 10, padding: '12px 14px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
+                            {isCritique ? '⚠️ ' : ''}{m.nom}
+                          </div>
+                          <div style={{ fontSize: 12, color: couleur, fontWeight: 600 }}>
+                            {m.count} ticket{m.count > 1 ? 's' : ''} en cours — {isCritique ? 'Situation critique' : 'À surveiller'}
+                          </div>
+                        </div>
+                        {impactEst !== null && (
+                          <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 12 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+                              <DollarSign size={12} color={couleur} />
+                              <span style={{ fontSize: 13, fontWeight: 800, color: couleur }}>{impactEst.toLocaleString('fr-FR')}€</span>
+                            </div>
+                            <div style={{ fontSize: 10, color: 'var(--text-secondary)' }}>impact estimé</div>
+                          </div>
+                        )}
+                      </div>
+                      <Link
+                        href={`/directeur/tickets?filtre=${encodeURIComponent(m.nom)}`}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: `${couleur}15`, border: `1px solid ${couleur}44`, borderRadius: 6, padding: '5px 12px', color: couleur, fontSize: 12, fontWeight: 700, textDecoration: 'none' }}
+                      >
+                        Voir les tickets →
+                      </Link>
                     </div>
-                    <div style={{ height: 6, background: 'var(--bg-primary)', borderRadius: 3 }}>
-                      <div style={{ height: '100%', width: `${(m.count / maxMachine) * 100}%`, background: i === 0 ? '#ef4444' : '#f59e0b', borderRadius: 3 }} />
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

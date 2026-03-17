@@ -40,6 +40,39 @@ export default function DirecteurRapportsPage() {
       });
   }, []);
 
+  function renderContenu(text: string, color: string) {
+    if (!text) return null;
+    const lines = text.split('\n');
+    const elements: React.ReactNode[] = [];
+    let i = 0;
+    for (const line of lines) {
+      const t = line.trim();
+      if (!t) { elements.push(<div key={i} style={{ height: 6 }} />); i++; continue; }
+      if (t.startsWith('**') && t.endsWith('**') && t.length > 4) {
+        elements.push(<div key={i} style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)', marginTop: 10 }}>{t.replace(/\*\*/g, '')}</div>);
+      } else if (t.startsWith('#')) {
+        elements.push(<div key={i} style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)', marginTop: 10 }}>{t.replace(/^#+\s*/, '')}</div>);
+      } else if (t.startsWith('- ') || t.startsWith('• ')) {
+        elements.push(<div key={i} style={{ display: 'flex', gap: 8, padding: '2px 0' }}>
+          <span style={{ color, flexShrink: 0, fontWeight: 700 }}>•</span>
+          <span style={{ fontSize: 13, lineHeight: 1.55 }}>{t.slice(2)}</span>
+        </div>);
+      } else {
+        const numMatch = t.match(/^(\d+)[.)]\s+(.+)/);
+        if (numMatch) {
+          elements.push(<div key={i} style={{ display: 'flex', gap: 8, padding: '2px 0' }}>
+            <span style={{ color, fontWeight: 700, flexShrink: 0, minWidth: 18, fontSize: 13 }}>{numMatch[1]}.</span>
+            <span style={{ fontSize: 13, lineHeight: 1.55 }}>{numMatch[2]}</span>
+          </div>);
+        } else {
+          elements.push(<div key={i} style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--text-secondary)', padding: '1px 0' }}>{t}</div>);
+        }
+      }
+      i++;
+    }
+    return <div style={{ display: 'flex', flexDirection: 'column' }}>{elements}</div>;
+  }
+
   function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
   }
@@ -86,18 +119,18 @@ export default function DirecteurRapportsPage() {
                 </div>
 
                 {isOpen && (
-                  <div style={{ borderTop: '1px solid var(--border)', padding: '20px' }}>
+                  <div style={{ borderTop: '1px solid var(--border)', padding: '16px 20px' }}>
                     {a.contenu && (
-                      <div style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', marginBottom: a.recommandations?.length ? 20 : 0 }}>
-                        {a.contenu}
+                      <div style={{ marginBottom: a.recommandations?.length ? 16 : 0, wordBreak: 'break-word' }}>
+                        {renderContenu(a.contenu, cfg.color)}
                       </div>
                     )}
                     {a.recommandations && a.recommandations.length > 0 && (
                       <div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 10 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 10 }}>
                           Recommandations
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 14 }}>
                           {a.recommandations.map((r, i) => (
                             <div key={i} style={{ background: 'var(--bg-secondary)', borderRadius: 8, padding: '10px 14px', fontSize: 13, lineHeight: 1.5, display: 'flex', gap: 10 }}>
                               <span style={{ color: cfg.color, fontWeight: 700, flexShrink: 0 }}>{i + 1}.</span>
@@ -105,6 +138,9 @@ export default function DirecteurRapportsPage() {
                             </div>
                           ))}
                         </div>
+                        <button style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', background: `${cfg.color}18`, border: `1px solid ${cfg.color}44`, borderRadius: 8, padding: '11px 16px', color: cfg.color, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                          ✓ Appliquer les recommandations
+                        </button>
                       </div>
                     )}
                   </div>
