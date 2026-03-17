@@ -47,7 +47,7 @@ export default function DirecteurMachinesPage() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} /></button>
         <Factory size={20} color="#0ea5e9" />
-        <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Parc Machines</h1>
+        <h1 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>Parc Machines</h1>
         <span style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '2px 10px', fontSize: 12, color: 'var(--text-secondary)' }}>{machines.length}</span>
       </div>
 

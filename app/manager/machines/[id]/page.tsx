@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { ArrowLeft, Wrench, MapPin, AlertTriangle, CheckCircle, Clock, Calendar, TrendingUp, Package } from 'lucide-react';
+import { ArrowLeft, Wrench, MapPin, AlertTriangle, CheckCircle, Clock, Calendar, Package, Plus } from 'lucide-react';
+import Link from 'next/link';
 
 type Machine = {
   id: string; external_id: string; nom: string; type_equipement: string;
@@ -23,6 +24,12 @@ type HistEntry = {
   technicians: { prenom: string; nom: string } | null;
 };
 
+type PlanPreventif = {
+  id: string; titre: string; description: string | null;
+  frequence_jours: number; prochaine_exec: string;
+  technicians: { prenom: string; nom: string } | null;
+};
+
 const prioriteColor: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e' };
 const criticiteColor: Record<string, string> = { critique: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e' };
 
@@ -38,23 +45,27 @@ export default function MachineDetailPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [history, setHistory] = useState<HistEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<'pannes' | 'historique'>('pannes');
+  const [tab, setTab] = useState<'pannes' | 'historique' | 'preventif'>('pannes');
+  const [plans, setPlans] = useState<PlanPreventif[]>([]);
   const [coutEdit, setCoutEdit] = useState('');
   const [savingCout, setSavingCout] = useState(false);
 
   useEffect(() => {
     async function load() {
-      const [{ data: m }, { data: t }, { data: h }] = await Promise.all([
+      const [{ data: m }, { data: t }, { data: h }, { data: pp }] = await Promise.all([
         supabase.from('machines').select('*').eq('id', params.id).single(),
         supabase.from('tickets').select('id, titre, priorite, statut, type_intervention, created_at, resolu_le, technicians(prenom, nom)')
           .eq('machine_id', params.id).order('created_at', { ascending: false }).limit(30),
         supabase.from('maintenance_history').select('id, type_action, description, pieces_changees, realise_le, technicians(prenom, nom)')
           .eq('machine_id', params.id).order('realise_le', { ascending: false }).limit(30),
+        supabase.from('preventive_plans').select('id, titre, description, frequence_jours, prochaine_exec, technicians(prenom, nom)')
+          .eq('machine_id', params.id).eq('actif', true).order('prochaine_exec'),
       ]);
       setMachine(m as Machine);
       setCoutEdit(m?.cout_heure_arret != null ? String(m.cout_heure_arret) : '');
       setTickets((t as unknown as Ticket[]) || []);
       setHistory((h as unknown as HistEntry[]) || []);
+      setPlans((pp as unknown as PlanPreventif[]) || []);
       setLoading(false);
     }
     if (params.id) load();
@@ -151,10 +162,14 @@ export default function MachineDetailPage() {
       </div>
 
       {/* Onglets */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 14, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 4, width: 'fit-content' }}>
-        {(['pannes', 'historique'] as const).map(v => (
-          <button key={v} onClick={() => setTab(v)} style={{ padding: '7px 16px', borderRadius: 7, fontSize: 13, fontWeight: tab === v ? 700 : 400, cursor: 'pointer', background: tab === v ? '#2563eb' : 'transparent', color: tab === v ? '#fff' : 'var(--text-secondary)', border: 'none' }}>
-            {v === 'pannes' ? `Tickets (${totalTickets})` : `Historique (${history.length})`}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 14, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 4, width: 'fit-content', flexWrap: 'wrap' }}>
+        {([
+          ['pannes', `Tickets (${totalTickets})`],
+          ['historique', `Historique (${history.length})`],
+          ['preventif', `Préventif (${plans.length})`],
+        ] as const).map(([v, l]) => (
+          <button key={v} onClick={() => setTab(v)} style={{ padding: '7px 14px', borderRadius: 7, fontSize: 13, fontWeight: tab === v ? 700 : 400, cursor: 'pointer', background: tab === v ? '#2563eb' : 'transparent', color: tab === v ? '#fff' : 'var(--text-secondary)', border: 'none' }}>
+            {l}
           </button>
         ))}
       </div>
@@ -184,6 +199,49 @@ export default function MachineDetailPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Plans préventifs */}
+      {tab === 'preventif' && (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{plans.length} plan{plans.length !== 1 ? 's' : ''} actif{plans.length !== 1 ? 's' : ''}</span>
+            <Link href="/manager/preventif" style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
+              <Plus size={12} /> Gérer les plans
+            </Link>
+          </div>
+          {plans.length === 0 ? (
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 32, textAlign: 'center', color: 'var(--text-secondary)', fontSize: 13 }}>
+              Aucun plan préventif pour cette machine
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {plans.map(p => {
+                const days = Math.ceil((new Date(p.prochaine_exec).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                const color = days < 0 ? '#ef4444' : days <= 7 ? '#f59e0b' : '#22c55e';
+                const Icon = days < 0 ? AlertTriangle : days <= 7 ? Clock : CheckCircle;
+                return (
+                  <div key={p.id} style={{ background: 'var(--bg-card)', border: `1px solid ${days < 0 ? '#ef444433' : days <= 7 ? '#f59e0b33' : 'var(--border)'}`, borderRadius: 10, padding: '12px 14px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700 }}>{p.titre}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, marginLeft: 8 }}>
+                        <Icon size={11} color={color} />
+                        <span style={{ fontSize: 11, color, fontWeight: 700 }}>{days < 0 ? `${Math.abs(days)}j retard` : `J-${days}`}</span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Tous les {p.frequence_jours}j</span>
+                      <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>· {new Date(p.prochaine_exec).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                      {p.technicians && (
+                        <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>· {(p.technicians as { prenom: string; nom: string }).prenom} {(p.technicians as { prenom: string; nom: string }).nom}</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 

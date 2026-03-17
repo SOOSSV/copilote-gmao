@@ -182,7 +182,7 @@ export default function DirecteurDashboard() {
       {/* ===== VUE DESKTOP ===== */}
       <div className="dir-desktop-home" style={{ padding: '32px 36px', maxWidth: 960 }}>
         <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 900, marginBottom: 4 }}>Vue synthèse</h1>
+          <h1 style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Vue synthèse</h1>
           <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
             {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
           </div>

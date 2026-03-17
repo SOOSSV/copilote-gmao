@@ -1,0 +1,85 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+
+export const maxDuration = 60;
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+const N8N_CHAT_URL = process.env.N8N_CHAT_URL || '';
+
+export async function POST(req: NextRequest) {
+  try {
+    const { machine_id } = await req.json();
+    if (!machine_id) return NextResponse.json({ error: 'machine_id requis' }, { status: 400 });
+
+    const { data: machine } = await supabase
+      .from('machines')
+      .select('nom, type_equipement, localisation')
+      .eq('id', machine_id)
+      .single();
+
+    if (!machine) return NextResponse.json({ error: 'Machine introuvable' }, { status: 404 });
+
+    // Plans existants pour éviter les doublons
+    const { data: existing } = await supabase
+      .from('preventive_plans')
+      .select('titre')
+      .eq('machine_id', machine_id)
+      .eq('actif', true);
+
+    const existingTitles = (existing || []).map(p => p.titre).join(', ');
+
+    const prompt = `Tu es un expert GMAO en maintenance industrielle boulangère.
+
+MACHINE :
+- Nom : ${machine.nom}
+- Type : ${machine.type_equipement}
+- Localisation : ${machine.localisation || 'Non renseignée'}
+
+${existingTitles ? `PLANS DÉJÀ EN PLACE (ne pas répéter) : ${existingTitles}` : ''}
+
+Propose 4 opérations de maintenance préventive adaptées à ce type d'équipement.
+Réponds UNIQUEMENT en JSON avec ce format exact :
+{
+  "plans": [
+    { "titre": "Nom court de l'opération", "description": "Ce qu'il faut faire concrètement", "frequence_jours": 30 },
+    { "titre": "...", "description": "...", "frequence_jours": 90 },
+    { "titre": "...", "description": "...", "frequence_jours": 180 },
+    { "titre": "...", "description": "...", "frequence_jours": 365 }
+  ]
+}
+
+Fréquences typiques : 7 (hebdo), 30 (mensuel), 90 (trimestriel), 180 (semestriel), 365 (annuel).`;
+
+    const aiRes = await fetch(N8N_CHAT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chatInput: prompt, sessionId: `preventif-ia-${machine_id}` }),
+    });
+
+    if (!aiRes.ok) return NextResponse.json({ error: 'Erreur appel IA' }, { status: 502 });
+
+    const aiData = await aiRes.json();
+    const rawOutput = aiData?.output || aiData?.text || aiData?.message || aiData?.response || '';
+
+    let plans: { titre: string; description: string; frequence_jours: number }[] = [];
+    try {
+      const first = rawOutput.indexOf('{');
+      const last = rawOutput.lastIndexOf('}');
+      if (first !== -1 && last !== -1) {
+        const parsed = JSON.parse(rawOutput.substring(first, last + 1));
+        plans = parsed.plans || [];
+      }
+    } catch { /* parsing failed */ }
+
+    if (plans.length === 0) return NextResponse.json({ error: 'Réponse IA invalide' }, { status: 500 });
+
+    return NextResponse.json({ success: true, plans, machine: machine.nom });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+  }
+}

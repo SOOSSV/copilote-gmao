@@ -35,7 +35,7 @@ export default function DirecteurStocksPage() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} /></button>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Stocks & Pièces</h1>
+          <h1 style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Stocks & Pièces</h1>
           <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{stocks.length} article{stocks.length > 1 ? 's' : ''} · {alertes} en alerte</div>
         </div>
       </div>
