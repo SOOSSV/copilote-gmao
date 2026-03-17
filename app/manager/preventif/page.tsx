@@ -42,6 +42,7 @@ export default function PreventifPage() {
   const [donePlanId, setDonePlanId] = useState<string | null>(null);
   const [doneError, setDoneError] = useState<string | null>(null);
   const [doneSuccess, setDoneSuccess] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   async function load() {
     const [{ data: p }, { data: m }, { data: t }] = await Promise.all([
@@ -70,7 +71,8 @@ export default function PreventifPage() {
   async function save() {
     if (!form.machine_id || !form.titre || !form.prochaine_exec) return;
     setSaving(true);
-    await supabase.from('preventive_plans').insert({
+    setSaveError(null);
+    const { error } = await supabase.from('preventive_plans').insert({
       machine_id: form.machine_id,
       titre: form.titre.trim(),
       description: form.description.trim() || null,
@@ -80,6 +82,10 @@ export default function PreventifPage() {
       actif: true,
     });
     setSaving(false);
+    if (error) {
+      setSaveError(error.message);
+      return;
+    }
     setShowForm(false);
     setForm(emptyForm);
     setIaSuggestions([]);
@@ -407,8 +413,13 @@ export default function PreventifPage() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 8, marginTop: 20, justifyContent: 'flex-end' }}>
-              <button onClick={() => { setShowForm(false); setIaSuggestions([]); }} style={{ padding: '9px 16px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 13 }}>Annuler</button>
+            {saveError && (
+              <div style={{ marginTop: 14, background: '#ef444410', border: '1px solid #ef444433', borderRadius: 8, padding: '9px 12px', fontSize: 12, color: '#ef4444' }}>
+                ⚠️ Erreur : {saveError}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 8, marginTop: 14, justifyContent: 'flex-end' }}>
+              <button onClick={() => { setShowForm(false); setIaSuggestions([]); setSaveError(null); }} style={{ padding: '9px 16px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 13 }}>Annuler</button>
               <button onClick={save} disabled={saving || !form.machine_id || !form.titre || !form.prochaine_exec} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', background: '#2563eb', border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: saving || !form.machine_id || !form.titre || !form.prochaine_exec ? 0.6 : 1 }}>
                 <Save size={13} /> {saving ? 'Sauvegarde...' : 'Créer'}
               </button>
