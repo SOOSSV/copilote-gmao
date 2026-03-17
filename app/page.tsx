@@ -17,7 +17,7 @@ const roles = [
     desc: 'Accès protégé — dashboard, gestion, rapports',
     href: '/manager/login',
     icon: BarChart3,
-    color: '#6366f1',
+    color: '#2563eb',
     protected: true,
   },
   {
@@ -48,7 +48,7 @@ export default function HomePage() {
       <div style={{ textAlign: 'center' }}>
         <div style={{
           width: 68, height: 68, borderRadius: '50%',
-          background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+          background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           margin: '0 auto 16px',
           boxShadow: '0 0 40px rgba(99,102,241,0.3)',
@@ -57,7 +57,7 @@ export default function HomePage() {
         </div>
         <div style={{
           fontSize: 32, fontWeight: 900,
-          background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+          background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           letterSpacing: '-0.5px',
         }}>

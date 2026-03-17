@@ -14,7 +14,7 @@ type Ticket = {
 type Stock = { id: string; reference: string; nom: string; unite: string; quantite_actuelle: number; };
 type PieceUtilisee = { stock_id: string; nom: string; reference: string; unite: string; quantite: number; };
 
-const prioriteColor: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e' };
+const prioriteColor: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e' };
 
 export default function TechTicketDetail() {
   const router = useRouter();
@@ -94,7 +94,7 @@ export default function TechTicketDetail() {
   if (loading) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Chargement...</div>;
   if (!ticket) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Ticket introuvable</div>;
 
-  const pc = prioriteColor[ticket.priorite] || '#6366f1';
+  const pc = prioriteColor[ticket.priorite] || '#2563eb';
 
   return (
     <div style={{ padding: 16 }}>
@@ -151,7 +151,7 @@ export default function TechTicketDetail() {
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px', marginBottom: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pièces utilisées</div>
-            <button onClick={() => setShowPieces(!showPieces)} style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#6366f118', border: 'none', borderRadius: 6, padding: '4px 10px', color: '#6366f1', cursor: 'pointer', fontSize: 12 }}>
+            <button onClick={() => setShowPieces(!showPieces)} style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#2563eb18', border: 'none', borderRadius: 6, padding: '4px 10px', color: '#2563eb', cursor: 'pointer', fontSize: 12 }}>
               <Plus size={12} /> Ajouter
             </button>
           </div>

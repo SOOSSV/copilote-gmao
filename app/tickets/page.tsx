@@ -8,7 +8,7 @@ import { Ticket as TicketIcon, RefreshCw, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
 const statutColor: Record<string, string> = {
-  ouvert:   '#6366f1',
+  ouvert:   '#2563eb',
   en_cours: '#f59e0b',
   resolu:   '#22c55e',
 };

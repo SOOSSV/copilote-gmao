@@ -13,7 +13,7 @@ export default function NotFound() {
         Cette page n'existe pas ou a été déplacée.
       </div>
       <Link href="/" style={{
-        background: '#6366f1', color: '#fff', borderRadius: 10,
+        background: '#2563eb', color: '#fff', borderRadius: 10,
         padding: '12px 24px', fontWeight: 600, fontSize: 14, textDecoration: 'none',
       }}>
         Retour à l'accueil

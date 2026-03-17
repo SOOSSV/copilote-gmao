@@ -17,7 +17,7 @@ type Analyse = {
 
 const typeConfig: Record<string, { label: string; color: string }> = {
   pannes_recurrentes:       { label: 'Analyse Pannes',       color: '#ef4444' },
-  planification_preventive: { label: 'Plan Préventif',       color: '#6366f1' },
+  planification_preventive: { label: 'Plan Préventif',       color: '#2563eb' },
   rapport_hebdo:            { label: 'Rapport Hebdomadaire', color: '#22c55e' },
 };
 
@@ -64,7 +64,7 @@ export default function DirecteurRapportsPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {analyses.map(a => {
-            const cfg = typeConfig[a.type_analyse] || { label: a.type_analyse, color: '#8b5cf6' };
+            const cfg = typeConfig[a.type_analyse] || { label: a.type_analyse, color: '#7c3aed' };
             const isOpen = ouvert === a.id;
             return (
               <div key={a.id} style={{

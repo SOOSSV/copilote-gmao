@@ -16,7 +16,7 @@ type Analyse = {
 
 const typeConfig: Record<string, { label: string; color: string }> = {
   pannes_recurrentes:       { label: 'Analyse Pannes',       color: '#ef4444' },
-  planification_preventive: { label: 'Plan Préventif',       color: '#6366f1' },
+  planification_preventive: { label: 'Plan Préventif',       color: '#2563eb' },
   rapport_hebdo:            { label: 'Rapport Hebdomadaire', color: '#22c55e' },
 };
 
@@ -76,6 +76,39 @@ export default function RapportsPage() {
     setGenerating(false);
   }
 
+  function renderContenu(text: string, color: string) {
+    if (!text) return null;
+    const lines = text.split('\n');
+    const elements: React.ReactNode[] = [];
+    let i = 0;
+    for (const line of lines) {
+      const t = line.trim();
+      if (!t) { elements.push(<div key={i} style={{ height: 6 }} />); i++; continue; }
+      if (t.startsWith('**') && t.endsWith('**') && t.length > 4) {
+        elements.push(<div key={i} style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)', marginTop: 10 }}>{t.replace(/\*\*/g, '')}</div>);
+      } else if (t.startsWith('#')) {
+        elements.push(<div key={i} style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)', marginTop: 10 }}>{t.replace(/^#+\s*/, '')}</div>);
+      } else if (t.startsWith('- ') || t.startsWith('• ')) {
+        elements.push(<div key={i} style={{ display: 'flex', gap: 8, paddingLeft: 4, padding: '2px 0' }}>
+          <span style={{ color, flexShrink: 0, fontWeight: 700 }}>•</span>
+          <span style={{ fontSize: 13, lineHeight: 1.55 }}>{t.slice(2)}</span>
+        </div>);
+      } else {
+        const numMatch = t.match(/^(\d+)[.)]\s+(.+)/);
+        if (numMatch) {
+          elements.push(<div key={i} style={{ display: 'flex', gap: 8, paddingLeft: 4, padding: '2px 0' }}>
+            <span style={{ color, fontWeight: 700, flexShrink: 0, minWidth: 18, fontSize: 13 }}>{numMatch[1]}.</span>
+            <span style={{ fontSize: 13, lineHeight: 1.55 }}>{numMatch[2]}</span>
+          </div>);
+        } else {
+          elements.push(<div key={i} style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--text-secondary)', padding: '1px 0' }}>{t}</div>);
+        }
+      }
+      i++;
+    }
+    return <div style={{ display: 'flex', flexDirection: 'column' }}>{elements}</div>;
+  }
+
   function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
@@ -95,18 +128,18 @@ export default function RapportsPage() {
       </div>
 
       {/* Générateur */}
-      <div style={{ background: 'var(--bg-card)', border: '1px solid #6366f133', borderRadius: 14, padding: '14px', marginBottom: 20 }}>
+      <div style={{ background: 'var(--bg-card)', border: '1px solid #2563eb33', borderRadius: 14, padding: '14px', marginBottom: 20 }}>
         <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Sparkles size={15} color="#6366f1" /> Générer un nouveau rapport
+          <Sparkles size={15} color="#2563eb" /> Générer un nouveau rapport
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 8, marginBottom: 16 }}>
           {TYPES.map(t => (
             <button key={t.value} onClick={() => setSelectedType(t.value)} style={{
               textAlign: 'left', padding: '12px 14px', borderRadius: 10, cursor: 'pointer',
-              background: selectedType === t.value ? '#6366f118' : 'var(--bg-primary)',
-              border: `1px solid ${selectedType === t.value ? '#6366f166' : 'var(--border)'}`,
+              background: selectedType === t.value ? '#2563eb18' : 'var(--bg-primary)',
+              border: `1px solid ${selectedType === t.value ? '#2563eb66' : 'var(--border)'}`,
             }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: selectedType === t.value ? '#6366f1' : 'var(--text-primary)', marginBottom: 3 }}>{t.label}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: selectedType === t.value ? '#2563eb' : 'var(--text-primary)', marginBottom: 3 }}>{t.label}</div>
               <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{t.desc}</div>
             </button>
           ))}
@@ -114,7 +147,7 @@ export default function RapportsPage() {
         {error && <div style={{ background: '#ef444418', border: '1px solid #ef444433', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#ef4444', marginBottom: 12 }}>⚠️ {error}</div>}
         <button onClick={generate} disabled={generating} style={{
           display: 'flex', alignItems: 'center', gap: 8,
-          background: generating ? '#6366f177' : '#6366f1',
+          background: generating ? '#2563eb77' : '#2563eb',
           color: '#fff', border: 'none', borderRadius: 10,
           padding: '11px 22px', cursor: generating ? 'not-allowed' : 'pointer',
           fontWeight: 700, fontSize: 14,
@@ -135,7 +168,7 @@ export default function RapportsPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {analyses.map(a => {
-            const cfg = typeConfig[a.type_analyse] || { label: a.type_analyse, color: '#8b5cf6' };
+            const cfg = typeConfig[a.type_analyse] || { label: a.type_analyse, color: '#7c3aed' };
             const isOpen = ouvert === a.id;
             return (
               <div key={a.id} style={{
@@ -161,14 +194,14 @@ export default function RapportsPage() {
                 {isOpen && (
                   <div style={{ borderTop: '1px solid var(--border)', padding: '14px' }}>
                     {a.contenu && (
-                      <div style={{ fontSize: 13, lineHeight: 1.7, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'break-word', marginBottom: a.recommandations?.length ? 16 : 0 }}>
-                        {a.contenu}
+                      <div style={{ marginBottom: a.recommandations?.length ? 16 : 0, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                        {renderContenu(a.contenu, cfg.color)}
                       </div>
                     )}
                     {a.recommandations && a.recommandations.length > 0 && (
                       <div>
                         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>Recommandations</div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 14 }}>
                           {a.recommandations.map((r, i) => (
                             <div key={i} style={{ background: 'var(--bg-secondary)', borderRadius: 8, padding: '10px 12px', fontSize: 13, lineHeight: 1.5, display: 'flex', gap: 8, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               <span style={{ color: cfg.color, fontWeight: 700, flexShrink: 0 }}>{i + 1}.</span>
@@ -176,6 +209,9 @@ export default function RapportsPage() {
                             </div>
                           ))}
                         </div>
+                        <button style={{ display: 'flex', alignItems: 'center', gap: 8, background: `${cfg.color}18`, border: `1px solid ${cfg.color}44`, borderRadius: 8, padding: '10px 16px', color: cfg.color, fontSize: 13, fontWeight: 700, cursor: 'pointer', width: '100%', justifyContent: 'center' }}>
+                          ✓ Appliquer les recommandations
+                        </button>
                       </div>
                     )}
                   </div>

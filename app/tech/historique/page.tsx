@@ -58,7 +58,7 @@ export default function TechHistorique() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 24 }}>
         {[
           { label: 'Cette semaine', value: cetteSemaine, color: '#0ea5e9' },
-          { label: 'Ce mois', value: ceMois, color: '#6366f1' },
+          { label: 'Ce mois', value: ceMois, color: '#2563eb' },
           { label: 'Total résolus', value: resolus, color: '#22c55e' },
         ].map(k => (
           <div key={k.label} style={{ background: 'var(--bg-card)', border: `1px solid ${k.color}33`, borderRadius: 12, padding: '14px 12px', textAlign: 'center' }}>

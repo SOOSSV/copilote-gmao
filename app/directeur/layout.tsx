@@ -44,7 +44,7 @@ export default function DirecteurLayout({ children }: { children: React.ReactNod
       {/* Sidebar desktop */}
       <aside className="dir-sidebar">
         <div style={{ padding: '0 20px 24px', borderBottom: '1px solid var(--border)' }}>
-          <div style={{ fontSize: 18, fontWeight: 800, background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>COPILOTE</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>COPILOTE</div>
           <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Espace Directeur</div>
         </div>
         <nav style={{ padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>

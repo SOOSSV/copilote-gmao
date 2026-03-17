@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { supabase, Ticket } from '@/lib/supabase';
 import PrioriteBadge from '@/components/PrioriteBadge';
 import { Search, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 
 const statutColor: Record<string, string> = {
-  ouvert:   '#6366f1',
+  ouvert:   '#2563eb',
   en_cours: '#f59e0b',
   resolu:   '#22c55e',
 };
@@ -25,8 +25,24 @@ export default function ManagerTicketsPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const f = params.get('filtre');
+    const m = params.get('machine');
     if (f) setFiltre(f);
+    if (m) setSearch(m);
   }, []);
+
+  // Détection récurrence : machine ayant >= 2 tickets dans les 24h
+  const recurrenceMap = useMemo(() => {
+    const now = Date.now();
+    const h24 = 24 * 60 * 60 * 1000;
+    const map = new Map<string, number>();
+    tickets.forEach(t => {
+      const machineNom = (t.machines as { nom: string } | null)?.nom;
+      if (machineNom && now - new Date(t.created_at).getTime() < h24) {
+        map.set(machineNom, (map.get(machineNom) || 0) + 1);
+      }
+    });
+    return map;
+  }, [tickets]);
 
   async function fetchTickets() {
     setLoading(true);
@@ -107,6 +123,15 @@ export default function ManagerTicketsPage() {
           <div className="tickets-mobile">
             {filtered.map(t => (
               <Link key={t.id} href={`/manager/tickets/${t.id}`} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 7, padding: '6px 8px', marginBottom: 5, overflow: 'hidden', minWidth: 0, display: 'block', textDecoration: 'none', color: 'inherit' }}>
+                {(() => {
+                  const machineNom = (t.machines as { nom: string } | null)?.nom;
+                  const count = machineNom ? recurrenceMap.get(machineNom) || 0 : 0;
+                  return count >= 2 ? (
+                    <div style={{ fontSize: 10, color: '#f59e0b', fontWeight: 700, marginBottom: 3 }}>
+                      ⚠️ {count} pannes en 24h sur cette machine
+                    </div>
+                  ) : null;
+                })()}
                 <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titre}</div>
                 <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 5, alignItems: 'center' }}>
                   <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{(t.machines as { nom: string } | null)?.nom || '—'} · {(t.technicians as { prenom: string } | null)?.prenom || '—'}</span>
@@ -141,8 +166,13 @@ export default function ManagerTicketsPage() {
               <tbody>
                 {filtered.map((t, i) => (
                   <tr key={t.id} style={{ borderBottom: i < filtered.length - 1 ? '1px solid var(--border)' : 'none' }}>
-                    <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 500, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      <Link href={`/manager/tickets/${t.id}`} style={{ color: 'inherit', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')} onMouseLeave={e => (e.currentTarget.style.color = 'inherit')}>{t.titre}</Link>
+                    <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 500, maxWidth: 200 }}>
+                      <Link href={`/manager/tickets/${t.id}`} style={{ color: 'inherit', textDecoration: 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')} onMouseLeave={e => (e.currentTarget.style.color = 'inherit')}>{t.titre}</Link>
+                      {(() => {
+                        const machineNom = (t.machines as { nom: string } | null)?.nom;
+                        const count = machineNom ? recurrenceMap.get(machineNom) || 0 : 0;
+                        return count >= 2 ? <span style={{ fontSize: 10, color: '#f59e0b', fontWeight: 700 }}>⚠️ {count} pannes/24h</span> : null;
+                      })()}
                     </td>
                     <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-secondary)' }}>{(t.machines as { nom: string } | null)?.nom || '—'}</td>
                     <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-secondary)' }}>{(t.technicians as { prenom: string; nom: string } | null)?.prenom || '—'}</td>

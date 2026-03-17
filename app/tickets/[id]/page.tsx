@@ -8,7 +8,7 @@ import { ArrowLeft, Clock, Wrench, Cpu, Tag, User } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 
 const statutColor: Record<string, string> = {
-  ouvert:   '#6366f1',
+  ouvert:   '#2563eb',
   en_cours: '#f59e0b',
   resolu:   '#22c55e',
 };

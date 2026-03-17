@@ -18,8 +18,8 @@ type Tech = {
 
 const equipes: Record<string, { label: string; horaire: string; color: string; icon: React.ElementType; membres: string[] }> = {
   matin:      { label: 'Matin',      horaire: '06h–14h', color: '#f59e0b', icon: Sun,    membres: ['Marc', 'Julie'] },
-  'apres-midi': { label: 'Après-midi', horaire: '14h–22h', color: '#6366f1', icon: Sunset, membres: ['Thomas', 'Sophie'] },
-  nuit:       { label: 'Nuit',       horaire: '22h–06h', color: '#8b5cf6', icon: Moon,   membres: ['Karim', 'Nadia'] },
+  'apres-midi': { label: 'Après-midi', horaire: '14h–22h', color: '#2563eb', icon: Sunset, membres: ['Thomas', 'Sophie'] },
+  nuit:       { label: 'Nuit',       horaire: '22h–06h', color: '#7c3aed', icon: Moon,   membres: ['Karim', 'Nadia'] },
 };
 
 function getEquipe(prenom: string) {
@@ -37,12 +37,12 @@ function getShiftActuel() {
 }
 
 const specialiteColor: Record<string, string> = {
-  mécanique: '#6366f1', électrique: '#f59e0b', hydraulique: '#22c55e',
-  automatisme: '#06b6d4', froid: '#0ea5e9', cvc: '#0ea5e9', polyvalent: '#8b5cf6', pneumatique: '#10b981',
+  mécanique: '#2563eb', électrique: '#f59e0b', hydraulique: '#22c55e',
+  automatisme: '#06b6d4', froid: '#0ea5e9', cvc: '#0ea5e9', polyvalent: '#7c3aed', pneumatique: '#10b981',
 };
 
 function getSpecialiteColor(s: string) {
-  return specialiteColor[s.toLowerCase()] || '#8b5cf6';
+  return specialiteColor[s.toLowerCase()] || '#7c3aed';
 }
 
 export default function TechniciensPage() {

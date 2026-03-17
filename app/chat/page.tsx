@@ -151,7 +151,7 @@ export default function ChatPage() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg-primary)' }}>
       {/* Header */}
       <div style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-        <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <Bot size={18} color="white" />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -177,7 +177,7 @@ export default function ChatPage() {
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px', paddingBottom: '140px' }}>
         {messages.map(msg => (
           <div key={msg.id} style={{ display: 'flex', flexDirection: msg.role === 'user' ? 'row-reverse' : 'row', gap: '8px', alignItems: 'flex-end' }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: msg.role === 'assistant' ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: msg.role === 'assistant' ? 'var(--accent)' : 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {msg.role === 'assistant' ? <Bot size={14} color="white" /> : <User size={14} color="var(--text-secondary)" />}
             </div>
             <div style={{ maxWidth: '78%' }}>
@@ -190,9 +190,18 @@ export default function ChatPage() {
             </div>
           </div>
         ))}
+        {messages.length === 1 && !loading && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, paddingLeft: 36 }}>
+            {['Bruit anormal sur une machine', 'Panne électrique', 'Fuite hydraulique', 'Vibrations anormales'].map(s => (
+              <button key={s} onClick={() => setInput(s)} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '6px 13px', fontSize: 13, color: 'var(--text-secondary)', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
         {loading && (
           <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Bot size={14} color="white" />
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px 14px 14px 4px', padding: '12px 16px', display: 'flex', gap: 4 }}>

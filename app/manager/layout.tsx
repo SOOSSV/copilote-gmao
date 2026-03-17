@@ -61,7 +61,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
       {/* Sidebar — visible desktop ≥1025px, masquée mobile/tablette via CSS */}
       <aside className="mgr-sidebar">
         <div style={{ padding: '0 20px 24px', borderBottom: '1px solid var(--border)' }}>
-          <div style={{ fontSize: 18, fontWeight: 800, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>COPILOTE</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>COPILOTE</div>
           <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Espace Manager</div>
         </div>
 

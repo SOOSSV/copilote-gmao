@@ -15,7 +15,7 @@ const statutConfig: Record<string, { color: string; icon: React.ElementType; lab
   inactif:      { color: '#f59e0b', icon: AlertCircle,  label: 'Inactif' },
   hors_service: { color: '#ef4444', icon: XCircle,      label: 'Hors service' },
 };
-const criticiteColor: Record<string, string> = { critique: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e' };
+const criticiteColor: Record<string, string> = { critique: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e' };
 
 export default function DirecteurMachinesPage() {
   const [machines, setMachines] = useState<Machine[]>([]);
@@ -68,7 +68,7 @@ export default function DirecteurMachinesPage() {
           {filtered.map(m => {
             const cfg = statutConfig[m.statut] || statutConfig.inactif;
             const StatIcon = cfg.icon;
-            const critColor = criticiteColor[m.criticite] || '#6366f1';
+            const critColor = criticiteColor[m.criticite] || '#2563eb';
             return (
               <Link key={m.id} href={`/directeur/machines/${m.id}`} style={{
                 background: 'var(--bg-card)', border: '1px solid var(--border)',

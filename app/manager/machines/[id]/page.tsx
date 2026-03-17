@@ -23,8 +23,8 @@ type HistEntry = {
   technicians: { prenom: string; nom: string } | null;
 };
 
-const prioriteColor: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e' };
-const criticiteColor: Record<string, string> = { critique: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e' };
+const prioriteColor: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e' };
+const criticiteColor: Record<string, string> = { critique: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e' };
 
 function daysBetween(a: string, b: string | null) {
   if (!b) return null;
@@ -60,7 +60,7 @@ export default function MachineDetailPage() {
   if (loading) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Chargement...</div>;
   if (!machine) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Machine introuvable</div>;
 
-  const critColor = criticiteColor[machine.criticite] || '#6366f1';
+  const critColor = criticiteColor[machine.criticite] || '#2563eb';
   const totalTickets = tickets.length;
   const resolus = tickets.filter(t => t.statut === 'resolu').length;
   const ouverts = tickets.filter(t => t.statut === 'ouvert' || t.statut === 'en_cours').length;
@@ -102,7 +102,7 @@ export default function MachineDetailPage() {
       {/* KPI */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 14 }}>
         {[
-          { label: 'Total', value: totalTickets, color: '#6366f1' },
+          { label: 'Total', value: totalTickets, color: '#2563eb' },
           { label: 'Ouverts', value: ouverts, color: ouverts > 0 ? '#f59e0b' : 'var(--text-secondary)' },
           { label: 'Urgents', value: urgents, color: urgents > 0 ? '#ef4444' : 'var(--text-secondary)' },
           { label: mttr !== null ? `MTTR ${mttr}j` : 'MTTR —', value: resolus, color: '#22c55e' },
@@ -117,7 +117,7 @@ export default function MachineDetailPage() {
       {/* Onglets */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 14, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 4, width: 'fit-content' }}>
         {(['pannes', 'historique'] as const).map(v => (
-          <button key={v} onClick={() => setTab(v)} style={{ padding: '7px 16px', borderRadius: 7, fontSize: 13, fontWeight: tab === v ? 700 : 400, cursor: 'pointer', background: tab === v ? '#6366f1' : 'transparent', color: tab === v ? '#fff' : 'var(--text-secondary)', border: 'none' }}>
+          <button key={v} onClick={() => setTab(v)} style={{ padding: '7px 16px', borderRadius: 7, fontSize: 13, fontWeight: tab === v ? 700 : 400, cursor: 'pointer', background: tab === v ? '#2563eb' : 'transparent', color: tab === v ? '#fff' : 'var(--text-secondary)', border: 'none' }}>
             {v === 'pannes' ? `Tickets (${totalTickets})` : `Historique (${history.length})`}
           </button>
         ))}
@@ -129,7 +129,7 @@ export default function MachineDetailPage() {
           {tickets.length === 0 ? (
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>Aucun ticket</div>
           ) : tickets.map(t => {
-            const pc = prioriteColor[t.priorite] || '#6366f1';
+            const pc = prioriteColor[t.priorite] || '#2563eb';
             const duree = daysBetween(t.created_at, t.resolu_le);
             return (
               <div key={t.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px' }}>
@@ -138,7 +138,7 @@ export default function MachineDetailPage() {
                   <span style={{ background: `${pc}22`, color: pc, borderRadius: 5, padding: '2px 7px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', flexShrink: 0 }}>{t.priorite}</span>
                 </div>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 11, color: t.statut === 'resolu' ? '#22c55e' : t.statut === 'en_cours' ? '#f59e0b' : '#6366f1', fontWeight: 600 }}>
+                  <span style={{ fontSize: 11, color: t.statut === 'resolu' ? '#22c55e' : t.statut === 'en_cours' ? '#f59e0b' : '#2563eb', fontWeight: 600 }}>
                     {t.statut === 'resolu' ? '✓ Résolu' : t.statut === 'en_cours' ? '⏳ En cours' : '● Ouvert'}
                   </span>
                   {t.technicians && <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{(t.technicians as { prenom: string; nom: string }).prenom}</span>}
@@ -159,7 +159,7 @@ export default function MachineDetailPage() {
           ) : history.map(h => (
             <div key={h.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, background: '#6366f122', color: '#6366f1', borderRadius: 5, padding: '2px 8px' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, background: '#2563eb22', color: '#2563eb', borderRadius: 5, padding: '2px 8px' }}>
                   {h.type_action === 'preventive' || h.type_action === 'inspection' ? 'Préventif' : 'Correctif'}
                 </span>
                 <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{new Date(h.realise_le).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</span>

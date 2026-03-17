@@ -12,9 +12,9 @@ type Machine = {
 };
 type Ticket = { id: string; titre: string; priorite: string; statut: string; created_at: string };
 
-const criticiteColor: Record<string, string> = { critique: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e' };
-const statutColor: Record<string, string> = { ouvert: '#6366f1', en_cours: '#f59e0b', resolu: '#22c55e' };
-const prioriteColor: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e' };
+const criticiteColor: Record<string, string> = { critique: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e' };
+const statutColor: Record<string, string> = { ouvert: '#2563eb', en_cours: '#f59e0b', resolu: '#22c55e' };
+const prioriteColor: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e' };
 
 export default function DirecteurMachineDetailPage() {
   const router = useRouter();
@@ -38,7 +38,7 @@ export default function DirecteurMachineDetailPage() {
   if (loading) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Chargement...</div>;
   if (!machine) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Machine introuvable</div>;
 
-  const critColor = criticiteColor[machine.criticite] || '#6366f1';
+  const critColor = criticiteColor[machine.criticite] || '#2563eb';
   const ouverts = tickets.filter(t => t.statut !== 'resolu').length;
 
   return (
@@ -57,7 +57,7 @@ export default function DirecteurMachineDetailPage() {
       {/* KPI */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 }}>
         {[
-          { label: 'Tickets total', value: tickets.length, color: '#6366f1' },
+          { label: 'Tickets total', value: tickets.length, color: '#2563eb' },
           { label: 'En cours', value: ouverts, color: '#f59e0b' },
           { label: 'Résolus', value: tickets.filter(t => t.statut === 'resolu').length, color: '#22c55e' },
         ].map(k => (
@@ -93,8 +93,8 @@ export default function DirecteurMachineDetailPage() {
           <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-secondary)' }}>Aucun ticket pour cette machine</div>
         ) : (
           tickets.map((t, i) => {
-            const pc = prioriteColor[t.priorite] || '#6366f1';
-            const sc = statutColor[t.statut] || '#6366f1';
+            const pc = prioriteColor[t.priorite] || '#2563eb';
+            const sc = statutColor[t.statut] || '#2563eb';
             return (
               <Link key={t.id} href={`/directeur/tickets/${t.id}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 20px', borderBottom: i < tickets.length - 1 ? '1px solid var(--border)' : 'none', textDecoration: 'none', color: 'inherit' }}
                 onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-secondary)')}

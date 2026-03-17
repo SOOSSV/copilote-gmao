@@ -22,10 +22,10 @@ type Ticket = {
 type Technician = { id: string; prenom: string; nom: string; specialites: string[] };
 
 const prioriteColor: Record<string, string> = {
-  urgente: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e',
+  urgente: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e',
 };
 const statutColor: Record<string, string> = {
-  ouvert: '#6366f1', en_cours: '#f59e0b', resolu: '#22c55e',
+  ouvert: '#2563eb', en_cours: '#f59e0b', resolu: '#22c55e',
 };
 
 export default function TicketDetailPage() {
@@ -74,8 +74,8 @@ export default function TicketDetailPage() {
   if (loading) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Chargement...</div>;
   if (!ticket) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Ticket introuvable</div>;
 
-  const pColor = prioriteColor[ticket.priorite] || '#6366f1';
-  const sColor = statutColor[ticket.statut] || '#6366f1';
+  const pColor = prioriteColor[ticket.priorite] || '#2563eb';
+  const sColor = statutColor[ticket.statut] || '#2563eb';
 
   return (
     <div style={{ padding: '16px', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
@@ -166,7 +166,7 @@ export default function TicketDetailPage() {
             <option value="">— Non assigné —</option>
             {techs.map(t => <option key={t.id} value={t.id}>{t.prenom} {t.nom}</option>)}
           </select>
-          <button onClick={assignTech} disabled={assigning} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 16px', cursor: 'pointer', fontWeight: 600, fontSize: 13, opacity: assigning ? 0.6 : 1, whiteSpace: 'nowrap' }}>
+          <button onClick={assignTech} disabled={assigning} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 16px', cursor: 'pointer', fontWeight: 600, fontSize: 13, opacity: assigning ? 0.6 : 1, whiteSpace: 'nowrap' }}>
             <UserCheck size={15} /> {assigning ? '...' : 'Assigner'}
           </button>
         </div>
@@ -177,7 +177,7 @@ export default function TicketDetailPage() {
         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 12 }}>Changer le statut</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {[
-            { value: 'ouvert',   label: 'Ouvert',   icon: AlertTriangle, color: '#6366f1' },
+            { value: 'ouvert',   label: 'Ouvert',   icon: AlertTriangle, color: '#2563eb' },
             { value: 'en_cours', label: 'En cours', icon: Clock,         color: '#f59e0b' },
             { value: 'resolu',   label: 'Résolu',   icon: CheckCircle,   color: '#22c55e' },
           ].map(({ value, label, icon: Icon, color }) => (

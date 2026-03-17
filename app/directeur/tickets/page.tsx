@@ -12,8 +12,8 @@ type Ticket = {
   technicians: { prenom: string; nom: string } | null;
 };
 
-const prioriteColor: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e' };
-const statutColor: Record<string, string> = { ouvert: '#6366f1', en_cours: '#f59e0b', resolu: '#22c55e' };
+const prioriteColor: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e' };
+const statutColor: Record<string, string> = { ouvert: '#2563eb', en_cours: '#f59e0b', resolu: '#22c55e' };
 const statutLabel = (s: string) => s === 'resolu' ? 'Résolu' : s === 'en_cours' ? 'En cours' : 'Ouvert';
 
 export default function DirecteurTicketsPage() {
@@ -95,8 +95,8 @@ export default function DirecteurTicketsPage() {
           {/* Vue mobile : cartes */}
           <div className="tickets-mobile">
             {filtered.map(t => {
-              const pc = prioriteColor[t.priorite] || '#6366f1';
-              const sc = statutColor[t.statut] || '#6366f1';
+              const pc = prioriteColor[t.priorite] || '#2563eb';
+              const sc = statutColor[t.statut] || '#2563eb';
               return (
                 <Link key={t.id} href={`/directeur/tickets/${t.id}`} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 7, padding: '6px 8px', marginBottom: 5, overflow: 'hidden', minWidth: 0, display: 'block', textDecoration: 'none', color: 'inherit' }}>
                   <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titre}</div>
@@ -123,8 +123,8 @@ export default function DirecteurTicketsPage() {
               </thead>
               <tbody>
                 {filtered.map((t, i) => {
-                  const pc = prioriteColor[t.priorite] || '#6366f1';
-                  const sc = statutColor[t.statut] || '#6366f1';
+                  const pc = prioriteColor[t.priorite] || '#2563eb';
+                  const sc = statutColor[t.statut] || '#2563eb';
                   return (
                     <tr key={t.id} style={{ borderBottom: i < filtered.length - 1 ? '1px solid var(--border)' : 'none' }}>
                       <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 500, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

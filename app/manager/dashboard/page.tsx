@@ -17,7 +17,7 @@ type TicketRecent = {
 };
 
 const prioriteColor: Record<string, string> = {
-  urgente: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e',
+  urgente: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e',
 };
 
 function StatCard({ label, value, icon: Icon, color, sub, href }: {
@@ -104,13 +104,13 @@ export default function DashboardPage() {
       {loading ? <div style={{ color: 'var(--text-secondary)', padding: 20 }}>Chargement...</div> : (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 12 }}>
-            <StatCard label="Ouverts"   value={stats.ouverts}  icon={Clock}         color="#6366f1" href="/manager/tickets?filtre=ouvert" />
+            <StatCard label="Ouverts"   value={stats.ouverts}  icon={Clock}         color="#2563eb" href="/manager/tickets?filtre=ouvert" />
             <StatCard label="En cours"  value={stats.en_cours} icon={Activity}      color="#f59e0b" href="/manager/tickets?filtre=en_cours" />
             <StatCard label="Urgents"   value={stats.urgents}  icon={AlertTriangle} color="#ef4444" href="/manager/tickets?filtre=urgente" />
             <StatCard label="Résolution" value={`${tauxResolution}%`} icon={TrendingUp} color="#22c55e" sub={`${stats.fermes}/${stats.total}`} href="/manager/tickets?filtre=resolu" />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 20 }}>
-            <StatCard label="Machines"    value={stats.machines}    icon={Wrench}       color="#8b5cf6" />
+            <StatCard label="Machines"    value={stats.machines}    icon={Wrench}       color="#7c3aed" />
             <StatCard label="Techniciens" value={stats.techniciens} icon={CheckCircle}  color="#06b6d4" />
           </div>
 

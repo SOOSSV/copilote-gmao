@@ -12,8 +12,8 @@ type Ticket = {
   technicians: { prenom: string; nom: string; specialites: string[] } | null;
 };
 
-const prioriteColor: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e' };
-const statutColor: Record<string, string> = { ouvert: '#6366f1', en_cours: '#f59e0b', resolu: '#22c55e' };
+const prioriteColor: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e' };
+const statutColor: Record<string, string> = { ouvert: '#2563eb', en_cours: '#f59e0b', resolu: '#22c55e' };
 
 export default function DirecteurTicketDetailPage() {
   const router = useRouter();
@@ -32,8 +32,8 @@ export default function DirecteurTicketDetailPage() {
   if (loading) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Chargement...</div>;
   if (!ticket) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Ticket introuvable</div>;
 
-  const pc = prioriteColor[ticket.priorite] || '#6366f1';
-  const sc = statutColor[ticket.statut] || '#6366f1';
+  const pc = prioriteColor[ticket.priorite] || '#2563eb';
+  const sc = statutColor[ticket.statut] || '#2563eb';
   const statutLabel = ticket.statut === 'resolu' ? 'Résolu' : ticket.statut === 'en_cours' ? 'En cours' : 'Ouvert';
 
   return (

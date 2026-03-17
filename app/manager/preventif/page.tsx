@@ -98,7 +98,7 @@ export default function PreventifPage() {
           <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Maintenance Préventive</h1>
           <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{plans.length} plan{plans.length > 1 ? 's' : ''} · {retard} en retard · {urgent} cette semaine</div>
         </div>
-        <button onClick={() => setShowForm(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#6366f1', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+        <button onClick={() => setShowForm(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
           <Plus size={16} /> Nouveau plan
         </button>
       </div>
@@ -122,7 +122,7 @@ export default function PreventifPage() {
       {/* Filtres */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
         {[['tous', 'Tous'], ['urgent', 'Urgent / Retard'], ['ok', 'OK']] .map(([v, l]) => (
-          <button key={v} onClick={() => setFilter(v as 'tous' | 'urgent' | 'ok')} style={{ padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: filter === v ? 700 : 400, cursor: 'pointer', background: filter === v ? '#6366f122' : 'var(--bg-card)', border: `1px solid ${filter === v ? '#6366f166' : 'var(--border)'}`, color: filter === v ? '#6366f1' : 'var(--text-secondary)' }}>
+          <button key={v} onClick={() => setFilter(v as 'tous' | 'urgent' | 'ok')} style={{ padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: filter === v ? 700 : 400, cursor: 'pointer', background: filter === v ? '#2563eb22' : 'var(--bg-card)', border: `1px solid ${filter === v ? '#2563eb66' : 'var(--border)'}`, color: filter === v ? '#2563eb' : 'var(--text-secondary)' }}>
             {l}
           </button>
         ))}
@@ -253,7 +253,7 @@ export default function PreventifPage() {
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 24, justifyContent: 'flex-end' }}>
               <button onClick={() => setShowForm(false)} style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 14 }}>Annuler</button>
-              <button onClick={save} disabled={saving || !form.machine_id || !form.titre || !form.prochaine_exec} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', background: '#6366f1', border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer', fontSize: 14, fontWeight: 600, opacity: saving || !form.machine_id || !form.titre || !form.prochaine_exec ? 0.6 : 1 }}>
+              <button onClick={save} disabled={saving || !form.machine_id || !form.titre || !form.prochaine_exec} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', background: '#2563eb', border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer', fontSize: 14, fontWeight: 600, opacity: saving || !form.machine_id || !form.titre || !form.prochaine_exec ? 0.6 : 1 }}>
                 <Save size={15} /> {saving ? 'Sauvegarde...' : 'Créer'}
               </button>
             </div>

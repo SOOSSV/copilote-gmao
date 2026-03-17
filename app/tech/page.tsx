@@ -17,7 +17,7 @@ type Ticket = {
 };
 
 const prioriteColor: Record<string, string> = {
-  urgente: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e',
+  urgente: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e',
 };
 
 export default function TechDashboard() {
@@ -54,11 +54,25 @@ export default function TechDashboard() {
     (prioriteOrder[a.priorite] ?? 2) - (prioriteOrder[b.priorite] ?? 2)
   );
 
-  async function demarrer(e: React.MouseEvent, id: string) {
+  function timeAgo(iso: string): string {
+    const diff = Date.now() - new Date(iso).getTime();
+    const min = Math.floor(diff / 60000);
+    if (min < 1) return "à l'instant";
+    if (min < 60) return `il y a ${min} min`;
+    const h = Math.floor(min / 60);
+    if (h < 24) return `il y a ${h}h`;
+    const d = Math.floor(h / 24);
+    if (d < 7) return `il y a ${d}j`;
+    return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  }
+
+  async function setStatut(e: React.MouseEvent, id: string, statut: string) {
     e.preventDefault();
     e.stopPropagation();
-    await supabase.from('tickets').update({ statut: 'en_cours' }).eq('id', id);
-    setTickets(prev => prev.map(t => t.id === id ? { ...t, statut: 'en_cours' } : t));
+    const update: Record<string, string> = { statut };
+    if (statut === 'resolu') update.resolu_le = new Date().toISOString();
+    await supabase.from('tickets').update(update).eq('id', id);
+    setTickets(prev => prev.map(t => t.id === id ? { ...t, statut } : t));
   }
 
   return (
@@ -80,7 +94,7 @@ export default function TechDashboard() {
       {/* KPI */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
         {[
-          { label: 'Ouverts', value: actifs.filter(t => t.statut === 'ouvert').length, color: '#6366f1' },
+          { label: 'Ouverts', value: actifs.filter(t => t.statut === 'ouvert').length, color: '#2563eb' },
           { label: 'En cours', value: actifs.filter(t => t.statut === 'en_cours').length, color: '#f59e0b' },
           { label: 'Résolus', value: resolus.length, color: '#22c55e' },
         ].map(k => (
@@ -114,7 +128,7 @@ export default function TechDashboard() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {displayed.map(t => {
-            const pc = prioriteColor[t.priorite] || '#6366f1';
+            const pc = prioriteColor[t.priorite] || '#2563eb';
             return (
               <Link key={t.id} href={`/tech/tickets/${t.id}`} style={{ background: 'var(--bg-card)', border: `1px solid ${t.priorite === 'urgente' ? '#ef444433' : 'var(--border)'}`, borderRadius: 14, padding: '16px', textDecoration: 'none', display: 'block' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
@@ -128,18 +142,30 @@ export default function TechDashboard() {
                 )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    {t.statut === 'resolu' ? <CheckCircle size={13} color="#22c55e" /> : t.statut === 'en_cours' ? <Clock size={13} color="#f59e0b" /> : <AlertTriangle size={13} color="#6366f1" />}
+                    {t.statut === 'resolu' ? <CheckCircle size={13} color="var(--success)" /> : t.statut === 'en_cours' ? <Clock size={13} color="var(--warning)" /> : <AlertTriangle size={13} color="var(--accent)" />}
                     <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{t.statut === 'en_cours' ? 'En cours' : t.statut === 'resolu' ? 'Résolu' : 'Ouvert'}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{timeAgo(t.created_at)}</span>
+                </div>
+                {filter === 'actifs' && (
+                  <div style={{ display: 'flex', gap: 8, marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
                     {t.statut === 'ouvert' && (
-                      <button onClick={e => demarrer(e, t.id)} style={{ background: '#f59e0b22', border: '1px solid #f59e0b44', borderRadius: 6, padding: '3px 10px', color: '#f59e0b', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
-                        ▶ Démarrer
+                      <>
+                        <button onClick={e => setStatut(e, t.id, 'en_cours')} style={{ flex: 1, background: 'rgba(37,99,235,0.12)', border: '1px solid rgba(37,99,235,0.3)', borderRadius: 8, padding: '7px 0', color: 'var(--accent)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                          J'arrive
+                        </button>
+                        <button onClick={e => setStatut(e, t.id, 'en_cours')} style={{ flex: 1, background: 'rgba(217,119,6,0.12)', border: '1px solid rgba(217,119,6,0.3)', borderRadius: 8, padding: '7px 0', color: 'var(--warning)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                          Commencer
+                        </button>
+                      </>
+                    )}
+                    {t.statut === 'en_cours' && (
+                      <button onClick={e => setStatut(e, t.id, 'resolu')} style={{ flex: 1, background: 'rgba(22,163,74,0.12)', border: '1px solid rgba(22,163,74,0.3)', borderRadius: 8, padding: '7px 0', color: 'var(--success)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                        ✓ Terminé
                       </button>
                     )}
-                    <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}</span>
                   </div>
-                </div>
+                )}
               </Link>
             );
           })}

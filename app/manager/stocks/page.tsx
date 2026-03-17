@@ -168,7 +168,7 @@ export default function StocksPage() {
           <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{stocks.length} article{stocks.length > 1 ? 's' : ''} · {alertes} en alerte</div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={openAdd} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#6366f1', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+          <button onClick={openAdd} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
             <Plus size={16} /> Ajouter
           </button>
         </div>
@@ -177,7 +177,7 @@ export default function StocksPage() {
       {/* Onglets */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 20, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 4, width: 'fit-content' }}>
         {(['stocks', 'stats'] as const).map(v => (
-          <button key={v} onClick={() => setView(v)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 7, fontSize: 13, fontWeight: view === v ? 700 : 400, cursor: 'pointer', background: view === v ? '#6366f1' : 'transparent', color: view === v ? '#fff' : 'var(--text-secondary)', border: 'none' }}>
+          <button key={v} onClick={() => setView(v)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 7, fontSize: 13, fontWeight: view === v ? 700 : 400, cursor: 'pointer', background: view === v ? '#2563eb' : 'transparent', color: view === v ? '#fff' : 'var(--text-secondary)', border: 'none' }}>
             {v === 'stocks' ? <Package size={14} /> : <BarChart2 size={14} />}
             {v === 'stocks' ? 'Articles' : 'Consommation'}
           </button>
@@ -188,7 +188,7 @@ export default function StocksPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 24 }}>
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '18px 20px' }}>
           <div style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>Total articles</div>
-          <div style={{ fontSize: 28, fontWeight: 800, color: '#6366f1' }}>{stocks.length}</div>
+          <div style={{ fontSize: 28, fontWeight: 800, color: '#2563eb' }}>{stocks.length}</div>
         </div>
         <div style={{ background: 'var(--bg-card)', border: `1px solid ${alertes > 0 ? '#ef444433' : 'var(--border)'}`, borderRadius: 14, padding: '18px 20px' }}>
           <div style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>En alerte</div>
@@ -221,12 +221,12 @@ export default function StocksPage() {
                       {/* Aire */}
                       <defs>
                         <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#6366f1" stopOpacity="0.3" />
-                          <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+                          <stop offset="0%" stopColor="#2563eb" stopOpacity="0.3" />
+                          <stop offset="100%" stopColor="#2563eb" stopOpacity="0" />
                         </linearGradient>
                       </defs>
                       <polygon points={`0,${lineH} ${points} ${lineW},${lineH}`} fill="url(#grad)" />
-                      <polyline points={points} fill="none" stroke="#6366f1" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                      <polyline points={points} fill="none" stroke="#2563eb" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                       {/* Labels dates */}
                       {[0, 7, 14, 21, 29].map(i => (
                         <text key={i} x={(i / 29) * lineW} y={lineH + 16} textAnchor="middle" fontSize={9} fill="var(--text-secondary)">
@@ -251,10 +251,10 @@ export default function StocksPage() {
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                             <span style={{ fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.nom}</span>
-                            <span style={{ fontSize: 13, fontWeight: 700, color: '#6366f1', flexShrink: 0, marginLeft: 8 }}>{c.total} {c.unite}</span>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: '#2563eb', flexShrink: 0, marginLeft: 8 }}>{c.total} {c.unite}</span>
                           </div>
                           <div style={{ height: 6, background: 'var(--bg-primary)', borderRadius: 3, overflow: 'hidden' }}>
-                            <div style={{ height: '100%', width: `${(c.total / maxBar) * 100}%`, background: i === 0 ? '#6366f1' : i === 1 ? '#8b5cf6' : '#a78bfa', borderRadius: 3, transition: 'width 0.4s ease' }} />
+                            <div style={{ height: '100%', width: `${(c.total / maxBar) * 100}%`, background: i === 0 ? '#2563eb' : i === 1 ? '#7c3aed' : '#a78bfa', borderRadius: 3, transition: 'width 0.4s ease' }} />
                           </div>
                         </div>
                       </div>
@@ -307,7 +307,7 @@ export default function StocksPage() {
                       <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{s.reference}{s.categorie ? ` · ${s.categorie}` : ''}</div>
                     </div>
                     <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                      <button onClick={() => openEdit(s)} style={{ background: '#6366f118', border: 'none', borderRadius: 6, padding: '6px', cursor: 'pointer', color: '#6366f1' }}><Pencil size={13} /></button>
+                      <button onClick={() => openEdit(s)} style={{ background: '#2563eb18', border: 'none', borderRadius: 6, padding: '6px', cursor: 'pointer', color: '#2563eb' }}><Pencil size={13} /></button>
                       <button onClick={() => remove(s)} style={{ background: '#ef444418', border: 'none', borderRadius: 6, padding: '6px', cursor: 'pointer', color: '#ef4444' }}><Trash2 size={13} /></button>
                     </div>
                   </div>
@@ -352,7 +352,7 @@ export default function StocksPage() {
                       <td style={{ padding: '12px 16px', fontSize: 12, color: 'var(--text-secondary)' }}>{s.emplacement || '—'}</td>
                       <td style={{ padding: '12px 16px' }}>
                         <div style={{ display: 'flex', gap: 6 }}>
-                          <button onClick={() => openEdit(s)} style={{ background: '#6366f118', border: 'none', borderRadius: 6, padding: '6px', cursor: 'pointer', color: '#6366f1' }}><Pencil size={13} /></button>
+                          <button onClick={() => openEdit(s)} style={{ background: '#2563eb18', border: 'none', borderRadius: 6, padding: '6px', cursor: 'pointer', color: '#2563eb' }}><Pencil size={13} /></button>
                           <button onClick={() => remove(s)} style={{ background: '#ef444418', border: 'none', borderRadius: 6, padding: '6px', cursor: 'pointer', color: '#ef4444' }}><Trash2 size={13} /></button>
                         </div>
                       </td>
@@ -421,7 +421,7 @@ export default function StocksPage() {
 
             <div style={{ display: 'flex', gap: 10, marginTop: 24, justifyContent: 'flex-end' }}>
               <button onClick={() => setShowForm(false)} style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 14 }}>Annuler</button>
-              <button onClick={save} disabled={saving || !form.reference || !form.nom} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', background: '#6366f1', border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer', fontSize: 14, fontWeight: 600, opacity: saving || !form.reference || !form.nom ? 0.6 : 1 }}>
+              <button onClick={save} disabled={saving || !form.reference || !form.nom} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', background: '#2563eb', border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer', fontSize: 14, fontWeight: 600, opacity: saving || !form.reference || !form.nom ? 0.6 : 1 }}>
                 <Save size={15} /> {saving ? 'Sauvegarde...' : 'Sauvegarder'}
               </button>
             </div>

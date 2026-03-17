@@ -81,7 +81,7 @@ export default function DirecteurDashboard() {
       <div className="dir-mobile-home">
         <div style={{ padding: '24px 16px 40px', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
           <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 22, fontWeight: 800, background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: 2 }}>COPILOTE</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px', marginBottom: 2 }}>COPILOTE</div>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Espace Directeur · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
           </div>
 
@@ -97,10 +97,10 @@ export default function DirecteurDashboard() {
             {[
               { href: '/directeur/synthese',     icon: TrendingUp, color: '#22c55e', label: 'Vue synthèse',   sub: 'KPIs & indicateurs' },
               { href: '/directeur/tickets',       icon: Ticket,     color: '#f59e0b', label: 'Tickets',        sub: `${stats.urgents > 0 ? stats.urgents + ' urgents' : 'Tous les tickets'}` },
-              { href: '/directeur/machines',      icon: Factory,    color: '#8b5cf6', label: 'Machines',       sub: `${stats.machines} actives` },
+              { href: '/directeur/machines',      icon: Factory,    color: '#7c3aed', label: 'Machines',       sub: `${stats.machines} actives` },
               { href: '/directeur/techniciens',   icon: Users,      color: '#0ea5e9', label: 'Techniciens',    sub: `${stats.techniciens} au total` },
               { href: '/directeur/stocks',        icon: Package,    color: '#10b981', label: 'Stocks',         sub: 'Niveaux & alertes' },
-              { href: '/directeur/rapports',      icon: BarChart3,  color: '#6366f1', label: 'Rapports IA',   sub: 'Analyses & recommandations' },
+              { href: '/directeur/rapports',      icon: BarChart3,  color: '#2563eb', label: 'Rapports IA',   sub: 'Analyses & recommandations' },
             ].map(card => (
               <Link key={card.href} href={card.href} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '16px', textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 10, background: `${card.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -141,12 +141,12 @@ export default function DirecteurDashboard() {
           <>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
               <KpiCard label="Taux de résolution" value={`${tauxResolution}%`} sub={`${stats.fermes} résolus sur ${stats.total} au total`} icon={TrendingUp} color="#22c55e" big />
-              <KpiCard label="Charge en cours" value={`${charge}%`} sub={`${stats.ouverts} ouverts · ${stats.en_cours} en traitement`} icon={Zap} color="#6366f1" big />
+              <KpiCard label="Charge en cours" value={`${charge}%`} sub={`${stats.ouverts} ouverts · ${stats.en_cours} en traitement`} icon={Zap} color="#2563eb" big />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
               <KpiCard label="Tickets urgents"  value={stats.urgents}     icon={AlertTriangle} color="#ef4444" />
               <KpiCard label="Machines actives" value={stats.machines}    icon={CheckCircle2}  color="#0ea5e9" />
-              <KpiCard label="Techniciens"       value={stats.techniciens} icon={Clock}         color="#8b5cf6" />
+              <KpiCard label="Techniciens"       value={stats.techniciens} icon={Clock}         color="#7c3aed" />
             </div>
           </>
         )}

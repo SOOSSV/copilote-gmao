@@ -46,13 +46,13 @@ export default function DirecteurLoginPage() {
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{
             width: 56, height: 56, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
+            background: 'linear-gradient(135deg, #0ea5e9, #2563eb)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 14px',
           }}>
             <Bot size={28} color="white" />
           </div>
-          <div style={{ fontSize: 22, fontWeight: 800, background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)' }}>
             COPILOTE
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>Espace Directeur</div>
@@ -91,7 +91,7 @@ export default function DirecteurLoginPage() {
           disabled={!password || loading}
           style={{
             width: '100%', padding: '13px',
-            background: password ? 'linear-gradient(135deg, #0ea5e9, #6366f1)' : 'var(--bg-secondary)',
+            background: password ? 'linear-gradient(135deg, #0ea5e9, #2563eb)' : 'var(--bg-secondary)',
             border: '1px solid var(--border)',
             borderRadius: 12, color: 'white', fontSize: 15, fontWeight: 700,
             cursor: password ? 'pointer' : 'default', transition: 'all 0.15s',

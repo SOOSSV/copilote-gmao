@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Factory, CheckCircle, XCircle, AlertCircle, Cpu } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 type Machine = {
   id: string;
@@ -25,11 +26,12 @@ const statutConfig: Record<string, { color: string; icon: React.ElementType; lab
 const criticiteColor: Record<string, string> = {
   critique: '#ef4444',
   haute:    '#f59e0b',
-  normale:  '#6366f1',
+  normale:  '#2563eb',
   basse:    '#22c55e',
 };
 
 export default function MachinesPage() {
+  const router = useRouter();
   const [machines, setMachines] = useState<Machine[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtre, setFiltre] = useState('tous');
@@ -87,7 +89,7 @@ export default function MachinesPage() {
           {filtered.map(m => {
             const cfg = statutConfig[m.statut] || statutConfig.inactif;
             const StatIcon = cfg.icon;
-            const critColor = criticiteColor[m.criticite] || '#6366f1';
+            const critColor = criticiteColor[m.criticite] || '#2563eb';
             return (
               <Link key={m.id} href={`/manager/machines/${m.id}`} style={{
                 background: 'var(--bg-card)', border: '1px solid var(--border)',
@@ -118,10 +120,14 @@ export default function MachinesPage() {
                     <span style={{ color: 'var(--text-secondary)' }}>Criticité</span>
                     <span style={{ color: critColor, fontWeight: 600, textTransform: 'capitalize' }}>{m.criticite}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, borderTop: '1px solid var(--border)', paddingTop: 8, marginTop: 2 }}>
+                  <div
+                    onClick={e => { if ((m.ticket_count || 0) > 0) { e.preventDefault(); e.stopPropagation(); router.push(`/manager/tickets?machine=${encodeURIComponent(m.nom)}`); } }}
+                    style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, borderTop: '1px solid var(--border)', paddingTop: 8, marginTop: 2, cursor: (m.ticket_count || 0) > 0 ? 'pointer' : 'default' }}
+                  >
                     <span style={{ color: 'var(--text-secondary)' }}>Tickets ouverts</span>
-                    <span style={{ fontWeight: 700, color: (m.ticket_count || 0) > 0 ? '#f59e0b' : 'var(--text-secondary)' }}>
+                    <span style={{ fontWeight: 700, color: (m.ticket_count || 0) > 0 ? '#f59e0b' : 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 4 }}>
                       {m.ticket_count || 0}
+                      {(m.ticket_count || 0) > 0 && <span style={{ fontSize: 11 }}>→</span>}
                     </span>
                   </div>
                 </div>

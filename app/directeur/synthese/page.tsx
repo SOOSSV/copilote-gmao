@@ -106,11 +106,11 @@ export default function SynthesePage() {
           {/* KPI grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 24 }}>
             <KpiMini label="Taux résolution" value={`${tauxResolution}%`} color="#22c55e" sub={`${stats.fermes}/${stats.total}`} icon={Target} />
-            <KpiMini label="Charge" value={`${charge}%`} color="#6366f1" sub={`${stats.ouverts} ouverts`} icon={Battery} />
+            <KpiMini label="Charge" value={`${charge}%`} color="#2563eb" sub={`${stats.ouverts} ouverts`} icon={Battery} />
             <KpiMini label="Urgents" value={stats.urgents} color="#ef4444" icon={ShieldAlert} />
             <KpiMini label="En cours" value={stats.en_cours} color="#f59e0b" icon={Wrench} />
             <KpiMini label="Machines" value={stats.machines} color="#0ea5e9" icon={Cpu} />
-            <KpiMini label="Techniciens" value={stats.techniciens} color="#8b5cf6" icon={Users} />
+            <KpiMini label="Techniciens" value={stats.techniciens} color="#7c3aed" icon={Users} />
           </div>
 
           {/* Top machines en défaut */}
