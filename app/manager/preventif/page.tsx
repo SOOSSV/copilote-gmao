@@ -40,6 +40,8 @@ export default function PreventifPage() {
   const [iaSuggestions, setIaSuggestions] = useState<IASuggestion[]>([]);
   const [iaLoading, setIaLoading] = useState(false);
   const [donePlanId, setDonePlanId] = useState<string | null>(null);
+  const [doneError, setDoneError] = useState<string | null>(null);
+  const [doneSuccess, setDoneSuccess] = useState<string | null>(null);
 
   async function load() {
     const [{ data: p }, { data: m }, { data: t }] = await Promise.all([
@@ -86,40 +88,51 @@ export default function PreventifPage() {
 
   async function markDone(plan: Plan) {
     setDonePlanId(plan.id);
+    setDoneError(null);
+    setDoneSuccess(null);
     const now = new Date().toISOString();
     const next = new Date();
     next.setDate(next.getDate() + plan.frequence_jours);
 
-    // 1. Mettre à jour la prochaine échéance
-    await supabase.from('preventive_plans').update({ prochaine_exec: next.toISOString() }).eq('id', plan.id);
+    try {
+      // 1. Mettre à jour la prochaine échéance
+      const { error: e1 } = await supabase.from('preventive_plans').update({ prochaine_exec: next.toISOString() }).eq('id', plan.id);
+      if (e1) throw new Error(`Plan: ${e1.message}`);
 
-    // 2. Créer un ticket préventif résolu pour la traçabilité
-    const { data: ticket } = await supabase.from('tickets').insert({
-      titre: plan.titre,
-      description: plan.description || `Maintenance préventive réalisée : ${plan.titre}`,
-      machine_id: plan.machine_id,
-      technicien_id: plan.technicien_id || null,
-      type_intervention: 'preventive',
-      priorite: 'normale',
-      statut: 'resolu',
-      classification: 'autre',
-      source: 'preventif',
-      resolu_le: now,
-    }).select('id').single();
+      // 2. Créer un ticket préventif résolu pour la traçabilité
+      const { data: ticket, error: e2 } = await supabase.from('tickets').insert({
+        titre: plan.titre,
+        description: plan.description || `Maintenance préventive réalisée : ${plan.titre}`,
+        machine_id: plan.machine_id,
+        technicien_id: plan.technicien_id || null,
+        type_intervention: 'preventive',
+        priorite: 'normale',
+        statut: 'resolu',
+        classification: 'autre',
+        resolu_le: now,
+      }).select('id').single();
+      if (e2) throw new Error(`Ticket: ${e2.message}`);
 
-    // 3. Log dans maintenance_history
-    await supabase.from('maintenance_history').insert({
-      ticket_id: ticket?.id || null,
-      machine_id: plan.machine_id,
-      technicien_id: plan.technicien_id || null,
-      type_action: 'inspection',
-      description: plan.titre,
-      observations: `Plan préventif — fréquence ${plan.frequence_jours}j. Prochaine échéance : ${next.toLocaleDateString('fr-FR')}`,
-      realise_le: now,
-    });
+      // 3. Log dans maintenance_history
+      const { error: e3 } = await supabase.from('maintenance_history').insert({
+        ticket_id: ticket?.id || null,
+        machine_id: plan.machine_id,
+        technicien_id: plan.technicien_id || null,
+        type_action: 'inspection',
+        description: plan.titre,
+        observations: `Plan préventif — fréquence ${plan.frequence_jours}j. Prochaine : ${next.toLocaleDateString('fr-FR')}`,
+        realise_le: now,
+      });
+      if (e3) throw new Error(`Historique: ${e3.message}`);
 
-    setDonePlanId(null);
-    load();
+      setDoneSuccess(`✓ "${plan.titre}" enregistré — prochain dans ${plan.frequence_jours}j`);
+      setTimeout(() => setDoneSuccess(null), 4000);
+      load();
+    } catch (err) {
+      setDoneError(err instanceof Error ? err.message : 'Erreur inconnue');
+    } finally {
+      setDonePlanId(null);
+    }
   }
 
   async function remove(id: string) {
@@ -202,6 +215,18 @@ export default function PreventifPage() {
           </button>
         ))}
       </div>
+
+      {/* Toasts feedback */}
+      {doneSuccess && (
+        <div style={{ background: '#22c55e18', border: '1px solid #22c55e44', borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: '#22c55e', fontWeight: 600 }}>
+          {doneSuccess}
+        </div>
+      )}
+      {doneError && (
+        <div style={{ background: '#ef444418', border: '1px solid #ef444444', borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: '#ef4444' }}>
+          ⚠️ Erreur : {doneError}
+        </div>
+      )}
 
       {/* Liste */}
       {loading ? (

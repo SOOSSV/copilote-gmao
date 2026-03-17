@@ -34,6 +34,7 @@ export default function TechTicketDetail() {
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [diagnostic, setDiagnostic] = useState<Diagnostic | null>(null);
   const [diagLoading, setDiagLoading] = useState(false);
+  const [diagError, setDiagError] = useState<string | null>(null);
   const [pieces, setPieces] = useState<PieceUtilisee[]>([]);
   const [showPieces, setShowPieces] = useState(false);
   const [searchStock, setSearchStock] = useState('');
@@ -58,6 +59,7 @@ export default function TechTicketDetail() {
 
   async function runDiagnostic() {
     setDiagLoading(true);
+    setDiagError(null);
     try {
       const res = await fetch('/api/diagnostic', {
         method: 'POST',
@@ -65,7 +67,13 @@ export default function TechTicketDetail() {
         body: JSON.stringify({ ticket_id: params.id }),
       });
       const data = await res.json();
-      if (data.diagnostic) setDiagnostic(data.diagnostic);
+      if (data.diagnostic) {
+        setDiagnostic(data.diagnostic);
+      } else {
+        setDiagError(data.error || 'Réponse IA vide — réessayez');
+      }
+    } catch {
+      setDiagError('Erreur réseau');
     } finally {
       setDiagLoading(false);
     }
@@ -173,6 +181,11 @@ export default function TechTicketDetail() {
         {diagLoading && (
           <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)', fontSize: 13 }}>
             <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> Analyse en cours...
+          </div>
+        )}
+        {diagError && (
+          <div style={{ marginTop: 8, fontSize: 12, color: '#ef4444', background: '#ef444410', border: '1px solid #ef444433', borderRadius: 8, padding: '8px 12px' }}>
+            ⚠️ {diagError}
           </div>
         )}
         {diagnostic && (

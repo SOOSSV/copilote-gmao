@@ -31,6 +31,7 @@ export default function DirecteurTicketDetailPage() {
   const [loading, setLoading] = useState(true);
   const [diagnostic, setDiagnostic] = useState<Diagnostic | null>(null);
   const [diagLoading, setDiagLoading] = useState(false);
+  const [diagError, setDiagError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!params.id) return;
@@ -49,6 +50,7 @@ export default function DirecteurTicketDetailPage() {
 
   async function runDiagnostic() {
     setDiagLoading(true);
+    setDiagError(null);
     try {
       const res = await fetch('/api/diagnostic', {
         method: 'POST',
@@ -56,7 +58,13 @@ export default function DirecteurTicketDetailPage() {
         body: JSON.stringify({ ticket_id: params.id }),
       });
       const data = await res.json();
-      if (data.diagnostic) setDiagnostic(data.diagnostic);
+      if (data.diagnostic) {
+        setDiagnostic(data.diagnostic);
+      } else {
+        setDiagError(data.error || 'Réponse IA vide — réessayez');
+      }
+    } catch {
+      setDiagError('Erreur réseau');
     } finally {
       setDiagLoading(false);
     }
@@ -126,7 +134,12 @@ export default function DirecteurTicketDetailPage() {
             <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> Analyse du ticket en cours...
           </div>
         )}
-        {!diagnostic && !diagLoading && (
+        {diagError && (
+          <div style={{ marginTop: 10, fontSize: 12, color: '#ef4444', background: '#ef444410', border: '1px solid #ef444433', borderRadius: 8, padding: '8px 12px' }}>
+            ⚠️ {diagError}
+          </div>
+        )}
+        {!diagnostic && !diagLoading && !diagError && (
           <div style={{ marginTop: 10, fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
             Analyse IA pour obtenir la cause probable, les actions recommandées et les pièces nécessaires.
           </div>

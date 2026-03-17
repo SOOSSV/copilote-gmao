@@ -49,12 +49,13 @@ export default function TicketDetailPage() {
   const [diagLoading, setDiagLoading] = useState(false);
   const [diagExpanded, setDiagExpanded] = useState(true);
   const [diagnostic, setDiagnostic] = useState<Diagnostic | null>(null);
+  const [diagError, setDiagError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
       const [{ data: t }, { data: techList }] = await Promise.all([
         supabase.from('tickets').select('*, machines(nom, localisation, type_equipement), technicians(prenom, nom, specialites)').eq('id', params.id).single(),
-        supabase.from('technicians').select('id, prenom, nom, specialites').eq('actif', true).order('prenom'),
+        supabase.from('technicians').select('id, prenom, nom, specialites').order('prenom'),
       ]);
       const ticketData = t as Ticket;
       setTicket(ticketData);
@@ -79,6 +80,7 @@ export default function TicketDetailPage() {
 
   async function runDiagnostic() {
     setDiagLoading(true);
+    setDiagError(null);
     try {
       const res = await fetch('/api/diagnostic', {
         method: 'POST',
@@ -89,7 +91,11 @@ export default function TicketDetailPage() {
       if (data.diagnostic) {
         setDiagnostic(data.diagnostic);
         setDiagExpanded(true);
+      } else {
+        setDiagError(data.error || 'Réponse IA vide — réessayez dans quelques secondes');
       }
+    } catch {
+      setDiagError('Erreur réseau — vérifiez la connexion');
     } finally {
       setDiagLoading(false);
     }
@@ -182,9 +188,14 @@ export default function TicketDetailPage() {
           </div>
         </div>
 
-        {!diagnostic && !diagLoading && (
+        {!diagnostic && !diagLoading && !diagError && (
           <div style={{ marginTop: 10, fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
             Lance l&apos;IA pour obtenir une analyse de cause probable, des actions recommandées et une estimation des pièces nécessaires.
+          </div>
+        )}
+        {diagError && (
+          <div style={{ marginTop: 10, fontSize: 12, color: '#ef4444', background: '#ef444410', border: '1px solid #ef444433', borderRadius: 8, padding: '8px 12px' }}>
+            ⚠️ {diagError}
           </div>
         )}
 
