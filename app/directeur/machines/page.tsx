@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { Factory, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Factory, CheckCircle, XCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type Machine = {
   id: string; external_id: string; nom: string; type_equipement: string;
@@ -18,6 +19,7 @@ const statutConfig: Record<string, { color: string; icon: React.ElementType; lab
 const criticiteColor: Record<string, string> = { critique: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e' };
 
 export default function DirecteurMachinesPage() {
+  const router = useRouter();
   const [machines, setMachines] = useState<Machine[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtre, setFiltre] = useState('tous');
@@ -43,6 +45,7 @@ export default function DirecteurMachinesPage() {
   return (
     <div style={{ padding: 'clamp(14px, 3vw, 22px)', maxWidth: 1100, boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} /></button>
         <Factory size={20} color="#0ea5e9" />
         <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Parc Machines</h1>
         <span style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '2px 10px', fontSize: 12, color: 'var(--text-secondary)' }}>{machines.length}</span>

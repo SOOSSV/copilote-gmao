@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Users, Wrench, Moon, Sun, Sunset } from 'lucide-react';
+import { Users, Wrench, Moon, Sun, Sunset, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type Tech = {
   id: string;
@@ -46,6 +47,7 @@ function getSpecialiteColor(s: string) {
 }
 
 export default function TechniciensPage() {
+  const router = useRouter();
   const [techs, setTechs] = useState<Tech[]>([]);
   const [loading, setLoading] = useState(true);
   const shiftActuel = getShiftActuel();
@@ -78,6 +80,7 @@ export default function TechniciensPage() {
   return (
     <div style={{ padding: '20px 16px', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} /></button>
         <Users size={20} color="var(--accent)" />
         <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Techniciens</h1>
         <span style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '2px 10px', fontSize: 12, color: 'var(--text-secondary)' }}>

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Package, AlertTriangle, CheckCircle, Plus, Pencil, Trash2, X, Save, BarChart2 } from 'lucide-react';
+import { Package, AlertTriangle, CheckCircle, Plus, Pencil, Trash2, X, Save, BarChart2, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type ConsoPiece = { nom: string; total: number; unite: string };
 type ConsoJour = { date: string; total: number };
@@ -27,6 +28,7 @@ const emptyForm = {
 };
 
 export default function StocksPage() {
+  const router = useRouter();
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -163,9 +165,12 @@ export default function StocksPage() {
     <div style={{ padding: 'clamp(16px, 4vw, 32px)', maxWidth: 1100, boxSizing: 'border-box' }}>
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
-        <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Stocks & Pièces</h1>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{stocks.length} article{stocks.length > 1 ? 's' : ''} · {alertes} en alerte</div>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+          <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: '2px 4px', display: 'flex', alignItems: 'center', marginTop: 2 }}><ArrowLeft size={20} /></button>
+          <div>
+            <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Stocks & Pièces</h1>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{stocks.length} article{stocks.length > 1 ? 's' : ''} · {alertes} en alerte</div>
+          </div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={openAdd} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>

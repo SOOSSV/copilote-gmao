@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { BarChart3, Brain, ChevronDown, ChevronUp, Sparkles, RefreshCw, Trash2 } from 'lucide-react';
+import { BarChart3, Brain, ChevronDown, ChevronUp, Sparkles, RefreshCw, Trash2, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type Analyse = {
   id: string;
@@ -27,6 +28,7 @@ const TYPES = [
 ];
 
 export default function RapportsPage() {
+  const router = useRouter();
   const [analyses, setAnalyses] = useState<Analyse[]>([]);
   const [loading, setLoading] = useState(true);
   const [ouvert, setOuvert] = useState<string | null>(null);
@@ -119,6 +121,7 @@ export default function RapportsPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} /></button>
           <BarChart3 size={22} color="var(--accent)" />
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Rapports IA</h1>
         </div>

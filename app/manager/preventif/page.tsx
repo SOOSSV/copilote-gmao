@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Calendar, AlertTriangle, CheckCircle, Clock, Plus, X, Save } from 'lucide-react';
+import { Calendar, AlertTriangle, CheckCircle, Clock, Plus, X, Save, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type Plan = {
   id: string;
@@ -20,6 +21,7 @@ type Machine = { id: string; nom: string; localisation: string };
 const emptyForm = { machine_id: '', titre: '', description: '', frequence_jours: '30', prochaine_exec: '' };
 
 export default function PreventifPage() {
+  const router = useRouter();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [machines, setMachines] = useState<Machine[]>([]);
   const [loading, setLoading] = useState(true);
@@ -94,9 +96,12 @@ export default function PreventifPage() {
   return (
     <div style={{ padding: 'clamp(16px, 4vw, 32px)', maxWidth: 1000, boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
-        <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Maintenance Préventive</h1>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{plans.length} plan{plans.length > 1 ? 's' : ''} · {retard} en retard · {urgent} cette semaine</div>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+          <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: '2px 4px', display: 'flex', alignItems: 'center', marginTop: 2 }}><ArrowLeft size={20} /></button>
+          <div>
+            <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Maintenance Préventive</h1>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{plans.length} plan{plans.length > 1 ? 's' : ''} · {retard} en retard · {urgent} cette semaine</div>
+          </div>
         </div>
         <button onClick={() => setShowForm(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
           <Plus size={16} /> Nouveau plan

@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { supabase, Ticket } from '@/lib/supabase';
 import BottomNav from '@/components/BottomNav';
 import PrioriteBadge from '@/components/PrioriteBadge';
-import { Ticket as TicketIcon, RefreshCw, ChevronRight } from 'lucide-react';
+import { Ticket as TicketIcon, RefreshCw, ChevronRight, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const statutColor: Record<string, string> = {
@@ -14,6 +15,7 @@ const statutColor: Record<string, string> = {
 };
 
 export default function TicketsPage() {
+  const router = useRouter();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtre, setFiltre] = useState<'tous' | 'ouvert' | 'en_cours' | 'resolu'>('tous');
@@ -47,6 +49,7 @@ export default function TicketsPage() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} /></button>
           <TicketIcon size={20} color="var(--accent)" />
           <span style={{ fontWeight: 700, fontSize: 16 }}>Mes Tickets</span>
         </div>

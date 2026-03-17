@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase, Machine } from '@/lib/supabase';
 import BottomNav from '@/components/BottomNav';
-import { PlusCircle, CheckCircle, AlertCircle } from 'lucide-react';
+import { PlusCircle, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 const inputStyle = {
@@ -98,6 +98,7 @@ export default function NouveauTicketPage() {
         padding: '16px 20px',
         display: 'flex', alignItems: 'center', gap: 10,
       }}>
+        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} /></button>
         <PlusCircle size={20} color="var(--accent)" />
         <span style={{ fontWeight: 700, fontSize: 16 }}>Nouveau Ticket</span>
       </div>

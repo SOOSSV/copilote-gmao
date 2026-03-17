@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { CheckCircle, Calendar, Wrench, Package, TrendingUp } from 'lucide-react';
+import { CheckCircle, Calendar, Wrench, Package, TrendingUp, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type HistEntry = {
   id: string;
@@ -15,6 +16,7 @@ type HistEntry = {
 };
 
 export default function TechHistorique() {
+  const router = useRouter();
   const [history, setHistory] = useState<HistEntry[]>([]);
   const [resolus, setResolus] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -49,6 +51,7 @@ export default function TechHistorique() {
   return (
     <div style={{ padding: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} /></button>
         <TrendingUp size={18} color="#22c55e" />
         <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Mes stats</h1>
       </div>

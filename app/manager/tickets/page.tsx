@@ -3,7 +3,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import { supabase, Ticket } from '@/lib/supabase';
 import PrioriteBadge from '@/components/PrioriteBadge';
-import { Search, RefreshCw } from 'lucide-react';
+import { Search, RefreshCw, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const statutColor: Record<string, string> = {
@@ -17,6 +18,7 @@ function statutLabel(s: string) {
 }
 
 export default function ManagerTicketsPage() {
+  const router = useRouter();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -80,7 +82,10 @@ export default function ManagerTicketsPage() {
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Tous les Tickets</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} /></button>
+          <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Tous les Tickets</h1>
+        </div>
         <button onClick={fetchTickets} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '7px 12px', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
           <RefreshCw size={13} /> Actualiser
         </button>

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Package, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Package, AlertTriangle, CheckCircle, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type Stock = {
   id: string; reference: string; nom: string; categorie: string | null;
@@ -10,6 +11,7 @@ type Stock = {
 };
 
 export default function DirecteurStocksPage() {
+  const router = useRouter();
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterAlerte, setFilterAlerte] = useState(false);
@@ -30,9 +32,12 @@ export default function DirecteurStocksPage() {
 
   return (
     <div style={{ padding: 'clamp(16px, 4vw, 32px)', maxWidth: 1100, boxSizing: 'border-box' }}>
-      <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Stocks & Pièces</h1>
-        <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{stocks.length} article{stocks.length > 1 ? 's' : ''} · {alertes} en alerte</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} /></button>
+        <div>
+          <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Stocks & Pièces</h1>
+          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{stocks.length} article{stocks.length > 1 ? 's' : ''} · {alertes} en alerte</div>
+        </div>
       </div>
 
       {/* KPI */}
