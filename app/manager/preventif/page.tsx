@@ -73,24 +73,26 @@ export default function PreventifPage() {
     if (!form.machine_id || !form.titre || !form.prochaine_exec) return;
     setSaving(true);
     setSaveError(null);
-    const { error } = await supabase.from('preventive_plans').insert({
-      machine_id: form.machine_id,
-      titre: form.titre.trim(),
-      description: form.description.trim() || null,
-      frequence_jours: parseInt(form.frequence_jours) || 30,
-      prochaine_exec: form.prochaine_exec,
-      technicien_id: form.technicien_id || null,
-      actif: true,
-    });
-    setSaving(false);
-    if (error) {
-      setSaveError(error.message);
-      return;
+    try {
+      const res = await fetch('/api/preventif', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setSaveError(data.error || 'Erreur inconnue');
+        return;
+      }
+      setShowForm(false);
+      setForm(emptyForm);
+      setIaSuggestions([]);
+      load();
+    } catch {
+      setSaveError('Erreur réseau');
+    } finally {
+      setSaving(false);
     }
-    setShowForm(false);
-    setForm(emptyForm);
-    setIaSuggestions([]);
-    load();
   }
 
   async function markDone(plan: Plan) {
