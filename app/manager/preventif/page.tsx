@@ -39,6 +39,7 @@ export default function PreventifPage() {
   const [filter, setFilter] = useState<'tous' | 'urgent' | 'ok'>('tous');
   const [iaSuggestions, setIaSuggestions] = useState<IASuggestion[]>([]);
   const [iaLoading, setIaLoading] = useState(false);
+  const [iaError, setIaError] = useState<string | null>(null);
   const [donePlanId, setDonePlanId] = useState<string | null>(null);
   const [doneError, setDoneError] = useState<string | null>(null);
   const [doneSuccess, setDoneSuccess] = useState<string | null>(null);
@@ -151,6 +152,7 @@ export default function PreventifPage() {
     if (!form.machine_id) return;
     setIaLoading(true);
     setIaSuggestions([]);
+    setIaError(null);
     try {
       const res = await fetch('/api/preventif-ia', {
         method: 'POST',
@@ -158,7 +160,13 @@ export default function PreventifPage() {
         body: JSON.stringify({ machine_id: form.machine_id }),
       });
       const data = await res.json();
-      if (data.plans) setIaSuggestions(data.plans);
+      if (data.plans) {
+        setIaSuggestions(data.plans);
+      } else {
+        setIaError(data.error || 'Réponse vide');
+      }
+    } catch {
+      setIaError('Erreur réseau');
     } finally {
       setIaLoading(false);
     }
@@ -363,6 +371,11 @@ export default function PreventifPage() {
                   <button onClick={loadIASuggestions} disabled={iaLoading} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(37,99,235,0.1)', border: '1px solid rgba(37,99,235,0.3)', borderRadius: 8, padding: '8px 14px', color: '#2563eb', fontSize: 13, fontWeight: 600, cursor: iaLoading ? 'default' : 'pointer', opacity: iaLoading ? 0.7 : 1 }}>
                     {iaLoading ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> Génération...</> : <><Bot size={13} /> Suggestions IA pour cette machine</>}
                   </button>
+                  {iaError && (
+                    <div style={{ marginTop: 6, fontSize: 12, color: '#ef4444', background: '#ef444410', border: '1px solid #ef444433', borderRadius: 6, padding: '6px 10px' }}>
+                      ⚠️ {iaError}
+                    </div>
+                  )}
                   {iaSuggestions.length > 0 && (
                     <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {iaSuggestions.map((s, i) => (
