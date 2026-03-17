@@ -45,7 +45,7 @@ export default function PreventifPage() {
     const [{ data: p }, { data: m }, { data: t }] = await Promise.all([
       supabase.from('preventive_plans').select('*, machines(nom, localisation), technicians(prenom, nom)').eq('actif', true).order('prochaine_exec'),
       supabase.from('machines').select('id, nom, localisation').eq('statut', 'actif').order('nom'),
-      supabase.from('technicians').select('id, prenom, nom').eq('actif', true).order('prenom'),
+      supabase.from('technicians').select('id, prenom, nom').order('prenom'),
     ]);
     setPlans((p as unknown as Plan[]) || []);
     setMachines((m as Machine[]) || []);
