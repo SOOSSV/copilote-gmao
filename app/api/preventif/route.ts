@@ -15,19 +15,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Champs obligatoires manquants' }, { status: 400 });
     }
 
-    const { data, error } = await supabase.from('preventive_plans').insert({
-      machine_id,
-      titre: titre.trim(),
-      description: description?.trim() || null,
-      frequence_jours: parseInt(frequence_jours) || 30,
-      prochaine_exec,
-      technicien_id: technicien_id || null,
-      actif: true,
-    }).select('id').single();
+    const { data, error } = await supabase.rpc('create_preventive_plan', {
+      p_machine_id: machine_id,
+      p_titre: titre.trim(),
+      p_description: description?.trim() || null,
+      p_frequence_jours: parseInt(frequence_jours) || 30,
+      p_prochaine_exec: prochaine_exec,
+      p_technicien_id: technicien_id || null,
+    });
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-    return NextResponse.json({ success: true, id: data.id });
+    return NextResponse.json({ success: true, id: data });
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : 'Erreur serveur' }, { status: 500 });
   }
