@@ -7,7 +7,7 @@ import { ArrowLeft, Wrench, MapPin, AlertTriangle, CheckCircle, Clock, Calendar,
 
 type Machine = {
   id: string; external_id: string; nom: string; type_equipement: string;
-  localisation: string; criticite: string; statut: string;
+  localisation: string; criticite: string; statut: string; cout_heure_arret: number | null;
 };
 
 type Ticket = {
@@ -39,6 +39,8 @@ export default function MachineDetailPage() {
   const [history, setHistory] = useState<HistEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'pannes' | 'historique'>('pannes');
+  const [coutEdit, setCoutEdit] = useState('');
+  const [savingCout, setSavingCout] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -50,12 +52,22 @@ export default function MachineDetailPage() {
           .eq('machine_id', params.id).order('realise_le', { ascending: false }).limit(30),
       ]);
       setMachine(m as Machine);
+      setCoutEdit(m?.cout_heure_arret != null ? String(m.cout_heure_arret) : '');
       setTickets((t as unknown as Ticket[]) || []);
       setHistory((h as unknown as HistEntry[]) || []);
       setLoading(false);
     }
     if (params.id) load();
   }, [params.id]);
+
+  async function saveCout() {
+    if (!machine) return;
+    setSavingCout(true);
+    const val = coutEdit.trim() === '' ? null : parseFloat(coutEdit);
+    await supabase.from('machines').update({ cout_heure_arret: val }).eq('id', machine.id);
+    setMachine(prev => prev ? { ...prev, cout_heure_arret: val } : prev);
+    setSavingCout(false);
+  }
 
   if (loading) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Chargement...</div>;
   if (!machine) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Machine introuvable</div>;
@@ -96,6 +108,30 @@ export default function MachineDetailPage() {
             <Wrench size={13} color="var(--text-secondary)" />
             <span style={{ fontSize: 13, textTransform: 'capitalize' }}>{machine.statut}</span>
           </div>
+        </div>
+      </div>
+
+      {/* Coût arrêt */}
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 14px', marginBottom: 14 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 10 }}>Impact financier</div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div style={{ flex: 1, position: 'relative' }}>
+            <input
+              type="number"
+              value={coutEdit}
+              onChange={e => setCoutEdit(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && saveCout()}
+              placeholder="Ex: 800"
+              style={{ width: '100%', background: 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 36px 8px 12px', color: 'var(--text-primary)', fontSize: 13, boxSizing: 'border-box', outline: 'none' }}
+            />
+            <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 12, color: 'var(--text-secondary)' }}>€/h</span>
+          </div>
+          <button onClick={saveCout} disabled={savingCout} style={{ background: '#2563eb', border: 'none', borderRadius: 8, padding: '8px 14px', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0, opacity: savingCout ? 0.6 : 1 }}>
+            {savingCout ? '...' : 'Enregistrer'}
+          </button>
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 6 }}>
+          Coût par heure d'arrêt — utilisé pour calculer l'impact financier dans la synthèse directeur
         </div>
       </div>
 
