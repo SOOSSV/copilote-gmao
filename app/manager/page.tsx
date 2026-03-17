@@ -178,44 +178,6 @@ export default function ManagerDashboard() {
             ))}
           </div>
 
-          {/* Cards denses — Machines + Techniciens */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
-            {/* Machines */}
-            <Link href="/manager/machines" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-                <Factory size={14} color="#7c3aed" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed' }}>Machines</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>● Actives</span>
-                  <span style={{ fontWeight: 700, color: '#22c55e' }}>{stats.machinesActives}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>● Inactives</span>
-                  <span style={{ fontWeight: 700, color: '#f59e0b' }}>{stats.machinesInactives}</span>
-                </div>
-                {stats.machinesHorsService > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>● Hors service</span>
-                    <span style={{ fontWeight: 700, color: '#ef4444' }}>{stats.machinesHorsService}</span>
-                  </div>
-                )}
-              </div>
-            </Link>
-            {/* Techniciens */}
-            <Link href="/manager/techniciens" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-                <Users size={14} color="#06b6d4" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#06b6d4' }}>Techniciens</span>
-              </div>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#06b6d4', marginBottom: 4 }}>{stats.techniciens}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
-                {stats.en_cours} intervention{stats.en_cours > 1 ? 's' : ''} en cours
-              </div>
-            </Link>
-          </div>
-
           {/* Barre IA suggestion */}
           {suggestion && !loading && (
             <div style={{ background: 'rgba(37,99,235,0.08)', border: '1px solid rgba(37,99,235,0.25)', borderRadius: 14, padding: '14px', marginBottom: 12 }}>
