@@ -74,7 +74,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
               <Link key={href} href={href} style={{
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '10px 12px', borderRadius: 10,
-                background: active ? 'rgba(99,102,241,0.15)' : 'transparent',
+                background: active ? 'rgba(37,99,235,0.15)' : 'transparent',
                 color: active ? 'var(--accent)' : 'var(--text-secondary)',
                 textDecoration: 'none', fontSize: 14, fontWeight: active ? 600 : 400,
               }}>
@@ -95,7 +95,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
               <Link key={href} href={href} style={{
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '10px 12px', borderRadius: 10,
-                background: active ? 'rgba(99,102,241,0.15)' : 'transparent',
+                background: active ? 'rgba(37,99,235,0.15)' : 'transparent',
                 color: active ? 'var(--accent)' : 'var(--text-secondary)',
                 textDecoration: 'none', fontSize: 14, fontWeight: active ? 600 : 400,
               }}><Icon size={18} />{label}</Link>

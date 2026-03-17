@@ -123,17 +123,6 @@ export default function ManagerDashboard() {
 
   const tauxResolution = stats.total > 0 ? Math.round((stats.fermes / stats.total) * 100) : 0;
 
-  const menuCards = [
-    { href: '/manager/dashboard', icon: BarChart3,    label: 'Tableau de bord', color: '#2563eb', badge: stats.urgents > 0 ? `${stats.urgents} urgents` : null, badgeColor: '#ef4444' },
-    { href: '/manager/tickets',   icon: Ticket,        label: 'Tickets',         color: '#f59e0b', badge: stats.ouverts > 0 ? `${stats.ouverts} ouverts` : null, badgeColor: '#f59e0b' },
-    { href: '/manager/machines',  icon: Factory,       label: 'Machines',        color: '#7c3aed', badge: null, badgeColor: '' },
-    { href: '/manager/techniciens', icon: Users,       label: 'Techniciens',     color: '#06b6d4', badge: `${stats.techniciens}`, badgeColor: '#06b6d4' },
-    { href: '/manager/stocks',    icon: Package,       label: 'Stocks',          color: '#f59e0b', badge: stats.stockAlertes > 0 ? `${stats.stockAlertes} rupture${stats.stockAlertes > 1 ? 's' : ''}` : null, badgeColor: '#f59e0b' },
-    { href: '/manager/rapports',  icon: BarChart3,     label: 'Rapports IA',     color: '#22c55e', badge: null, badgeColor: '' },
-    { href: '/manager/chat',      icon: MessageCircle, label: 'Chat IA',         color: '#0ea5e9', badge: null, badgeColor: '' },
-    { href: '/manager/nouveau',   icon: PlusCircle,    label: 'Nouveau ticket',  color: '#10b981', badge: null, badgeColor: '' },
-  ];
-
   return (
     <>
       {/* ===== VUE MOBILE : Menu cartes ===== */}
