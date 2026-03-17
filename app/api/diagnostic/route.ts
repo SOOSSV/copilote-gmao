@@ -72,11 +72,26 @@ niveau_urgence doit être exactement : critique, élevé, modéré ou faible`;
 
     if (!N8N_CHAT_URL) return NextResponse.json({ error: 'N8N_CHAT_URL non configurée sur le serveur' }, { status: 500 });
 
-    const aiRes = await fetch(N8N_CHAT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chatInput: prompt, sessionId: `diag-${ticket_id}` }),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 55000);
+
+    let aiRes: Response;
+    try {
+      aiRes = await fetch(N8N_CHAT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chatInput: prompt, sessionId: `diag-${ticket_id}` }),
+        signal: controller.signal,
+      });
+    } catch (fetchErr) {
+      clearTimeout(timeout);
+      const msg = fetchErr instanceof Error ? fetchErr.message : 'inconnu';
+      if (msg.includes('abort') || msg.includes('AbortError')) {
+        return NextResponse.json({ error: 'n8n n\'a pas répondu dans les temps (>55s) — vérifiez que le workflow est actif' }, { status: 504 });
+      }
+      return NextResponse.json({ error: `Impossible de joindre n8n : ${msg}` }, { status: 502 });
+    }
+    clearTimeout(timeout);
 
     if (!aiRes.ok) return NextResponse.json({ error: `n8n erreur ${aiRes.status}` }, { status: 502 });
 
