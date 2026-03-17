@@ -240,33 +240,52 @@ export default function ManagerDashboard() {
             </div>
           )}
 
-          {/* Cartes de navigation */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
-            {menuCards.map(card => (
-              <Link key={card.href} href={card.href} style={{
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                borderRadius: 16, padding: '20px 16px', textDecoration: 'none',
-                display: 'flex', flexDirection: 'column', gap: 10,
-                position: 'relative', overflow: 'hidden',
-              }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: `${card.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <card.icon size={22} color={card.color} />
-                </div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{card.label}</div>
-                {card.badge && (
-                  <span style={{ background: `${card.badgeColor}22`, color: card.badgeColor, border: `1px solid ${card.badgeColor}44`, borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600, alignSelf: 'flex-start' }}>
-                    {card.badge}
-                  </span>
-                )}
-              </Link>
-            ))}
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#2563eb20', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Bell size={22} color="#2563eb" />
+          {/* Stocks + Rapports IA */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+            <Link href="/manager/stocks" style={{ background: 'var(--bg-card)', border: `1px solid ${stats.stockAlertes > 0 ? '#f59e0b44' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <Package size={14} color="#f59e0b" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b' }}>Stocks</span>
               </div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Notifications</div>
-              <PushNotifSetup role="manager" fullCard={true} />
+              {stats.stockAlertes > 0
+                ? <><div style={{ fontSize: 24, fontWeight: 800, color: '#f59e0b', marginBottom: 2 }}>{stats.stockAlertes}</div><div style={{ fontSize: 11, color: '#f59e0b' }}>rupture{stats.stockAlertes > 1 ? 's' : ''} détectée{stats.stockAlertes > 1 ? 's' : ''}</div></>
+                : <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>Niveaux OK</div>
+              }
+            </Link>
+            <Link href="/manager/rapports" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <BarChart3 size={14} color="#22c55e" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#22c55e' }}>Rapports IA</span>
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Analyses & recommandations</div>
+            </Link>
+          </div>
+
+          {/* Chat IA + Nouveau ticket */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+            <Link href="/manager/chat" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <MessageCircle size={14} color="#0ea5e9" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#0ea5e9' }}>Chat IA</span>
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Copilote assistant</div>
+            </Link>
+            <Link href="/manager/nouveau" style={{ background: '#10b98112', border: '1px solid #10b98133', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <PlusCircle size={14} color="#10b981" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#10b981' }}>Nouveau ticket</span>
+              </div>
+              <div style={{ fontSize: 11, color: '#10b981', fontWeight: 600 }}>+ Créer</div>
+            </Link>
+          </div>
+
+          {/* Notifications */}
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', marginBottom: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+              <Bell size={14} color="#2563eb" />
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb' }}>Notifications push</span>
             </div>
+            <PushNotifSetup role="manager" fullCard={false} />
           </div>
 
           {/* Déconnexion */}

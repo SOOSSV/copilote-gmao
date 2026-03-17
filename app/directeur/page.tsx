@@ -8,7 +8,7 @@ import { AlertTriangle, TrendingUp, CheckCircle2, Clock, Zap, BarChart3, LogOut,
 
 type Stats = {
   total: number; ouverts: number; en_cours: number; fermes: number;
-  urgents: number; machines: number; techniciens: number;
+  urgents: number; machines: number; techniciens: number; stockAlertes: number;
 };
 
 function KpiCard({ label, value, sub, icon: Icon, color, big }: {
@@ -43,17 +43,19 @@ function KpiMini({ label, value, color, icon: Icon, href }: { label: string; val
 
 export default function DirecteurDashboard() {
   const router = useRouter();
-  const [stats, setStats] = useState<Stats>({ total: 0, ouverts: 0, en_cours: 0, fermes: 0, urgents: 0, machines: 0, techniciens: 0 });
+  const [stats, setStats] = useState<Stats>({ total: 0, ouverts: 0, en_cours: 0, fermes: 0, urgents: 0, machines: 0, techniciens: 0, stockAlertes: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const [tickets, machines, techniciens] = await Promise.all([
+      const [tickets, machines, techniciens, stocks] = await Promise.all([
         supabase.from('tickets').select('statut, priorite'),
         supabase.from('machines').select('id').eq('statut', 'actif'),
         supabase.from('technicians').select('id'),
+        supabase.from('stocks').select('quantite_actuelle, seuil_minimum').eq('actif', true),
       ]);
       const t = tickets.data || [];
+      const stockAlertes = (stocks.data || []).filter(s => s.quantite_actuelle <= s.seuil_minimum).length;
       setStats({
         total: t.length, ouverts: t.filter(x => x.statut === 'ouvert').length,
         en_cours: t.filter(x => x.statut === 'en_cours').length,
@@ -61,6 +63,7 @@ export default function DirecteurDashboard() {
         urgents: t.filter(x => x.priorite === 'urgente').length,
         machines: machines.data?.length || 0,
         techniciens: techniciens.data?.length || 0,
+        stockAlertes,
       });
       setLoading(false);
     }
@@ -92,24 +95,81 @@ export default function DirecteurDashboard() {
             </div>
           )}
 
-          {/* Cartes navigation */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 20 }}>
+          {/* KPI rapides */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 10 }}>
             {[
-              { href: '/directeur/synthese',     icon: TrendingUp, color: '#22c55e', label: 'Vue synthèse',   sub: 'KPIs & indicateurs' },
-              { href: '/directeur/tickets',       icon: Ticket,     color: '#f59e0b', label: 'Tickets',        sub: `${stats.urgents > 0 ? stats.urgents + ' urgents' : 'Tous les tickets'}` },
-              { href: '/directeur/machines',      icon: Factory,    color: '#7c3aed', label: 'Machines',       sub: `${stats.machines} actives` },
-              { href: '/directeur/techniciens',   icon: Users,      color: '#0ea5e9', label: 'Techniciens',    sub: `${stats.techniciens} au total` },
-              { href: '/directeur/stocks',        icon: Package,    color: '#10b981', label: 'Stocks',         sub: 'Niveaux & alertes' },
-              { href: '/directeur/rapports',      icon: BarChart3,  color: '#2563eb', label: 'Rapports IA',   sub: 'Analyses & recommandations' },
-            ].map(card => (
-              <Link key={card.href} href={card.href} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '16px', textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: `${card.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <card.icon size={20} color={card.color} />
-                </div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{card.label}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{card.sub}</div>
+              { label: 'Ouverts',  value: stats.ouverts,   color: '#2563eb', href: '/directeur/tickets?filtre=ouvert' },
+              { label: 'En cours', value: stats.en_cours,  color: '#f59e0b', href: '/directeur/tickets?filtre=en_cours' },
+              { label: 'Résolus',  value: stats.fermes,    color: '#22c55e', href: '/directeur/tickets?filtre=resolu' },
+            ].map(k => (
+              <Link key={k.label} href={k.href} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 12px', textAlign: 'center', textDecoration: 'none', display: 'block' }}>
+                <div style={{ fontSize: 26, fontWeight: 800, color: k.color }}>{k.value}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{k.label}</div>
               </Link>
             ))}
+          </div>
+
+          {/* Cards denses row 1 */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+            <Link href="/directeur/synthese" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <TrendingUp size={14} color="#22c55e" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#22c55e' }}>Vue synthèse</span>
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: '#22c55e', marginBottom: 2 }}>{tauxResolution}%</div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>taux de résolution</div>
+            </Link>
+            <Link href="/directeur/tickets" style={{ background: 'var(--bg-card)', border: `1px solid ${stats.urgents > 0 ? '#ef444433' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <Ticket size={14} color="#f59e0b" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b' }}>Tickets</span>
+              </div>
+              {stats.urgents > 0
+                ? <><div style={{ fontSize: 24, fontWeight: 800, color: '#ef4444', marginBottom: 2 }}>{stats.urgents}</div><div style={{ fontSize: 11, color: '#ef4444' }}>urgent{stats.urgents > 1 ? 's' : ''}</div></>
+                : <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>{stats.ouverts} ouverts</div>
+              }
+            </Link>
+          </div>
+
+          {/* Cards denses row 2 */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+            <Link href="/directeur/machines" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <Factory size={14} color="#7c3aed" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed' }}>Machines</span>
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: '#7c3aed', marginBottom: 2 }}>{stats.machines}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>actives</div>
+            </Link>
+            <Link href="/directeur/techniciens" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <Users size={14} color="#0ea5e9" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#0ea5e9' }}>Techniciens</span>
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: '#0ea5e9', marginBottom: 2 }}>{stats.techniciens}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{stats.en_cours} en intervention</div>
+            </Link>
+          </div>
+
+          {/* Cards denses row 3 */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+            <Link href="/directeur/stocks" style={{ background: 'var(--bg-card)', border: `1px solid ${stats.stockAlertes > 0 ? '#f59e0b44' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <Package size={14} color="#10b981" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#10b981' }}>Stocks</span>
+              </div>
+              {stats.stockAlertes > 0
+                ? <><div style={{ fontSize: 24, fontWeight: 800, color: '#f59e0b', marginBottom: 2 }}>{stats.stockAlertes}</div><div style={{ fontSize: 11, color: '#f59e0b' }}>rupture{stats.stockAlertes > 1 ? 's' : ''}</div></>
+                : <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>Niveaux OK</div>
+              }
+            </Link>
+            <Link href="/directeur/rapports" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <BarChart3 size={14} color="#2563eb" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb' }}>Rapports IA</span>
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Analyses & recommandations</div>
+            </Link>
           </div>
 
           <button onClick={handleLogout} style={{ width: '100%', padding: '14px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--text-secondary)', fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
