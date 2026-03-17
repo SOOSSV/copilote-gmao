@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { ArrowLeft, Wrench, MapPin, User, Calendar, AlertTriangle, CheckCircle, Clock, UserCheck } from 'lucide-react';
+import { ArrowLeft, Wrench, MapPin, User, Calendar, AlertTriangle, CheckCircle, Clock, UserCheck, Bot, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 
 type Ticket = {
   id: string;
@@ -15,8 +15,17 @@ type Ticket = {
   classification: string;
   created_at: string;
   technicien_id: string | null;
+  diagnostic_ia: string | null;
   machines: { nom: string; localisation: string; type_equipement: string } | null;
   technicians: { prenom: string; nom: string; specialites: string[] } | null;
+};
+
+type Diagnostic = {
+  cause_probable: string;
+  actions_recommandees: string[];
+  niveau_urgence: string;
+  pieces_probables: string[];
+  temps_estime: string;
 };
 
 type Technician = { id: string; prenom: string; nom: string; specialites: string[] };
@@ -37,6 +46,9 @@ export default function TicketDetailPage() {
   const [techs, setTechs] = useState<Technician[]>([]);
   const [selectedTech, setSelectedTech] = useState('');
   const [assigning, setAssigning] = useState(false);
+  const [diagLoading, setDiagLoading] = useState(false);
+  const [diagExpanded, setDiagExpanded] = useState(true);
+  const [diagnostic, setDiagnostic] = useState<Diagnostic | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -44,9 +56,14 @@ export default function TicketDetailPage() {
         supabase.from('tickets').select('*, machines(nom, localisation, type_equipement), technicians(prenom, nom, specialites)').eq('id', params.id).single(),
         supabase.from('technicians').select('id, prenom, nom, specialites').eq('actif', true).order('prenom'),
       ]);
-      setTicket(t as Ticket);
+      const ticketData = t as Ticket;
+      setTicket(ticketData);
       setTechs((techList as Technician[]) || []);
-      setSelectedTech((t as Ticket)?.technicien_id || '');
+      setSelectedTech(ticketData?.technicien_id || '');
+      // Charger le diagnostic existant si présent
+      if (ticketData?.diagnostic_ia) {
+        try { setDiagnostic(JSON.parse(ticketData.diagnostic_ia)); } catch { /* ignore */ }
+      }
       setLoading(false);
     }
     if (params.id) load();
@@ -60,11 +77,36 @@ export default function TicketDetailPage() {
     setAssigning(false);
   }
 
+  async function runDiagnostic() {
+    setDiagLoading(true);
+    try {
+      const res = await fetch('/api/diagnostic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticket_id: params.id }),
+      });
+      const data = await res.json();
+      if (data.diagnostic) {
+        setDiagnostic(data.diagnostic);
+        setDiagExpanded(true);
+      }
+    } finally {
+      setDiagLoading(false);
+    }
+  }
+
   async function updateStatut(statut: string) {
     setSaving(true);
     await supabase.from('tickets').update({ statut }).eq('id', params.id as string);
     setTicket(prev => prev ? { ...prev, statut } : prev);
     setSaving(false);
+  }
+
+  function urgenceColor(niveau: string) {
+    if (niveau === 'critique') return '#ef4444';
+    if (niveau === 'élevé') return '#f59e0b';
+    if (niveau === 'modéré') return '#2563eb';
+    return '#22c55e';
   }
 
   function formatDate(iso: string) {
@@ -110,6 +152,87 @@ export default function TicketDetailPage() {
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px', marginBottom: 12 }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>Description</div>
         <div style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--text-primary)' }}>{ticket.description}</div>
+      </div>
+
+      {/* Bloc IA Diagnostic */}
+      <div style={{ background: diagnostic ? 'rgba(37,99,235,0.06)' : 'var(--bg-card)', border: `1px solid ${diagnostic ? 'rgba(37,99,235,0.25)' : 'var(--border)'}`, borderRadius: 12, padding: '14px 16px', marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(37,99,235,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Bot size={14} color="#2563eb" />
+            </div>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Diagnostic IA
+            </span>
+            {diagnostic && (
+              <span style={{ fontSize: 10, background: urgenceColor(diagnostic.niveau_urgence) + '22', color: urgenceColor(diagnostic.niveau_urgence), border: `1px solid ${urgenceColor(diagnostic.niveau_urgence)}44`, borderRadius: 4, padding: '1px 6px', fontWeight: 700, textTransform: 'uppercase' }}>
+                {diagnostic.niveau_urgence}
+              </span>
+            )}
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {diagnostic && (
+              <button onClick={() => setDiagExpanded(v => !v)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}>
+                {diagExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+            )}
+            <button onClick={runDiagnostic} disabled={diagLoading} style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#2563eb', border: 'none', borderRadius: 7, padding: '6px 12px', color: 'white', fontSize: 12, fontWeight: 700, cursor: diagLoading ? 'default' : 'pointer', opacity: diagLoading ? 0.7 : 1, whiteSpace: 'nowrap' }}>
+              {diagLoading ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> Analyse...</> : diagnostic ? '↻ Relancer' : '⚡ Diagnostiquer'}
+            </button>
+          </div>
+        </div>
+
+        {!diagnostic && !diagLoading && (
+          <div style={{ marginTop: 10, fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+            Lance l&apos;IA pour obtenir une analyse de cause probable, des actions recommandées et une estimation des pièces nécessaires.
+          </div>
+        )}
+
+        {diagLoading && (
+          <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)', fontSize: 13 }}>
+            <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />
+            Analyse du ticket en cours...
+          </div>
+        )}
+
+        {diagnostic && diagExpanded && (
+          <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {/* Cause probable */}
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 5 }}>Cause probable</div>
+              <div style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--text-primary)' }}>{diagnostic.cause_probable}</div>
+            </div>
+            {/* Actions */}
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 5 }}>Actions recommandées</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {diagnostic.actions_recommandees.map((a, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 13 }}>
+                    <span style={{ color: '#2563eb', fontWeight: 700, flexShrink: 0, minWidth: 16 }}>{i + 1}.</span>
+                    <span style={{ lineHeight: 1.5 }}>{a}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Pièces + temps */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              {diagnostic.pieces_probables.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 5 }}>Pièces probables</div>
+                  {diagnostic.pieces_probables.map((p, i) => (
+                    <div key={i} style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>· {p}</div>
+                  ))}
+                </div>
+              )}
+              {diagnostic.temps_estime && (
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 5 }}>Temps estimé</div>
+                  <div style={{ fontSize: 13, color: 'var(--text-primary)', fontWeight: 600 }}>{diagnostic.temps_estime}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Infos */}
@@ -171,6 +294,8 @@ export default function TicketDetailPage() {
           </button>
         </div>
       </div>
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
       {/* Changer statut */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px' }}>

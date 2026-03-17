@@ -3,12 +3,21 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { ArrowLeft, Wrench, MapPin, Calendar, AlertTriangle, CheckCircle, Clock, Package, Plus, X } from 'lucide-react';
+import { ArrowLeft, Wrench, MapPin, Calendar, AlertTriangle, CheckCircle, Clock, Package, Plus, X, Bot, Loader2 } from 'lucide-react';
 
 type Ticket = {
   id: string; titre: string; description: string; priorite: string;
   statut: string; type_intervention: string; classification: string; created_at: string;
+  diagnostic_ia: string | null;
   machines: { nom: string; localisation: string; type_equipement: string } | null;
+};
+
+type Diagnostic = {
+  cause_probable: string;
+  actions_recommandees: string[];
+  niveau_urgence: string;
+  pieces_probables: string[];
+  temps_estime: string;
 };
 
 type Stock = { id: string; reference: string; nom: string; unite: string; quantite_actuelle: number; };
@@ -23,6 +32,8 @@ export default function TechTicketDetail() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [stocks, setStocks] = useState<Stock[]>([]);
+  const [diagnostic, setDiagnostic] = useState<Diagnostic | null>(null);
+  const [diagLoading, setDiagLoading] = useState(false);
   const [pieces, setPieces] = useState<PieceUtilisee[]>([]);
   const [showPieces, setShowPieces] = useState(false);
   const [searchStock, setSearchStock] = useState('');
@@ -34,12 +45,38 @@ export default function TechTicketDetail() {
         supabase.from('tickets').select('*, machines(nom, localisation, type_equipement)').eq('id', params.id).single(),
         supabase.from('stocks').select('id, reference, nom, unite, quantite_actuelle').eq('actif', true).order('nom'),
       ]);
-      setTicket(t as Ticket);
+      const ticketData = t as Ticket;
+      setTicket(ticketData);
       setStocks((s as Stock[]) || []);
+      if (ticketData?.diagnostic_ia) {
+        try { setDiagnostic(JSON.parse(ticketData.diagnostic_ia)); } catch { /* ignore */ }
+      }
       setLoading(false);
     }
     if (params.id) load();
   }, [params.id]);
+
+  async function runDiagnostic() {
+    setDiagLoading(true);
+    try {
+      const res = await fetch('/api/diagnostic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticket_id: params.id }),
+      });
+      const data = await res.json();
+      if (data.diagnostic) setDiagnostic(data.diagnostic);
+    } finally {
+      setDiagLoading(false);
+    }
+  }
+
+  function urgenceColor(niveau: string) {
+    if (niveau === 'critique') return '#ef4444';
+    if (niveau === 'élevé') return '#f59e0b';
+    if (niveau === 'modéré') return '#2563eb';
+    return '#22c55e';
+  }
 
   async function updateStatut(statut: string) {
     setSaving(true);
@@ -114,6 +151,49 @@ export default function TechTicketDetail() {
         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>Description</div>
         <div style={{ fontSize: 13, lineHeight: 1.6 }}>{ticket.description}</div>
       </div>
+
+      {/* Bloc IA Diagnostic */}
+      <div style={{ background: diagnostic ? 'rgba(37,99,235,0.06)' : 'var(--bg-card)', border: `1px solid ${diagnostic ? 'rgba(37,99,235,0.25)' : 'var(--border)'}`, borderRadius: 12, padding: '14px 16px', marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(37,99,235,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Bot size={14} color="#2563eb" />
+            </div>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Diagnostic IA</span>
+            {diagnostic && (
+              <span style={{ fontSize: 10, background: urgenceColor(diagnostic.niveau_urgence) + '22', color: urgenceColor(diagnostic.niveau_urgence), border: `1px solid ${urgenceColor(diagnostic.niveau_urgence)}44`, borderRadius: 4, padding: '1px 6px', fontWeight: 700, textTransform: 'uppercase' }}>
+                {diagnostic.niveau_urgence}
+              </span>
+            )}
+          </div>
+          <button onClick={runDiagnostic} disabled={diagLoading} style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#2563eb', border: 'none', borderRadius: 7, padding: '6px 12px', color: 'white', fontSize: 12, fontWeight: 700, cursor: diagLoading ? 'default' : 'pointer', opacity: diagLoading ? 0.7 : 1, whiteSpace: 'nowrap' }}>
+            {diagLoading ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> Analyse...</> : diagnostic ? '↻ Relancer' : '⚡ Diagnostiquer'}
+          </button>
+        </div>
+        {diagLoading && (
+          <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)', fontSize: 13 }}>
+            <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> Analyse en cours...
+          </div>
+        )}
+        {diagnostic && (
+          <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--text-primary)' }}>{diagnostic.cause_probable}</div>
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 5 }}>Actions</div>
+              {diagnostic.actions_recommandees.map((a, i) => (
+                <div key={i} style={{ display: 'flex', gap: 8, fontSize: 13, marginBottom: 3 }}>
+                  <span style={{ color: '#2563eb', fontWeight: 700, flexShrink: 0 }}>{i + 1}.</span>
+                  <span style={{ lineHeight: 1.5 }}>{a}</span>
+                </div>
+              ))}
+            </div>
+            {diagnostic.temps_estime && (
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>⏱ Temps estimé : <strong style={{ color: 'var(--text-primary)' }}>{diagnostic.temps_estime}</strong></div>
+            )}
+          </div>
+        )}
+      </div>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
       {/* Infos */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px', marginBottom: 12 }}>
