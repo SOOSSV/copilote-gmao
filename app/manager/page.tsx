@@ -460,6 +460,60 @@ export default function ManagerDashboard() {
                 </table>
               </div>
             </div>
+
+            {/* Cartes navigation rapide — desktop */}
+            <div className="mt-5">
+              <div className="text-[11px] font-bold text-[#7d8590] uppercase tracking-[0.8px] mb-3">Accès rapide</div>
+              <div className="grid grid-cols-3 gap-3 mb-3">
+                <Link href="/manager/recurrentes" className="bg-[#1c2128] rounded-[14px] p-4 no-underline text-inherit" style={{ border: `1px solid ${nbPannesRecurrentes > 0 ? '#ef444433' : '#30363d'}`, background: nbPannesRecurrentes > 0 ? '#ef444412' : '#1c2128' }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Repeat2 size={15} color="#ef4444" />
+                    <span className="text-[13px] font-bold text-red-500">Récurrentes</span>
+                  </div>
+                  <div className="text-[22px] font-extrabold" style={{ color: nbPannesRecurrentes > 0 ? '#ef4444' : '#7d8590' }}>{nbPannesRecurrentes}</div>
+                  <div className="text-[11px] text-[#7d8590] mt-0.5">machine{nbPannesRecurrentes !== 1 ? 's' : ''} à risque</div>
+                </Link>
+                <Link href="/manager/amelioratif" className="rounded-[14px] p-4 no-underline text-inherit" style={{ background: nbAmelioratifs > 0 ? '#7c3aed12' : '#1c2128', border: `1px solid ${nbAmelioratifs > 0 ? '#7c3aed33' : '#30363d'}` }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles size={15} color="#7c3aed" />
+                    <span className="text-[13px] font-bold text-violet-600">Amélioratif</span>
+                  </div>
+                  <div className="text-[22px] font-extrabold" style={{ color: nbAmelioratifs > 0 ? '#7c3aed' : '#7d8590' }}>{nbAmelioratifs}</div>
+                  <div className="text-[11px] text-[#7d8590] mt-0.5">en cours</div>
+                </Link>
+                <Link href="/manager/technicians" className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-4 no-underline text-inherit">
+                  <div className="flex items-center gap-2 mb-2">
+                    <HardHat size={15} color="#2563eb" />
+                    <span className="text-[13px] font-bold text-blue-500">Gérer techniciens</span>
+                  </div>
+                  <div className="text-[22px] font-extrabold text-cyan-500">{stats.techniciens}</div>
+                  <div className="text-[11px] text-[#7d8590] mt-0.5">technicien{stats.techniciens !== 1 ? 's' : ''} actif{stats.techniciens !== 1 ? 's' : ''}</div>
+                </Link>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <Link href="/manager/preventif" className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-4 no-underline text-inherit">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <CheckCircle size={15} color="#06b6d4" />
+                    <span className="text-[13px] font-bold text-cyan-500">Préventif</span>
+                  </div>
+                  <div className="text-[12px] text-[#7d8590]">Plans de maintenance</div>
+                </Link>
+                <Link href="/manager/chat" className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-4 no-underline text-inherit">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <MessageCircle size={15} color="#0ea5e9" />
+                    <span className="text-[13px] font-bold text-sky-500">Chat IA</span>
+                  </div>
+                  <div className="text-[12px] text-[#7d8590]">Copilote assistant</div>
+                </Link>
+                <Link href="/manager/nouveau" className="rounded-[14px] p-4 no-underline text-inherit" style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)' }}>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <PlusCircle size={15} color="#10b981" />
+                    <span className="text-[13px] font-bold text-emerald-500">Nouveau ticket</span>
+                  </div>
+                  <div className="text-[12px] text-[#7d8590]">Créer une intervention</div>
+                </Link>
+              </div>
+            </div>
           </>
         )}
       </div>

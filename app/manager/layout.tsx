@@ -3,23 +3,26 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { LayoutDashboard, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut, Package, CalendarClock } from 'lucide-react';
+import { LayoutDashboard, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut, Package, CalendarClock, Repeat2, Sparkles, HardHat } from 'lucide-react';
 import PushNotifSetup from '@/components/PushNotifSetup';
 import { supabase } from '@/lib/supabase';
 
 const navManager = [
-  { href: '/manager',             icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/manager/tickets',     icon: Ticket,          label: 'Tickets' },
-  { href: '/manager/machines',    icon: Factory,         label: 'Machines' },
-  { href: '/manager/techniciens', icon: Users,           label: 'Techniciens' },
-  { href: '/manager/stocks',      icon: Package,         label: 'Stocks' },
-  { href: '/manager/preventif',   icon: CalendarClock,   label: 'Préventif' },
-  { href: '/manager/rapports',    icon: BarChart3,       label: 'Rapports IA' },
+  { href: '/manager',                icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/manager/tickets',        icon: Ticket,          label: 'Tickets' },
+  { href: '/manager/machines',       icon: Factory,         label: 'Machines' },
+  { href: '/manager/technicians',    icon: Users,           label: 'Techniciens' },
+  { href: '/manager/stocks',         icon: Package,         label: 'Stocks' },
+  { href: '/manager/preventif',      icon: CalendarClock,   label: 'Préventif' },
+  { href: '/manager/recurrentes',    icon: Repeat2,         label: 'Récurrentes' },
+  { href: '/manager/amelioratif',    icon: Sparkles,        label: 'Amélioratif' },
+  { href: '/manager/rapports',       icon: BarChart3,       label: 'Rapports IA' },
 ];
 
 const navTerrain = [
-  { href: '/manager/chat',    icon: MessageCircle, label: 'Chat IA' },
-  { href: '/manager/nouveau', icon: PlusCircle,    label: 'Nouveau' },
+  { href: '/manager/technicians', icon: HardHat,       label: 'Gérer techniciens' },
+  { href: '/manager/chat',        icon: MessageCircle, label: 'Chat IA' },
+  { href: '/manager/nouveau',     icon: PlusCircle,    label: 'Nouveau' },
 ];
 
 
