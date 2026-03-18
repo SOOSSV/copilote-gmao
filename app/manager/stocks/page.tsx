@@ -162,7 +162,7 @@ export default function StocksPage() {
   }).join(' ');
 
   return (
-    <div style={{ padding: 'clamp(16px, 4vw, 32px)', maxWidth: 1100, boxSizing: 'border-box' }}>
+    <div style={{ padding: 'clamp(16px, 4vw, 32px)', boxSizing: 'border-box' }}>
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>

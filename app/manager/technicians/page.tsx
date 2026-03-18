@@ -89,7 +89,7 @@ export default function TechniciansPage() {
   const byEquipe = EQUIPES.map(e => ({ ...e, count: techs.filter(t => t.equipe === e.value).length }));
 
   return (
-    <div className="min-h-screen bg-[#0d1117] px-4 py-5 max-w-[700px] mx-auto">
+    <div className="min-h-screen bg-[#0d1117] px-4 py-5 md:px-8">
       <button
         onClick={() => router.push('/manager')}
         className="flex items-center gap-1.5 bg-transparent border-none text-[#7d8590] text-[13px] cursor-pointer pb-5 -ml-1"

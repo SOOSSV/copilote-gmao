@@ -191,7 +191,7 @@ export default function PreventifPage() {
   });
 
   return (
-    <div style={{ padding: 'clamp(14px, 4vw, 28px)', maxWidth: 1000, boxSizing: 'border-box' }}>
+    <div style={{ padding: 'clamp(14px, 4vw, 28px)', boxSizing: 'border-box' }}>
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
