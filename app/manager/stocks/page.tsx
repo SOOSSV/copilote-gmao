@@ -126,6 +126,7 @@ export default function StocksPage() {
       quantite_actuelle: parseFloat(form.quantite_actuelle) || 0,
       seuil_minimum: parseFloat(form.seuil_minimum) || 0,
       emplacement: form.emplacement.trim() || null,
+      actif: true,
     };
     if (editing) {
       await supabase.from('stocks').update(payload).eq('id', editing.id);
