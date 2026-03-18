@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { AlertTriangle, TrendingUp, CheckCircle2, Clock, Zap, BarChart3, LogOut, Target, Battery, ShieldAlert, Users, Ticket, Factory, Package } from 'lucide-react';
+import { AlertTriangle, TrendingUp, CheckCircle2, Clock, Zap, BarChart3, LogOut, Target, Battery, ShieldAlert, Users, Ticket, Factory, Package, Repeat2, Sparkles } from 'lucide-react';
 
 type Stats = {
   total: number; ouverts: number; en_cours: number; fermes: number;
@@ -216,8 +216,10 @@ export default function DirecteurDashboard() {
                 { href: '/directeur/tickets',     label: 'Tickets',       sub: `${stats.ouverts} ouverts · ${stats.urgents} urgents`, icon: Ticket,      color: '#f59e0b' },
                 { href: '/directeur/machines',    label: 'Machines',      sub: `${stats.machines} actives`,                  icon: Factory,     color: '#7c3aed' },
                 { href: '/directeur/techniciens', label: 'Techniciens',   sub: `${stats.techniciens} actifs`,                icon: Users,       color: '#0ea5e9' },
-                { href: '/directeur/stocks',      label: 'Stocks',        sub: stats.stockAlertes > 0 ? `${stats.stockAlertes} rupture${stats.stockAlertes > 1 ? 's' : ''}` : 'Niveaux OK', icon: Package, color: stats.stockAlertes > 0 ? '#f59e0b' : '#10b981' },
-                { href: '/directeur/rapports',    label: 'Rapports IA',   sub: 'Analyses & recommandations',                 icon: BarChart3,   color: '#2563eb' },
+                { href: '/directeur/stocks',        label: 'Stocks',            sub: stats.stockAlertes > 0 ? `${stats.stockAlertes} rupture${stats.stockAlertes > 1 ? 's' : ''}` : 'Niveaux OK', icon: Package,  color: stats.stockAlertes > 0 ? '#f59e0b' : '#10b981' },
+                { href: '/directeur/rapports',      label: 'Rapports IA',       sub: 'Analyses & recommandations',           icon: BarChart3,    color: '#2563eb' },
+                { href: '/directeur/recurrentes',   label: 'Pannes récurrentes', sub: 'Machines à risque',                   icon: Repeat2,      color: '#ef4444' },
+                { href: '/directeur/amelioratif',   label: 'Amélioratif',       sub: 'Upgrades & optimisations',             icon: Sparkles,     color: '#7c3aed' },
               ].map(card => (
                 <Link key={card.href} href={card.href} style={{ textDecoration: 'none', background: 'var(--bg-card)', border: `1px solid ${card.color}33`, borderRadius: 12, padding: '16px 18px', display: 'block' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
