@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { AlertTriangle, CheckCircle, Clock, Wrench, TrendingUp, Activity, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut, Bell, Package, ShoppingCart, Repeat2, Sparkles } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, Wrench, TrendingUp, Activity, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut, Bell, Package, ShoppingCart, Repeat2, Sparkles, HardHat } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import PushNotifSetup from '@/components/PushNotifSetup';
 
@@ -317,6 +317,16 @@ export default function ManagerDashboard() {
               </div>
               <div style={{ fontSize: 20, fontWeight: 800, color: nbAmelioratifs > 0 ? '#7c3aed' : 'var(--text-secondary)' }}>{nbAmelioratifs}</div>
               <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>en cours</div>
+            </Link>
+          </div>
+
+          {/* Techniciens */}
+          <div style={{ marginBottom: 10 }}>
+            <Link href="/manager/technicians" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit', display: 'block' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <HardHat size={14} color="#2563eb" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb' }}>Gérer les techniciens</span>
+              </div>
             </Link>
           </div>
 

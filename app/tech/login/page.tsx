@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { HardHat, ArrowRight, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
-type Technician = { id: string; prenom: string; nom: string; email: string; pin: string | null };
+type Technician = { id: string; prenom: string; nom: string; email: string; pin: string | null; pin_changed: boolean };
 
 export default function TechLoginPage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function TechLoginPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    supabase.from('technicians').select('id, prenom, nom, email, pin').order('nom')
+    supabase.from('technicians').select('id, prenom, nom, email, pin, pin_changed').order('nom')
       .then(({ data }) => setTechnicians((data as Technician[]) || []));
   }, []);
 
@@ -46,6 +46,14 @@ export default function TechLoginPage() {
       setLoading(false);
       return;
     }
+    // PIN temporaire → forcer le changement
+    if (!selected!.pin_changed) {
+      setStep('create_pin');
+      setPin('');
+      setConfirmPin('');
+      setLoading(false);
+      return;
+    }
     localStorage.setItem('tech_id', selected!.id);
     localStorage.setItem('tech_prenom', selected!.prenom);
     localStorage.setItem('tech_nom', selected!.nom);
@@ -58,7 +66,7 @@ export default function TechLoginPage() {
     if (pin !== confirmPin) { setError('Les PIN ne correspondent pas.'); return; }
     setLoading(true);
     setError('');
-    const { error: err } = await supabase.from('technicians').update({ pin }).eq('id', selected!.id);
+    const { error: err } = await supabase.from('technicians').update({ pin, pin_changed: true }).eq('id', selected!.id);
     if (err) { setError('Erreur lors de la création du PIN.'); setLoading(false); return; }
     localStorage.setItem('tech_id', selected!.id);
     localStorage.setItem('tech_prenom', selected!.prenom);
