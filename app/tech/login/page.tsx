@@ -89,7 +89,7 @@ export default function TechLoginPage() {
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center mx-auto mb-3.5">
             <HardHat size={28} color="white" />
           </div>
-          <div className="text-[22px] font-extrabold bg-gradient-to-br from-green-500 to-green-700 bg-clip-text text-transparent">COPILOTE</div>
+          <div className="text-[22px] font-extrabold bg-gradient-to-br from-green-500 to-green-700 bg-clip-text text-transparent">RR GMAO</div>
           <div className="text-[13px] text-[#7d8590] mt-1">Espace Technicien</div>
         </div>
 

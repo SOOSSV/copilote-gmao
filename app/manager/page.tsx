@@ -142,7 +142,7 @@ export default function ManagerDashboard() {
           <div className="mb-6">
             <div className="flex justify-between items-start">
               <div>
-                <div className="text-[22px] font-extrabold text-[#e6edf3] tracking-[-0.5px] mb-0.5">COPILOTE</div>
+                <div className="text-[22px] font-extrabold text-[#e6edf3] tracking-[-0.5px] mb-0.5">RR GMAO</div>
                 <div className="text-[13px] text-[#7d8590]">Espace Manager · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
               </div>
             </div>

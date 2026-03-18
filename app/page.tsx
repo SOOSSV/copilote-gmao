@@ -61,7 +61,7 @@ export default function HomePage() {
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           letterSpacing: '-0.5px',
         }}>
-          COPILOTE
+          RR GMAO
         </div>
         <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 6 }}>
           Qui êtes-vous ?
@@ -115,7 +115,7 @@ export default function HomePage() {
       </div>
 
       <div style={{ fontSize: 12, color: 'var(--text-secondary)', opacity: 0.4 }}>
-        COPILOTE v1.0
+        RR GMAO v1.0
       </div>
     </div>
   );

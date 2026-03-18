@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { LayoutDashboard, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut, Package, CalendarClock, Repeat2, Sparkles, HardHat } from 'lucide-react';
+import { RRLogoBadge } from '@/components/RRLogo';
 import PushNotifSetup from '@/components/PushNotifSetup';
 import { supabase } from '@/lib/supabase';
 
@@ -64,8 +65,8 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
       {/* Sidebar — visible desktop ≥1025px, masquée mobile/tablette via CSS */}
       <aside className="mgr-sidebar">
         <div style={{ padding: '0 20px 24px', borderBottom: '1px solid var(--border)' }}>
-          <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>COPILOTE</div>
-          <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Espace Manager</div>
+          <RRLogoBadge size={34} />
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 6 }}>Espace Manager</div>
         </div>
 
         <nav style={{ padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -114,7 +115,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
             <LogOut size={18} /> Déconnexion
           </button>
             <div style={{ padding: '8px 4px 0' }}><PushNotifSetup role="manager" /></div>
-          <div style={{ fontSize: 11, color: 'var(--text-secondary)', padding: '8px 12px 0' }}>COPILOTE v1.0</div>
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)', padding: '8px 12px 0' }}>RR GMAO v1.0</div>
         </div>
       </aside>
 

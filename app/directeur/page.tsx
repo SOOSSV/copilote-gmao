@@ -91,7 +91,7 @@ export default function DirecteurDashboard() {
       <div className="dir-mobile-home">
         <div className="px-4 pt-6 pb-10 max-w-[100vw] box-border overflow-x-hidden">
           <div className="mb-5">
-            <div className="text-[22px] font-extrabold text-[#e6edf3] tracking-[-0.5px] mb-0.5">COPILOTE</div>
+            <div className="text-[22px] font-extrabold text-[#e6edf3] tracking-[-0.5px] mb-0.5">RR GMAO</div>
             <div className="text-[13px] text-[#7d8590]">Espace Directeur · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
           </div>
 

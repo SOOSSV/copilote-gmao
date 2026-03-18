@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { LayoutDashboard, BarChart3, LogOut, Ticket, Factory, Users, Package } from 'lucide-react';
+import { RRLogoBadge } from '@/components/RRLogo';
 
 const nav = [
   { href: '/directeur',               icon: LayoutDashboard, label: 'Vue synthèse' },
@@ -44,8 +45,8 @@ export default function DirecteurLayout({ children }: { children: React.ReactNod
       {/* Sidebar desktop */}
       <aside className="dir-sidebar">
         <div style={{ padding: '0 20px 24px', borderBottom: '1px solid var(--border)' }}>
-          <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>COPILOTE</div>
-          <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Espace Directeur</div>
+          <RRLogoBadge size={34} />
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 6 }}>Espace Directeur</div>
         </div>
         <nav style={{ padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
           {nav.map(({ href, icon: Icon, label }) => {
@@ -70,7 +71,7 @@ export default function DirecteurLayout({ children }: { children: React.ReactNod
           >
             <LogOut size={18} /> Déconnexion
           </button>
-          <div style={{ fontSize: 11, color: 'var(--text-secondary)', padding: '8px 12px 0' }}>COPILOTE v1.0</div>
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)', padding: '8px 12px 0' }}>RR GMAO v1.0</div>
         </div>
       </aside>
 

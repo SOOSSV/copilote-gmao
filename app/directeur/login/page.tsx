@@ -41,7 +41,7 @@ export default function DirecteurLoginPage() {
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center mx-auto mb-3.5">
             <Bot size={28} color="white" />
           </div>
-          <div className="text-[22px] font-extrabold text-[#e6edf3]">COPILOTE</div>
+          <div className="text-[22px] font-extrabold text-[#e6edf3]">RR GMAO</div>
           <div className="text-[13px] text-[#7d8590] mt-1">Espace Directeur</div>
         </div>
 

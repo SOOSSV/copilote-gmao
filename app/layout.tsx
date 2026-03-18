@@ -6,13 +6,13 @@ import { cn } from "@/lib/utils";
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
-  title: "COPILOTE",
+  title: "RR GMAO",
   description: "Assistant maintenance intelligent pour techniciens terrain",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "COPILOTE",
+    title: "RR GMAO",
   },
 };
 

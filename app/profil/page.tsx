@@ -69,7 +69,7 @@ export default function ProfilPage() {
             <Info size={18} color="var(--text-secondary)" />
             <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Version</span>
           </div>
-          <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}>COPILOTE v1.0</span>
+          <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}>RR GMAO v1.0</span>
         </div>
 
         {/* Déconnexion */}

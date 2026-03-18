@@ -145,7 +145,7 @@ export default function ChatPage() {
           <Bot size={18} color="white" />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 700, fontSize: '14px' }}>COPILOTE</div>
+          <div style={{ fontWeight: 700, fontSize: '14px' }}>RR GMAO</div>
           <div style={{ fontSize: '11px', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {current?.title || 'Nouvelle conversation'}
           </div>
