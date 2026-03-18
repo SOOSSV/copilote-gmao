@@ -3,29 +3,25 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BottomNav from '@/components/BottomNav';
+import PushNotifSetup from '@/components/PushNotifSetup';
 import { User, Info, LogOut, ArrowLeft } from 'lucide-react';
-
-const rowStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '14px 16px',
-  background: 'var(--bg-card)',
-  border: '1px solid var(--border)',
-  borderRadius: 12,
-};
 
 export default function ProfilPage() {
   const router = useRouter();
   const [prenom, setPrenom] = useState('');
+  const [nom, setNom] = useState('');
 
   useEffect(() => {
     setPrenom(localStorage.getItem('tech_prenom') || 'Technicien');
+    setNom(localStorage.getItem('tech_nom') || '');
   }, []);
 
   function handleLogout() {
+    localStorage.removeItem('tech_id');
     localStorage.removeItem('tech_prenom');
-    router.push('/');
+    localStorage.removeItem('tech_nom');
+    localStorage.removeItem('tech_email');
+    router.push('/tech/login');
   }
 
   const initiale = prenom.charAt(0).toUpperCase();
@@ -47,7 +43,7 @@ export default function ProfilPage() {
       </div>
 
       {/* Avatar */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 16px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 16px 24px' }}>
         <div style={{
           width: 80, height: 80, borderRadius: '50%',
           background: 'linear-gradient(135deg, #22c55e, #16a34a)',
@@ -56,13 +52,19 @@ export default function ProfilPage() {
         }}>
           {initiale}
         </div>
-        <div style={{ fontWeight: 700, fontSize: 18 }}>{prenom}</div>
+        <div style={{ fontWeight: 700, fontSize: 18 }}>{prenom} {nom}</div>
         <div style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 4 }}>Technicien</div>
       </div>
 
-      {/* Options */}
       <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <div style={rowStyle}>
+        {/* Push notifications */}
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Notifications</span>
+          <PushNotifSetup role="tech" />
+        </div>
+
+        {/* Version */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <Info size={18} color="var(--text-secondary)" />
             <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Version</span>
@@ -75,7 +77,7 @@ export default function ProfilPage() {
           onClick={handleLogout}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-            padding: '14px 16px', marginTop: 16,
+            padding: '14px 16px', marginTop: 8,
             background: 'rgba(239,68,68,0.08)',
             border: '1px solid rgba(239,68,68,0.25)',
             borderRadius: 12, color: 'var(--danger)',
@@ -87,6 +89,8 @@ export default function ProfilPage() {
           Se déconnecter
         </button>
       </div>
+
+      <BottomNav />
     </div>
   );
 }

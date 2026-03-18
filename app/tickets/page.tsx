@@ -22,11 +22,14 @@ export default function TicketsPage() {
 
   async function fetchTickets() {
     setLoading(true);
-    const { data } = await supabase
+    const techId = typeof window !== 'undefined' ? localStorage.getItem('tech_id') : null;
+    let query = supabase
       .from('tickets')
       .select('*, machines(nom), technicians(prenom, nom)')
       .order('created_at', { ascending: false })
       .limit(50);
+    if (techId) query = query.eq('technicien_id', techId);
+    const { data } = await query;
     setTickets(data || []);
     setLoading(false);
   }
@@ -82,7 +85,7 @@ export default function TicketsPage() {
           <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>Aucun ticket</div>
         ) : (
           filtered.map(ticket => (
-            <Link key={ticket.id} href={`/tickets/${ticket.id}`} style={{ textDecoration: 'none' }}>
+            <Link key={ticket.id} href={`/tech/tickets/${ticket.id}`} style={{ textDecoration: 'none' }}>
               <div style={{
                 background: 'var(--bg-card)',
                 border: '1px solid var(--border)',

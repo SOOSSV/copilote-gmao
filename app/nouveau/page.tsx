@@ -47,18 +47,8 @@ export default function NouveauTicketPage() {
       setMachines(data || []);
     });
 
-    // Récupérer l'ID du technicien connecté
-    const prenom = localStorage.getItem('tech_prenom');
-    if (prenom) {
-      supabase
-        .from('technicians')
-        .select('id')
-        .ilike('prenom', prenom)
-        .limit(1)
-        .then(({ data }) => {
-          if (data && data.length > 0) setTechnicienId(data[0].id);
-        });
-    }
+    const id = localStorage.getItem('tech_id');
+    if (id) setTechnicienId(id);
   }, []);
 
   function set(field: string, value: string) {
