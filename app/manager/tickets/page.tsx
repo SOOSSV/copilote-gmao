@@ -59,8 +59,8 @@ export default function ManagerTicketsPage() {
   useEffect(() => { fetchTickets(); }, []);
 
   async function updateStatut(id: string, statut: string) {
-    await supabase.from('tickets').update({ statut }).eq('id', id);
-    setTickets(prev => prev.map(t => t.id === id ? { ...t, statut: statut as Ticket['statut'] } : t));
+    const { error } = await supabase.from('tickets').update({ statut }).eq('id', id);
+    if (!error) setTickets(prev => prev.map(t => t.id === id ? { ...t, statut: statut as Ticket['statut'] } : t));
   }
 
   const filtered = tickets.filter(t => {

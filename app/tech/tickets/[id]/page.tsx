@@ -30,6 +30,7 @@ export default function TechTicketDetail() {
   const params = useParams();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [saving, setSaving] = useState(false);
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [diagnostic, setDiagnostic] = useState<Diagnostic | null>(null);
@@ -46,6 +47,7 @@ export default function TechTicketDetail() {
         supabase.from('tickets').select('*, machines(nom, localisation, type_equipement)').eq('id', params.id).single(),
         supabase.from('stocks').select('id, reference, nom, unite, quantite_actuelle').eq('actif', true).order('nom'),
       ]);
+      if (!t) { setLoadError(true); setLoading(false); return; }
       const ticketData = t as Ticket;
       setTicket(ticketData);
       setStocks((s as Stock[]) || []);
@@ -137,7 +139,8 @@ export default function TechTicketDetail() {
   ).slice(0, 6);
 
   if (loading) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Chargement...</div>;
-  if (!ticket) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Ticket introuvable</div>;
+  if (loadError) return <div style={{ padding: 20, color: '#ef4444' }}>⚠️ Erreur de chargement — réessayez.</div>;
+  if (!ticket) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Ticket introuvable.</div>;
 
   const pc = prioriteColor[ticket.priorite] || '#2563eb';
 

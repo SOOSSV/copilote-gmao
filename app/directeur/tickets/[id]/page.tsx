@@ -29,6 +29,7 @@ export default function DirecteurTicketDetailPage() {
   const params = useParams();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [diagnostic, setDiagnostic] = useState<Diagnostic | null>(null);
   const [diagLoading, setDiagLoading] = useState(false);
   const [diagError, setDiagError] = useState<string | null>(null);
@@ -38,7 +39,8 @@ export default function DirecteurTicketDetailPage() {
     supabase.from('tickets')
       .select('*, machines(nom, localisation, type_equipement), technicians(prenom, nom, specialites)')
       .eq('id', params.id).single()
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error || !data) { setLoadError(true); setLoading(false); return; }
         const t = data as Ticket;
         setTicket(t);
         if (t?.diagnostic_ia) {
@@ -78,7 +80,8 @@ export default function DirecteurTicketDetailPage() {
   }
 
   if (loading) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Chargement...</div>;
-  if (!ticket) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Ticket introuvable</div>;
+  if (loadError) return <div style={{ padding: 20, color: '#ef4444' }}>⚠️ Erreur de chargement — réessayez.</div>;
+  if (!ticket) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Ticket introuvable.</div>;
 
   const pc = prioriteColor[ticket.priorite] || '#2563eb';
   const sc = statutColor[ticket.statut] || '#2563eb';

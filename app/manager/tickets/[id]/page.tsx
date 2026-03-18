@@ -42,6 +42,7 @@ export default function TicketDetailPage() {
   const params = useParams();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [saving, setSaving] = useState(false);
   const [techs, setTechs] = useState<Technician[]>([]);
   const [selectedTech, setSelectedTech] = useState('');
@@ -57,11 +58,11 @@ export default function TicketDetailPage() {
         supabase.from('tickets').select('*, machines(nom, localisation, type_equipement), technicians(prenom, nom, specialites)').eq('id', params.id).single(),
         supabase.from('technicians').select('id, prenom, nom, specialites').order('prenom'),
       ]);
+      if (!t) { setLoadError(true); setLoading(false); return; }
       const ticketData = t as Ticket;
       setTicket(ticketData);
       setTechs((techList as Technician[]) || []);
       setSelectedTech(ticketData?.technicien_id || '');
-      // Charger le diagnostic existant si présent
       if (ticketData?.diagnostic_ia) {
         try { setDiagnostic(JSON.parse(ticketData.diagnostic_ia)); } catch { /* ignore */ }
       }
@@ -123,7 +124,8 @@ export default function TicketDetailPage() {
   }
 
   if (loading) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Chargement...</div>;
-  if (!ticket) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Ticket introuvable</div>;
+  if (loadError) return <div style={{ padding: 20, color: '#ef4444' }}>⚠️ Erreur de chargement — réessayez.</div>;
+  if (!ticket) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Ticket introuvable.</div>;
 
   const pColor = prioriteColor[ticket.priorite] || '#2563eb';
   const sColor = statutColor[ticket.statut] || '#2563eb';
