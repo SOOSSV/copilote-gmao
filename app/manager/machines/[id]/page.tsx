@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { ArrowLeft, Wrench, MapPin, AlertTriangle, CheckCircle, Clock, Calendar, Package, Plus } from 'lucide-react';
+import { ArrowLeft, Wrench, MapPin, AlertTriangle, CheckCircle, Clock, Package, Plus } from 'lucide-react';
 import Link from 'next/link';
 
 type Machine = {
@@ -84,8 +84,8 @@ export default function MachineDetailPage() {
     setSavingCout(false);
   }
 
-  if (loading) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Chargement...</div>;
-  if (!machine) return <div style={{ padding: 20, color: 'var(--text-secondary)' }}>Machine introuvable</div>;
+  if (loading) return <div className="p-5 text-[#7d8590]">Chargement...</div>;
+  if (!machine) return <div className="p-5 text-[#7d8590]">Machine introuvable</div>;
 
   const critColor = criticiteColor[machine.criticite] || '#2563eb';
   const totalTickets = tickets.length;
@@ -99,23 +99,26 @@ export default function MachineDetailPage() {
   const mttr = durees.length > 0 ? Math.round(durees.reduce((a, b) => a + b, 0) / durees.length) : null;
 
   return (
-    <div style={{ padding: '14px', maxWidth: '100%', boxSizing: 'border-box' }}>
+    <div className="p-3.5 max-w-full box-border">
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4 }}>
+      <div className="flex items-center gap-2.5 mb-4">
+        <button onClick={() => router.back()} className="bg-transparent border-none cursor-pointer text-[#7d8590] p-1">
           <ArrowLeft size={22} />
         </button>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <h1 style={{ fontSize: 16, fontWeight: 800, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{machine.nom}</h1>
-          <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{machine.external_id} · {machine.type_equipement}</div>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-[16px] font-extrabold m-0 overflow-hidden text-ellipsis whitespace-nowrap">{machine.nom}</h1>
+          <div className="text-[11px] text-[#7d8590]">{machine.external_id} · {machine.type_equipement}</div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end', flexShrink: 0 }}>
-          <span style={{ background: `${critColor}22`, color: critColor, border: `1px solid ${critColor}44`, borderRadius: 6, padding: '3px 10px', fontSize: 11, fontWeight: 700, textTransform: 'capitalize' }}>
+        <div className="flex flex-col gap-1 items-end shrink-0">
+          <span
+            className="rounded-md px-2.5 py-0.5 text-[11px] font-bold capitalize"
+            style={{ background: `${critColor}22`, color: critColor, border: `1px solid ${critColor}44` }}
+          >
             {machine.criticite}
           </span>
           {isPanneRecurrente && (
-            <span style={{ background: '#ef444422', color: '#ef4444', border: '1px solid #ef444444', borderRadius: 6, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>
+            <span className="bg-red-500/15 text-red-500 border border-red-500/25 rounded-md px-2.5 py-0.5 text-[11px] font-bold">
               ⚠️ {pannes30j}× en 30j
             </span>
           )}
@@ -123,96 +126,110 @@ export default function MachineDetailPage() {
       </div>
 
       {/* Infos */}
-      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 14px', marginBottom: 14 }}>
-        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            <MapPin size={13} color="var(--text-secondary)" />
-            <span style={{ fontSize: 13 }}>{machine.localisation || '—'}</span>
+      <div className="bg-[#1c2128] border border-[#30363d] rounded-xl px-3.5 py-3 mb-3.5">
+        <div className="flex gap-4 flex-wrap">
+          <div className="flex gap-1.5 items-center">
+            <MapPin size={13} color="#7d8590" />
+            <span className="text-[13px]">{machine.localisation || '—'}</span>
           </div>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            <Wrench size={13} color="var(--text-secondary)" />
-            <span style={{ fontSize: 13, textTransform: 'capitalize' }}>{machine.statut}</span>
+          <div className="flex gap-1.5 items-center">
+            <Wrench size={13} color="#7d8590" />
+            <span className="text-[13px] capitalize">{machine.statut}</span>
           </div>
         </div>
       </div>
 
       {/* Métriques MTBF / MTTR */}
       {metrics && (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 14px', marginBottom: 14 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 10 }}>Fiabilité machine</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 20, fontWeight: 800, color: metrics.mtbf_jours ? '#22c55e' : 'var(--text-secondary)' }}>
+        <div className="bg-[#1c2128] border border-[#30363d] rounded-xl px-3.5 py-3 mb-3.5">
+          <div className="text-[11px] font-bold text-[#7d8590] uppercase tracking-[0.5px] mb-2.5">Fiabilité machine</div>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="text-center">
+              <div className="text-[20px] font-extrabold" style={{ color: metrics.mtbf_jours ? '#22c55e' : '#7d8590' }}>
                 {metrics.mtbf_jours != null ? `${metrics.mtbf_jours}j` : '—'}
               </div>
-              <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>MTBF</div>
-              <div style={{ fontSize: 9, color: 'var(--text-secondary)' }}>moy. entre pannes</div>
+              <div className="text-[10px] text-[#7d8590] mt-0.5">MTBF</div>
+              <div className="text-[9px] text-[#7d8590]">moy. entre pannes</div>
             </div>
-            <div style={{ textAlign: 'center', borderLeft: '1px solid var(--border)', borderRight: '1px solid var(--border)' }}>
-              <div style={{ fontSize: 20, fontWeight: 800, color: metrics.mttr_heures != null && metrics.mttr_heures > 24 ? '#ef4444' : '#f59e0b' }}>
+            <div className="text-center border-l border-r border-[#30363d]">
+              <div className="text-[20px] font-extrabold" style={{ color: metrics.mttr_heures != null && metrics.mttr_heures > 24 ? '#ef4444' : '#f59e0b' }}>
                 {metrics.mttr_heures != null ? `${metrics.mttr_heures}h` : '—'}
               </div>
-              <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>MTTR</div>
-              <div style={{ fontSize: 9, color: 'var(--text-secondary)' }}>moy. résolution</div>
+              <div className="text-[10px] text-[#7d8590] mt-0.5">MTTR</div>
+              <div className="text-[9px] text-[#7d8590]">moy. résolution</div>
             </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 20, fontWeight: 800, color: '#2563eb' }}>
+            <div className="text-center">
+              <div className="text-[20px] font-extrabold text-blue-500">
                 {metrics.taux_resolution != null ? `${metrics.taux_resolution}%` : '—'}
               </div>
-              <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>Résolution</div>
-              <div style={{ fontSize: 9, color: 'var(--text-secondary)' }}>taux global</div>
+              <div className="text-[10px] text-[#7d8590] mt-0.5">Résolution</div>
+              <div className="text-[9px] text-[#7d8590]">taux global</div>
             </div>
           </div>
         </div>
       )}
 
       {/* Coût arrêt */}
-      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 14px', marginBottom: 14 }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 10 }}>Impact financier</div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <div style={{ flex: 1, position: 'relative' }}>
+      <div className="bg-[#1c2128] border border-[#30363d] rounded-xl px-3.5 py-3 mb-3.5">
+        <div className="text-[11px] font-bold text-[#7d8590] uppercase tracking-[0.5px] mb-2.5">Impact financier</div>
+        <div className="flex gap-2 items-center">
+          <div className="flex-1 relative">
             <input
               type="number"
               value={coutEdit}
               onChange={e => setCoutEdit(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && saveCout()}
               placeholder="Ex: 800"
-              style={{ width: '100%', background: 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 36px 8px 12px', color: 'var(--text-primary)', fontSize: 13, boxSizing: 'border-box', outline: 'none' }}
+              className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg py-2 pl-3 pr-9 text-[#e6edf3] text-[13px] box-border outline-none"
             />
-            <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 12, color: 'var(--text-secondary)' }}>€/h</span>
+            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[12px] text-[#7d8590]">€/h</span>
           </div>
-          <button onClick={saveCout} disabled={savingCout} style={{ background: '#2563eb', border: 'none', borderRadius: 8, padding: '8px 14px', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0, opacity: savingCout ? 0.6 : 1 }}>
+          <button
+            onClick={saveCout}
+            disabled={savingCout}
+            className="bg-blue-600 border-none rounded-lg px-3.5 py-2 text-white text-[12px] font-bold cursor-pointer shrink-0"
+            style={{ opacity: savingCout ? 0.6 : 1 }}
+          >
             {savingCout ? '...' : 'Enregistrer'}
           </button>
         </div>
-        <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 6 }}>
-          Coût par heure d'arrêt — utilisé pour calculer l'impact financier dans la synthèse directeur
+        <div className="text-[11px] text-[#7d8590] mt-1.5">
+          Coût par heure d&apos;arrêt — utilisé pour calculer l&apos;impact financier dans la synthèse directeur
         </div>
       </div>
 
       {/* KPI */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 14 }}>
+      <div className="grid grid-cols-4 gap-2 mb-3.5">
         {[
           { label: 'Total', value: totalTickets, color: '#2563eb' },
-          { label: 'Ouverts', value: ouverts, color: ouverts > 0 ? '#f59e0b' : 'var(--text-secondary)' },
-          { label: 'Urgents', value: urgents, color: urgents > 0 ? '#ef4444' : 'var(--text-secondary)' },
+          { label: 'Ouverts', value: ouverts, color: ouverts > 0 ? '#f59e0b' : '#7d8590' },
+          { label: 'Urgents', value: urgents, color: urgents > 0 ? '#ef4444' : '#7d8590' },
           { label: mttr !== null ? `MTTR ${mttr}j` : 'MTTR —', value: resolus, color: '#22c55e' },
         ].map(({ label, value, color }) => (
-          <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 12px', textAlign: 'center' }}>
-            <div style={{ fontSize: 20, fontWeight: 800, color }}>{value}</div>
-            <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>{label}</div>
+          <div key={label} className="bg-[#1c2128] border border-[#30363d] rounded-[10px] py-2.5 px-3 text-center">
+            <div className="text-[20px] font-extrabold" style={{ color }}>{value}</div>
+            <div className="text-[10px] text-[#7d8590] mt-0.5">{label}</div>
           </div>
         ))}
       </div>
 
       {/* Onglets */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 14, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 4, width: 'fit-content', flexWrap: 'wrap' }}>
+      <div className="flex gap-1 mb-3.5 bg-[#1c2128] border border-[#30363d] rounded-[10px] p-1 w-fit flex-wrap">
         {([
           ['pannes', `Tickets (${totalTickets})`],
           ['historique', `Historique (${history.length})`],
           ['preventif', `Préventif (${plans.length})`],
         ] as const).map(([v, l]) => (
-          <button key={v} onClick={() => setTab(v)} style={{ padding: '7px 14px', borderRadius: 7, fontSize: 13, fontWeight: tab === v ? 700 : 400, cursor: 'pointer', background: tab === v ? '#2563eb' : 'transparent', color: tab === v ? '#fff' : 'var(--text-secondary)', border: 'none' }}>
+          <button
+            key={v}
+            onClick={() => setTab(v)}
+            className="px-3.5 py-1.5 rounded-lg text-[13px] cursor-pointer border-none transition-all"
+            style={{
+              fontWeight: tab === v ? 700 : 400,
+              background: tab === v ? '#2563eb' : 'transparent',
+              color: tab === v ? '#fff' : '#7d8590',
+            }}
+          >
             {l}
           </button>
         ))}
@@ -220,25 +237,33 @@ export default function MachineDetailPage() {
 
       {/* Tickets */}
       {tab === 'pannes' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div className="flex flex-col gap-2">
           {tickets.length === 0 ? (
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>Aucun ticket</div>
+            <div className="bg-[#1c2128] border border-[#30363d] rounded-xl py-10 text-center text-[#7d8590]">Aucun ticket</div>
           ) : tickets.map(t => {
             const pc = prioriteColor[t.priorite] || '#2563eb';
             const duree = daysBetween(t.created_at, t.resolu_le);
             return (
-              <div key={t.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, flex: 1, paddingRight: 8 }}>{t.titre}</div>
-                  <span style={{ background: `${pc}22`, color: pc, borderRadius: 5, padding: '2px 7px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', flexShrink: 0 }}>{t.priorite}</span>
+              <div key={t.id} className="bg-[#1c2128] border border-[#30363d] rounded-[10px] px-3.5 py-3">
+                <div className="flex justify-between items-start mb-1.5">
+                  <div className="text-[13px] font-semibold flex-1 pr-2">{t.titre}</div>
+                  <span
+                    className="rounded px-1.5 py-0.5 text-[10px] font-bold uppercase shrink-0"
+                    style={{ background: `${pc}22`, color: pc }}
+                  >
+                    {t.priorite}
+                  </span>
                 </div>
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 11, color: t.statut === 'resolu' ? '#22c55e' : t.statut === 'en_cours' ? '#f59e0b' : '#2563eb', fontWeight: 600 }}>
+                <div className="flex gap-2.5 items-center flex-wrap">
+                  <span
+                    className="text-[11px] font-semibold"
+                    style={{ color: t.statut === 'resolu' ? '#22c55e' : t.statut === 'en_cours' ? '#f59e0b' : '#2563eb' }}
+                  >
                     {t.statut === 'resolu' ? '✓ Résolu' : t.statut === 'en_cours' ? '⏳ En cours' : '● Ouvert'}
                   </span>
-                  {t.technicians && <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{(t.technicians as { prenom: string; nom: string }).prenom}</span>}
-                  {duree !== null && <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>résolu en {duree}j</span>}
-                  <span style={{ fontSize: 11, color: 'var(--text-secondary)', marginLeft: 'auto' }}>{new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}</span>
+                  {t.technicians && <span className="text-[11px] text-[#7d8590]">{(t.technicians as { prenom: string; nom: string }).prenom}</span>}
+                  {duree !== null && <span className="text-[11px] text-[#7d8590]">résolu en {duree}j</span>}
+                  <span className="text-[11px] text-[#7d8590] ml-auto">{new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}</span>
                 </div>
               </div>
             );
@@ -249,36 +274,43 @@ export default function MachineDetailPage() {
       {/* Plans préventifs */}
       {tab === 'preventif' && (
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{plans.length} plan{plans.length !== 1 ? 's' : ''} actif{plans.length !== 1 ? 's' : ''}</span>
-            <Link href="/manager/preventif" style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
+          <div className="flex justify-between items-center mb-2.5">
+            <span className="text-[12px] text-[#7d8590]">{plans.length} plan{plans.length !== 1 ? 's' : ''} actif{plans.length !== 1 ? 's' : ''}</span>
+            <Link
+              href="/manager/preventif"
+              className="flex items-center gap-1.5 bg-blue-600 text-white border-none rounded-lg px-3 py-1.5 cursor-pointer text-[12px] font-semibold no-underline"
+            >
               <Plus size={12} /> Gérer les plans
             </Link>
           </div>
           {plans.length === 0 ? (
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 32, textAlign: 'center', color: 'var(--text-secondary)', fontSize: 13 }}>
+            <div className="bg-[#1c2128] border border-[#30363d] rounded-xl py-8 text-center text-[#7d8590] text-[13px]">
               Aucun plan préventif pour cette machine
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div className="flex flex-col gap-2">
               {plans.map(p => {
                 const days = Math.ceil((new Date(p.prochaine_exec).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
                 const color = days < 0 ? '#ef4444' : days <= 7 ? '#f59e0b' : '#22c55e';
                 const Icon = days < 0 ? AlertTriangle : days <= 7 ? Clock : CheckCircle;
                 return (
-                  <div key={p.id} style={{ background: 'var(--bg-card)', border: `1px solid ${days < 0 ? '#ef444433' : days <= 7 ? '#f59e0b33' : 'var(--border)'}`, borderRadius: 10, padding: '12px 14px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700 }}>{p.nom}</div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, marginLeft: 8 }}>
+                  <div
+                    key={p.id}
+                    className="bg-[#1c2128] rounded-[10px] px-3.5 py-3"
+                    style={{ border: `1px solid ${days < 0 ? '#ef444433' : days <= 7 ? '#f59e0b33' : '#30363d'}` }}
+                  >
+                    <div className="flex justify-between items-start mb-1">
+                      <div className="text-[13px] font-bold">{p.nom}</div>
+                      <div className="flex items-center gap-1 shrink-0 ml-2">
                         <Icon size={11} color={color} />
-                        <span style={{ fontSize: 11, color, fontWeight: 700 }}>{days < 0 ? `${Math.abs(days)}j retard` : `J-${days}`}</span>
+                        <span className="text-[11px] font-bold" style={{ color }}>{days < 0 ? `${Math.abs(days)}j retard` : `J-${days}`}</span>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Tous les {p.frequence_jours}j</span>
-                      <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>· {new Date(p.prochaine_exec).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                    <div className="flex gap-2.5 items-center flex-wrap">
+                      <span className="text-[11px] text-[#7d8590]">Tous les {p.frequence_jours}j</span>
+                      <span className="text-[11px] text-[#7d8590]">· {new Date(p.prochaine_exec).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
                       {p.technicians && (
-                        <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>· {(p.technicians as { prenom: string; nom: string }).prenom} {(p.technicians as { prenom: string; nom: string }).nom}</span>
+                        <span className="text-[11px] text-[#7d8590]">· {(p.technicians as { prenom: string; nom: string }).prenom} {(p.technicians as { prenom: string; nom: string }).nom}</span>
                       )}
                     </div>
                   </div>
@@ -291,28 +323,28 @@ export default function MachineDetailPage() {
 
       {/* Historique interventions */}
       {tab === 'historique' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div className="flex flex-col gap-2">
           {history.length === 0 ? (
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>Aucune intervention enregistrée</div>
+            <div className="bg-[#1c2128] border border-[#30363d] rounded-xl py-10 text-center text-[#7d8590]">Aucune intervention enregistrée</div>
           ) : history.map(h => (
-            <div key={h.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, background: '#2563eb22', color: '#2563eb', borderRadius: 5, padding: '2px 8px' }}>
+            <div key={h.id} className="bg-[#1c2128] border border-[#30363d] rounded-[10px] px-3.5 py-3">
+              <div className="flex justify-between items-start mb-1.5">
+                <span className="text-[12px] font-bold bg-blue-500/15 text-blue-500 rounded px-2 py-0.5">
                   {h.type_action === 'preventive' || h.type_action === 'inspection' ? 'Préventif' : 'Correctif'}
                 </span>
-                <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{new Date(h.realise_le).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                <span className="text-[11px] text-[#7d8590]">{new Date(h.realise_le).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
               </div>
-              {h.description && <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 6, lineHeight: 1.5 }}>{h.description.substring(0, 100)}{h.description.length > 100 ? '...' : ''}</div>}
+              {h.description && <div className="text-[13px] text-[#7d8590] mb-1.5 leading-relaxed">{h.description.substring(0, 100)}{h.description.length > 100 ? '...' : ''}</div>}
               {h.pieces_changees && h.pieces_changees.length > 0 && (
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <div className="flex gap-1.5 flex-wrap">
                   {h.pieces_changees.map((p, i) => (
-                    <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 5, padding: '2px 7px', fontSize: 11 }}>
+                    <span key={i} className="flex items-center gap-1 bg-[#0d1117] border border-[#30363d] rounded px-1.5 py-0.5 text-[11px]">
                       <Package size={10} /> {p.quantite} {p.unite} · {p.nom}
                     </span>
                   ))}
                 </div>
               )}
-              {h.technicians && <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 6 }}>par {(h.technicians as { prenom: string; nom: string }).prenom}</div>}
+              {h.technicians && <div className="text-[11px] text-[#7d8590] mt-1.5">par {(h.technicians as { prenom: string; nom: string }).prenom}</div>}
             </div>
           ))}
         </div>

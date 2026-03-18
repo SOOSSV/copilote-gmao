@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Factory, CheckCircle, XCircle, AlertCircle, Cpu, ArrowLeft } from 'lucide-react';
+import { Factory, CheckCircle, XCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -58,77 +58,87 @@ export default function MachinesPage() {
   const filtered = filtre === 'tous' ? machines : machines.filter(m => m.criticite === filtre);
 
   return (
-    <div style={{ padding: '20px 16px', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} /></button>
+    <div className="px-4 py-5 max-w-[100vw] box-border overflow-x-hidden">
+      <div className="flex items-center gap-2.5 mb-5">
+        <button onClick={() => router.back()} className="bg-transparent border-none cursor-pointer text-[#7d8590] p-1 flex items-center">
+          <ArrowLeft size={20} />
+        </button>
         <Factory size={20} color="var(--accent)" />
-        <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Parc Machines</h1>
-        <span style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '2px 10px', fontSize: 12, color: 'var(--text-secondary)' }}>
+        <h1 className="text-[20px] font-extrabold m-0">Parc Machines</h1>
+        <span className="bg-[#1c2128] border border-[#30363d] rounded-full px-2.5 py-0.5 text-[12px] text-[#7d8590]">
           {machines.length}
         </span>
       </div>
 
       {/* Filtres criticité */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'none' }}>
+      <div className="flex gap-2 mb-4 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
         {['tous', 'critique', 'haute', 'normale'].map(f => (
-          <button key={f} onClick={() => setFiltre(f)} style={{
-            padding: '6px 14px', borderRadius: 8, border: '1px solid', whiteSpace: 'nowrap', flexShrink: 0,
-            borderColor: filtre === f ? (criticiteColor[f] || 'var(--accent)') : 'var(--border)',
-            background: filtre === f ? (criticiteColor[f] ? `${criticiteColor[f]}22` : 'var(--accent)') : 'var(--bg-card)',
-            color: filtre === f ? (criticiteColor[f] || 'white') : 'var(--text-secondary)',
-            fontSize: 12, fontWeight: 600, cursor: 'pointer',
-          }}>
+          <button
+            key={f}
+            onClick={() => setFiltre(f)}
+            className="px-3.5 py-1.5 rounded-lg border whitespace-nowrap shrink-0 text-[12px] font-semibold cursor-pointer transition-all"
+            style={{
+              borderColor: filtre === f ? (criticiteColor[f] || 'var(--accent)') : '#30363d',
+              background: filtre === f ? (criticiteColor[f] ? `${criticiteColor[f]}22` : 'var(--accent)') : '#1c2128',
+              color: filtre === f ? (criticiteColor[f] || 'white') : '#7d8590',
+            }}
+          >
             {f.charAt(0).toUpperCase() + f.slice(1)}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <div style={{ color: 'var(--text-secondary)', padding: 20 }}>Chargement...</div>
+        <div className="text-[#7d8590] py-5">Chargement...</div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+        <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
           {filtered.map(m => {
             const cfg = statutConfig[m.statut] || statutConfig.inactif;
             const StatIcon = cfg.icon;
             const critColor = criticiteColor[m.criticite] || '#2563eb';
             return (
-              <Link key={m.id} href={`/manager/machines/${m.id}`} style={{
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                borderTop: `3px solid ${critColor}`, borderRadius: 14, padding: '16px 18px',
-                display: 'block', textDecoration: 'none', color: 'inherit', cursor: 'pointer',
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nom}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{m.external_id}</div>
+              <Link
+                key={m.id}
+                href={`/manager/machines/${m.id}`}
+                className="block no-underline text-inherit cursor-pointer rounded-[14px] px-[18px] py-4"
+                style={{ background: '#1c2128', border: '1px solid #30363d', borderTop: `3px solid ${critColor}` }}
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-[14px] mb-0.5 overflow-hidden text-ellipsis whitespace-nowrap">{m.nom}</div>
+                    <div className="text-[11px] text-[#7d8590]">{m.external_id}</div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: cfg.color, fontSize: 11, fontWeight: 600, flexShrink: 0, marginLeft: 8 }}>
+                  <div className="flex items-center gap-1 text-[11px] font-semibold shrink-0 ml-2" style={{ color: cfg.color }}>
                     <StatIcon size={13} />
                     {cfg.label}
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Type</span>
-                    <span style={{ textAlign: 'right', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.type_equipement || '—'}</span>
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex justify-between text-[12px]">
+                    <span className="text-[#7d8590]">Type</span>
+                    <span className="text-right max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap">{m.type_equipement || '—'}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Localisation</span>
-                    <span style={{ textAlign: 'right' }}>{m.localisation || '—'}</span>
+                  <div className="flex justify-between text-[12px]">
+                    <span className="text-[#7d8590]">Localisation</span>
+                    <span className="text-right">{m.localisation || '—'}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Criticité</span>
-                    <span style={{ color: critColor, fontWeight: 600, textTransform: 'capitalize' }}>{m.criticite}</span>
+                  <div className="flex justify-between text-[12px]">
+                    <span className="text-[#7d8590]">Criticité</span>
+                    <span className="font-semibold capitalize" style={{ color: critColor }}>{m.criticite}</span>
                   </div>
                   <div
                     onClick={e => { if ((m.ticket_count || 0) > 0) { e.preventDefault(); e.stopPropagation(); router.push(`/manager/tickets?machine=${encodeURIComponent(m.nom)}`); } }}
-                    style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, borderTop: '1px solid var(--border)', paddingTop: 8, marginTop: 2, cursor: (m.ticket_count || 0) > 0 ? 'pointer' : 'default' }}
+                    className="flex justify-between text-[12px] border-t border-[#30363d] pt-2 mt-0.5"
+                    style={{ cursor: (m.ticket_count || 0) > 0 ? 'pointer' : 'default' }}
                   >
-                    <span style={{ color: 'var(--text-secondary)' }}>Tickets ouverts</span>
-                    <span style={{ fontWeight: 700, color: (m.ticket_count || 0) > 0 ? '#f59e0b' : 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span className="text-[#7d8590]">Tickets ouverts</span>
+                    <span
+                      className="font-bold flex items-center gap-1"
+                      style={{ color: (m.ticket_count || 0) > 0 ? '#f59e0b' : '#7d8590' }}
+                    >
                       {m.ticket_count || 0}
-                      {(m.ticket_count || 0) > 0 && <span style={{ fontSize: 11 }}>→</span>}
+                      {(m.ticket_count || 0) > 0 && <span className="text-[11px]">→</span>}
                     </span>
                   </div>
                 </div>
@@ -137,7 +147,7 @@ export default function MachinesPage() {
           })}
         </div>
       )}
-      {!loading && <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-secondary)' }}>{filtered.length} machine(s)</div>}
+      {!loading && <div className="mt-3 text-[12px] text-[#7d8590]">{filtered.length} machine(s)</div>}
     </div>
   );
 }

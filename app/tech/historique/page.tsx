@@ -42,63 +42,69 @@ export default function TechHistorique() {
   const totalResolus = tickets.length;
 
   return (
-    <div style={{ padding: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} /></button>
+    <div className="p-4">
+      <div className="flex items-center gap-2 mb-1">
+        <button onClick={() => router.back()} className="bg-transparent border-none cursor-pointer text-[#7d8590] p-1 flex items-center">
+          <ArrowLeft size={20} />
+        </button>
         <TrendingUp size={18} color="#22c55e" />
-        <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Mes stats</h1>
+        <h1 className="text-[20px] font-extrabold m-0">Mes stats</h1>
       </div>
-      <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>
+      <div className="text-[13px] text-[#7d8590] mb-5">
         {totalResolus} intervention{totalResolus > 1 ? 's' : ''} résolue{totalResolus > 1 ? 's' : ''}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 24 }}>
+      <div className="grid grid-cols-3 gap-2.5 mb-6">
         {[
           { label: 'Cette semaine', value: cetteSemaine, color: '#0ea5e9' },
           { label: 'Ce mois', value: ceMois, color: '#2563eb' },
           { label: 'Total résolus', value: totalResolus, color: '#22c55e' },
         ].map(k => (
-          <div key={k.label} style={{ background: 'var(--bg-card)', border: `1px solid ${k.color}33`, borderRadius: 12, padding: '14px 12px', textAlign: 'center' }}>
-            <div style={{ fontSize: 26, fontWeight: 800, color: k.color }}>{k.value}</div>
-            <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>{k.label}</div>
+          <div
+            key={k.label}
+            className="bg-[#1c2128] rounded-xl py-3.5 px-3 text-center"
+            style={{ border: `1px solid ${k.color}33` }}
+          >
+            <div className="text-[26px] font-extrabold" style={{ color: k.color }}>{k.value}</div>
+            <div className="text-[10px] text-[#7d8590] mt-0.5">{k.label}</div>
           </div>
         ))}
       </div>
 
       {loading ? (
-        <div style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: 40 }}>Chargement...</div>
+        <div className="text-[#7d8590] text-center py-10">Chargement...</div>
       ) : tickets.length === 0 ? (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>
-          <CheckCircle size={28} style={{ opacity: 0.3, marginBottom: 10 }} />
-          <div>Aucune intervention résolue pour l'instant</div>
+        <div className="bg-[#1c2128] border border-[#30363d] rounded-[14px] py-10 text-center text-[#7d8590]">
+          <CheckCircle size={28} className="opacity-30 mx-auto mb-2.5" />
+          <div>Aucune intervention résolue pour l&apos;instant</div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div className="flex flex-col gap-2.5">
           {tickets.map(t => (
-            <div key={t.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8, gap: 8 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, flex: 1 }}>{t.titre}</div>
+            <div key={t.id} className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-4">
+              <div className="flex justify-between items-start mb-2 gap-2">
+                <div className="text-[14px] font-bold flex-1">{t.titre}</div>
                 <TypeBadge type={t.type_intervention} />
               </div>
               {t.machines && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                  <Wrench size={12} color="var(--text-secondary)" />
-                  <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{t.machines.nom}</span>
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <Wrench size={12} color="#7d8590" />
+                  <span className="text-[12px] text-[#7d8590]">{t.machines.nom}</span>
                 </div>
               )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div className="flex items-center gap-4">
                 {t.resolu_le && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Calendar size={12} color="var(--text-secondary)" />
-                    <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                  <div className="flex items-center gap-1.5">
+                    <Calendar size={12} color="#7d8590" />
+                    <span className="text-[12px] text-[#7d8590]">
                       {new Date(t.resolu_le).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </span>
                   </div>
                 )}
                 {t.duree_intervention_min && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Clock size={12} color="var(--text-secondary)" />
-                    <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{t.duree_intervention_min} min</span>
+                  <div className="flex items-center gap-1.5">
+                    <Clock size={12} color="#7d8590" />
+                    <span className="text-[12px] text-[#7d8590]">{t.duree_intervention_min} min</span>
                   </div>
                 )}
               </div>

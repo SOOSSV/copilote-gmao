@@ -16,30 +16,36 @@ function KpiCard({ label, value, sub, icon: Icon, color, big, href }: {
   icon: React.ElementType; color: string; big?: boolean; href?: string;
 }) {
   const inner = (
-    <div style={{ background: 'var(--bg-card)', border: `1px solid ${color}33`, borderRadius: 16, padding: big ? '28px' : '22px 24px', position: 'relative', overflow: 'hidden', cursor: href ? 'pointer' : 'default' }}>
-      <div style={{ position: 'absolute', top: -16, right: -16, width: 80, height: 80, borderRadius: '50%', background: `${color}0d` }} />
-      <div style={{ width: 40, height: 40, borderRadius: 12, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
+    <div
+      className="rounded-2xl relative overflow-hidden"
+      style={{ background: '#1c2128', border: `1px solid ${color}33`, padding: big ? 28 : '22px 24px', cursor: href ? 'pointer' : 'default' }}
+    >
+      <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full" style={{ background: `${color}0d` }} />
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3.5" style={{ background: `${color}18` }}>
         <Icon size={20} color={color} />
       </div>
-      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 6 }}>{label}</div>
-      <div style={{ fontSize: big ? 44 : 34, fontWeight: 900, color, lineHeight: 1 }}>{value}</div>
-      {sub && <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 6 }}>{sub}</div>}
+      <div className="text-[11px] font-bold text-[#7d8590] uppercase tracking-[0.8px] mb-1.5">{label}</div>
+      <div className="font-black leading-none" style={{ fontSize: big ? 44 : 34, color }}>{value}</div>
+      {sub && <div className="text-[12px] text-[#7d8590] mt-1.5">{sub}</div>}
     </div>
   );
-  return href ? <Link href={href} style={{ textDecoration: 'none' }}>{inner}</Link> : inner;
+  return href ? <Link href={href} className="no-underline">{inner}</Link> : inner;
 }
 
 function KpiMini({ label, value, color, icon: Icon, href }: { label: string; value: string | number; color: string; icon: React.ElementType; href?: string }) {
   const inner = (
-    <div style={{ background: 'var(--bg-card)', border: `1px solid ${color}33`, borderRadius: 12, padding: '14px 12px', cursor: href ? 'pointer' : 'default', textDecoration: 'none', display: 'block' }}>
-      <div style={{ width: 32, height: 32, borderRadius: 8, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+    <div
+      className="rounded-xl block"
+      style={{ background: '#1c2128', border: `1px solid ${color}33`, padding: '14px 12px', cursor: href ? 'pointer' : 'default' }}
+    >
+      <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style={{ background: `${color}18` }}>
         <Icon size={16} color={color} />
       </div>
-      <div style={{ fontSize: 24, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{label}</div>
+      <div className="text-[24px] font-extrabold" style={{ color }}>{value}</div>
+      <div className="text-[11px] text-[#7d8590] mt-0.5">{label}</div>
     </div>
   );
-  return href ? <Link href={href} style={{ textDecoration: 'none' }}>{inner}</Link> : inner;
+  return href ? <Link href={href} className="no-underline">{inner}</Link> : inner;
 }
 
 export default function DirecteurDashboard() {
@@ -83,134 +89,145 @@ export default function DirecteurDashboard() {
     <>
       {/* ===== VUE MOBILE ===== */}
       <div className="dir-mobile-home">
-        <div style={{ padding: '24px 16px 40px', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px', marginBottom: 2 }}>COPILOTE</div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Espace Directeur · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
+        <div className="px-4 pt-6 pb-10 max-w-[100vw] box-border overflow-x-hidden">
+          <div className="mb-5">
+            <div className="text-[22px] font-extrabold text-[#e6edf3] tracking-[-0.5px] mb-0.5">COPILOTE</div>
+            <div className="text-[13px] text-[#7d8590]">Espace Directeur · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
           </div>
 
           {!loading && stats.urgents > 0 && (
-            <div style={{ background: '#ef444418', border: '1px solid #ef444433', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-4 flex items-center gap-2.5">
               <AlertTriangle size={16} color="#ef4444" />
-              <span style={{ color: '#ef4444', fontWeight: 600, fontSize: 13 }}>{stats.urgents} ticket{stats.urgents > 1 ? 's' : ''} urgent{stats.urgents > 1 ? 's' : ''}</span>
+              <span className="text-red-500 font-semibold text-[13px]">{stats.urgents} ticket{stats.urgents > 1 ? 's' : ''} urgent{stats.urgents > 1 ? 's' : ''}</span>
             </div>
           )}
 
           {/* KPI rapides */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 10 }}>
+          <div className="grid grid-cols-3 gap-2.5 mb-2.5">
             {[
               { label: 'Ouverts',  value: stats.ouverts,   color: '#2563eb', href: '/directeur/tickets?filtre=ouvert' },
               { label: 'En cours', value: stats.en_cours,  color: '#f59e0b', href: '/directeur/tickets?filtre=en_cours' },
               { label: 'Résolus',  value: stats.fermes,    color: '#22c55e', href: '/directeur/tickets?filtre=resolu' },
             ].map(k => (
-              <Link key={k.label} href={k.href} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 12px', textAlign: 'center', textDecoration: 'none', display: 'block' }}>
-                <div style={{ fontSize: 26, fontWeight: 800, color: k.color }}>{k.value}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{k.label}</div>
+              <Link key={k.label} href={k.href} className="bg-[#1c2128] border border-[#30363d] rounded-xl py-3.5 px-3 text-center no-underline block">
+                <div className="text-[26px] font-extrabold" style={{ color: k.color }}>{k.value}</div>
+                <div className="text-[11px] text-[#7d8590] mt-0.5">{k.label}</div>
               </Link>
             ))}
           </div>
 
-          {/* Cards denses row 1 */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-            <Link href="/directeur/synthese" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+          {/* Cards row 1 */}
+          <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+            <Link href="/directeur/synthese" className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-3.5 no-underline text-inherit">
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <TrendingUp size={14} color="#22c55e" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#22c55e' }}>Vue synthèse</span>
+                <span className="text-[12px] font-bold text-green-500">Vue synthèse</span>
               </div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#22c55e', marginBottom: 2 }}>{tauxResolution}%</div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>taux de résolution</div>
+              <div className="text-[24px] font-extrabold text-green-500 mb-0.5">{tauxResolution}%</div>
+              <div className="text-[11px] text-[#7d8590]">taux de résolution</div>
             </Link>
-            <Link href="/directeur/tickets" style={{ background: 'var(--bg-card)', border: `1px solid ${stats.urgents > 0 ? '#ef444433' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+            <Link
+              href="/directeur/tickets"
+              className="bg-[#1c2128] rounded-[14px] p-3.5 no-underline text-inherit"
+              style={{ border: `1px solid ${stats.urgents > 0 ? '#ef444433' : '#30363d'}` }}
+            >
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <Ticket size={14} color="#f59e0b" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b' }}>Tickets</span>
+                <span className="text-[12px] font-bold text-amber-500">Tickets</span>
               </div>
               {stats.urgents > 0
-                ? <><div style={{ fontSize: 24, fontWeight: 800, color: '#ef4444', marginBottom: 2 }}>{stats.urgents}</div><div style={{ fontSize: 11, color: '#ef4444' }}>urgent{stats.urgents > 1 ? 's' : ''}</div></>
-                : <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>{stats.ouverts} ouverts</div>
+                ? <><div className="text-[24px] font-extrabold text-red-500 mb-0.5">{stats.urgents}</div><div className="text-[11px] text-red-500">urgent{stats.urgents > 1 ? 's' : ''}</div></>
+                : <div className="text-[11px] text-[#7d8590] mt-1">{stats.ouverts} ouverts</div>
               }
             </Link>
           </div>
 
-          {/* Cards denses row 2 */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-            <Link href="/directeur/machines" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+          {/* Cards row 2 */}
+          <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+            <Link href="/directeur/machines" className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-3.5 no-underline text-inherit">
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <Factory size={14} color="#7c3aed" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed' }}>Machines</span>
+                <span className="text-[12px] font-bold text-violet-600">Machines</span>
               </div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#7c3aed', marginBottom: 2 }}>{stats.machines}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>actives</div>
+              <div className="text-[24px] font-extrabold text-violet-600 mb-0.5">{stats.machines}</div>
+              <div className="text-[11px] text-[#7d8590]">actives</div>
             </Link>
-            <Link href="/directeur/techniciens" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+            <Link href="/directeur/techniciens" className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-3.5 no-underline text-inherit">
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <Users size={14} color="#0ea5e9" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#0ea5e9' }}>Techniciens</span>
+                <span className="text-[12px] font-bold text-sky-500">Techniciens</span>
               </div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#0ea5e9', marginBottom: 2 }}>{stats.techniciens}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{stats.en_cours} en intervention</div>
+              <div className="text-[24px] font-extrabold text-sky-500 mb-0.5">{stats.techniciens}</div>
+              <div className="text-[11px] text-[#7d8590]">{stats.en_cours} en intervention</div>
             </Link>
           </div>
 
-          {/* Cards denses row 3 */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
-            <Link href="/directeur/stocks" style={{ background: 'var(--bg-card)', border: `1px solid ${stats.stockAlertes > 0 ? '#f59e0b44' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+          {/* Cards row 3 */}
+          <div className="grid grid-cols-2 gap-2.5 mb-5">
+            <Link
+              href="/directeur/stocks"
+              className="bg-[#1c2128] rounded-[14px] p-3.5 no-underline text-inherit"
+              style={{ border: `1px solid ${stats.stockAlertes > 0 ? '#f59e0b44' : '#30363d'}` }}
+            >
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <Package size={14} color="#10b981" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#10b981' }}>Stocks</span>
+                <span className="text-[12px] font-bold text-emerald-500">Stocks</span>
               </div>
               {stats.stockAlertes > 0
-                ? <><div style={{ fontSize: 24, fontWeight: 800, color: '#f59e0b', marginBottom: 2 }}>{stats.stockAlertes}</div><div style={{ fontSize: 11, color: '#f59e0b' }}>rupture{stats.stockAlertes > 1 ? 's' : ''}</div></>
-                : <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>Niveaux OK</div>
+                ? <><div className="text-[24px] font-extrabold text-amber-500 mb-0.5">{stats.stockAlertes}</div><div className="text-[11px] text-amber-500">rupture{stats.stockAlertes > 1 ? 's' : ''}</div></>
+                : <div className="text-[11px] text-[#7d8590] mt-1">Niveaux OK</div>
               }
             </Link>
-            <Link href="/directeur/rapports" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+            <Link href="/directeur/rapports" className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-3.5 no-underline text-inherit">
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <BarChart3 size={14} color="#2563eb" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb' }}>Rapports IA</span>
+                <span className="text-[12px] font-bold text-blue-500">Rapports IA</span>
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Analyses & recommandations</div>
+              <div className="text-[11px] text-[#7d8590]">Analyses & recommandations</div>
             </Link>
           </div>
 
-          <button onClick={handleLogout} style={{ width: '100%', padding: '14px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--text-secondary)', fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <button
+            onClick={handleLogout}
+            className="w-full py-3.5 bg-transparent border border-[#30363d] rounded-xl text-[#7d8590] text-[14px] cursor-pointer flex items-center justify-center gap-2"
+          >
             <LogOut size={16} /> Déconnexion
           </button>
         </div>
       </div>
 
       {/* ===== VUE DESKTOP ===== */}
-      <div className="dir-desktop-home" style={{ padding: '32px 36px', maxWidth: 960 }}>
-        <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Vue synthèse</h1>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+      <div className="dir-desktop-home px-9 py-8" style={{ maxWidth: 960 }}>
+        <div className="mb-8">
+          <h1 className="text-[18px] font-extrabold mb-1">Vue synthèse</h1>
+          <div className="text-[13px] text-[#7d8590]">
             {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
           </div>
         </div>
 
         {!loading && stats.urgents > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 12, padding: '14px 18px', marginBottom: 28 }}>
+          <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/30 rounded-xl px-[18px] py-3.5 mb-7">
             <AlertTriangle size={20} color="#ef4444" />
             <div>
-              <span style={{ fontWeight: 700, color: '#ef4444' }}>{stats.urgents} ticket{stats.urgents > 1 ? 's' : ''} urgent{stats.urgents > 1 ? 's' : ''}</span>
-              <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}> en attente d'intervention</span>
+              <span className="font-bold text-red-500">{stats.urgents} ticket{stats.urgents > 1 ? 's' : ''} urgent{stats.urgents > 1 ? 's' : ''}</span>
+              <span className="text-[#7d8590] text-[13px]"> en attente d&apos;intervention</span>
             </div>
           </div>
         )}
 
-        {loading ? <div style={{ color: 'var(--text-secondary)' }}>Chargement...</div> : (
+        {loading ? <div className="text-[#7d8590]">Chargement...</div> : (
           <>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+            <div className="grid grid-cols-2 gap-4 mb-4">
               <KpiCard label="Taux de résolution" value={`${tauxResolution}%`} sub={`${stats.fermes} résolus sur ${stats.total} au total`} icon={TrendingUp} color="#22c55e" big href="/directeur/synthese" />
               <KpiCard label="Charge en cours" value={`${charge}%`} sub={`${stats.ouverts} ouverts · ${stats.en_cours} en traitement`} icon={Zap} color="#2563eb" big href="/directeur/tickets" />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>
+            <div className="grid grid-cols-3 gap-4 mb-4">
               <KpiCard label="Tickets urgents"  value={stats.urgents}     icon={AlertTriangle} color="#ef4444" href="/directeur/tickets?filtre=urgente" />
               <KpiCard label="Machines actives" value={stats.machines}    icon={CheckCircle2}  color="#0ea5e9" href="/directeur/machines" />
               <KpiCard label="Techniciens"       value={stats.techniciens} icon={Clock}         color="#7c3aed" href="/directeur/techniciens" />
             </div>
-            {/* Nav dense desktop — toutes les sections */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+            {/* Nav dense desktop */}
+            <div className="grid grid-cols-3 gap-3">
               {[
                 { href: '/directeur/synthese',    label: 'Vue synthèse',  sub: `${tauxResolution}% résolution`,              icon: TrendingUp,  color: '#22c55e' },
                 { href: '/directeur/tickets',     label: 'Tickets',       sub: `${stats.ouverts} ouverts · ${stats.urgents} urgents`, icon: Ticket,      color: '#f59e0b' },
@@ -221,14 +238,19 @@ export default function DirecteurDashboard() {
                 { href: '/directeur/recurrentes',   label: 'Pannes récurrentes', sub: 'Machines à risque',                   icon: Repeat2,      color: '#ef4444' },
                 { href: '/directeur/amelioratif',   label: 'Amélioratif',       sub: 'Upgrades & optimisations',             icon: Sparkles,     color: '#7c3aed' },
               ].map(card => (
-                <Link key={card.href} href={card.href} style={{ textDecoration: 'none', background: 'var(--bg-card)', border: `1px solid ${card.color}33`, borderRadius: 12, padding: '16px 18px', display: 'block' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                    <div style={{ width: 30, height: 30, borderRadius: 8, background: `${card.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Link
+                  key={card.href}
+                  href={card.href}
+                  className="no-underline bg-[#1c2128] rounded-xl px-[18px] py-4 block"
+                  style={{ border: `1px solid ${card.color}33` }}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-[30px] h-[30px] rounded-lg flex items-center justify-center" style={{ background: `${card.color}18` }}>
                       <card.icon size={15} color={card.color} />
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{card.label}</span>
+                    <span className="text-[13px] font-bold text-[#e6edf3]">{card.label}</span>
                   </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{card.sub}</div>
+                  <div className="text-[12px] text-[#7d8590]">{card.sub}</div>
                 </Link>
               ))}
             </div>

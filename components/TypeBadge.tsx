@@ -1,23 +1,13 @@
-const types: Record<string, { label: string; color: string }> = {
-  corrective:   { label: 'Correctif',    color: '#ef4444' },
-  preventive:   { label: 'Préventif',    color: '#2563eb' },
-  ameliorative: { label: 'Amélioratif',  color: '#7c3aed' },
+const types: Record<string, { label: string; color: string; bg: string; border: string }> = {
+  corrective:   { label: 'Correctif',   color: 'text-red-400',    bg: 'bg-red-400/10',    border: 'border-red-400/25' },
+  preventive:   { label: 'Préventif',   color: 'text-blue-500',   bg: 'bg-blue-500/10',   border: 'border-blue-500/25' },
+  ameliorative: { label: 'Amélioratif', color: 'text-violet-500', bg: 'bg-violet-500/10', border: 'border-violet-500/25' },
 };
 
 export default function TypeBadge({ type }: { type: string }) {
-  const t = types[type] || { label: type, color: '#8b8fa8' };
+  const t = types[type] || { label: type, color: 'text-[#8b8fa8]', bg: 'bg-[#8b8fa8]/10', border: 'border-[#8b8fa8]/25' };
   return (
-    <span style={{
-      background: `${t.color}22`,
-      color: t.color,
-      border: `1px solid ${t.color}44`,
-      borderRadius: '6px',
-      padding: '2px 8px',
-      fontSize: '11px',
-      fontWeight: 600,
-      textTransform: 'uppercase',
-      letterSpacing: '0.5px',
-    }}>
+    <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.5px] ${t.color} ${t.bg} ${t.border}`}>
       {t.label}
     </span>
   );

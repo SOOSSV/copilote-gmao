@@ -33,57 +33,66 @@ export default function RecurrentesPage() {
   }
 
   return (
-    <div style={{ padding: '16px', paddingBottom: 32 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}>
+    <div className="p-4 pb-8">
+      <div className="flex items-center gap-3 mb-5">
+        <button onClick={() => router.back()} className="bg-transparent border-none cursor-pointer text-[#7d8590] p-1 flex items-center">
           <ArrowLeft size={22} />
         </button>
-        <div style={{ flex: 1 }}>
-          <h1 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: '#ef4444' }}>Pannes récurrentes</h1>
-          <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Machines avec ≥ 3 pannes correctives sur 30 jours</div>
+        <div className="flex-1">
+          <h1 className="text-[18px] font-extrabold m-0 text-red-500">Pannes récurrentes</h1>
+          <div className="text-[12px] text-[#7d8590]">Machines avec ≥ 3 pannes correctives sur 30 jours</div>
         </div>
-        <button onClick={load} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <button
+          onClick={load}
+          className="bg-[#1c2128] border border-[#30363d] rounded-lg px-3 py-1.5 cursor-pointer text-[#7d8590] text-[12px] flex items-center gap-1.5"
+        >
           <RefreshCw size={13} /> Actualiser
         </button>
       </div>
 
       {loading ? (
-        <div style={{ color: 'var(--text-secondary)', padding: 32, textAlign: 'center' }}>Chargement...</div>
+        <div className="text-[#7d8590] py-8 text-center">Chargement...</div>
       ) : data.length === 0 ? (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '32px 16px', textAlign: 'center' }}>
-          <div style={{ fontSize: 32, marginBottom: 12 }}>✅</div>
-          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>Aucune panne récurrente</div>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Aucune machine n'a subi 3 pannes ou plus sur les 30 derniers jours.</div>
+        <div className="bg-[#1c2128] border border-[#30363d] rounded-[14px] px-4 py-8 text-center">
+          <div className="text-[32px] mb-3">✅</div>
+          <div className="text-[15px] font-bold mb-1.5">Aucune panne récurrente</div>
+          <div className="text-[13px] text-[#7d8590]">Aucune machine n&apos;a subi 3 pannes ou plus sur les 30 derniers jours.</div>
         </div>
       ) : (
         <>
-          <div style={{ background: '#ef444412', border: '1px solid #ef444433', borderRadius: 12, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="bg-red-500/8 border border-red-500/20 rounded-xl px-4 py-3 mb-5 flex items-center gap-2.5">
             <AlertTriangle size={16} color="#ef4444" />
-            <span style={{ color: '#ef4444', fontWeight: 600, fontSize: 13 }}>
+            <span className="text-red-500 font-semibold text-[13px]">
               {data.length} machine{data.length > 1 ? 's' : ''} nécessite{data.length === 1 ? '' : 'nt'} une attention immédiate
             </span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="flex flex-col gap-3">
             {data.map((p, i) => (
-              <Link key={p.machine_id} href={`/manager/machines/${p.machine_id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div style={{ background: 'var(--bg-card)', border: `1px solid ${i === 0 ? '#ef444444' : 'var(--border)'}`, borderRadius: 14, padding: '16px', display: 'flex', alignItems: 'center', gap: 16 }}>
+              <Link key={p.machine_id} href={`/manager/machines/${p.machine_id}`} className="no-underline text-inherit">
+                <div
+                  className="bg-[#1c2128] rounded-[14px] p-4 flex items-center gap-4"
+                  style={{ border: `1px solid ${i === 0 ? '#ef444444' : '#30363d'}` }}
+                >
                   {/* Rang */}
-                  <div style={{ width: 40, height: 40, borderRadius: 12, background: i === 0 ? '#ef444422' : 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ fontSize: 18, fontWeight: 900, color: i === 0 ? '#ef4444' : 'var(--text-secondary)' }}>#{i + 1}</span>
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                    style={{ background: i === 0 ? '#ef444422' : '#161b22' }}
+                  >
+                    <span className="text-[18px] font-black" style={{ color: i === 0 ? '#ef4444' : '#7d8590' }}>#{i + 1}</span>
                   </div>
 
                   {/* Infos */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.machine_nom}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4 }}>{p.machine_localisation}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Dernière panne : {formatDate(p.derniere_panne)}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[14px] font-bold mb-0.5 overflow-hidden text-ellipsis whitespace-nowrap">{p.machine_nom}</div>
+                    <div className="text-[12px] text-[#7d8590] mb-1">{p.machine_localisation}</div>
+                    <div className="text-[11px] text-[#7d8590]">Dernière panne : {formatDate(p.derniere_panne)}</div>
                   </div>
 
                   {/* Compteur */}
-                  <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                    <div style={{ fontSize: 28, fontWeight: 900, color: '#ef4444', lineHeight: 1 }}>{p.nb_pannes}</div>
-                    <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>pannes/30j</div>
+                  <div className="text-center shrink-0">
+                    <div className="text-[28px] font-black text-red-500 leading-none">{p.nb_pannes}</div>
+                    <div className="text-[10px] text-[#7d8590] mt-0.5">pannes/30j</div>
                   </div>
                 </div>
               </Link>

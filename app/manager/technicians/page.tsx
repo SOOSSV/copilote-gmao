@@ -21,7 +21,10 @@ function equipeBadge(equipe: string | null) {
   const e = EQUIPES.find(x => x.value === equipe);
   if (!e) return null;
   return (
-    <span style={{ fontSize: 10, fontWeight: 700, background: e.color + '20', color: e.color, borderRadius: 6, padding: '2px 7px' }}>
+    <span
+      className="text-[10px] font-bold rounded-md px-1.5 py-0.5"
+      style={{ background: e.color + '20', color: e.color }}
+    >
       {e.label} · {e.sub}
     </span>
   );
@@ -86,125 +89,193 @@ export default function TechniciansPage() {
   const byEquipe = EQUIPES.map(e => ({ ...e, count: techs.filter(t => t.equipe === e.value).length }));
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', padding: '20px 16px', maxWidth: 700, margin: '0 auto' }}>
-      <button onClick={() => router.push('/manager')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: 13, cursor: 'pointer', padding: '0 0 20px', marginLeft: -4 }}>
+    <div className="min-h-screen bg-[#0d1117] px-4 py-5 max-w-[700px] mx-auto">
+      <button
+        onClick={() => router.push('/manager')}
+        className="flex items-center gap-1.5 bg-transparent border-none text-[#7d8590] text-[13px] cursor-pointer pb-5 -ml-1"
+      >
         <ArrowLeft size={15} /> Tableau de bord
       </button>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>Techniciens</h1>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>{techs.length} technicien{techs.length > 1 ? 's' : ''} · 3×8</div>
+          <h1 className="text-[22px] font-extrabold text-[#e6edf3] m-0">Techniciens</h1>
+          <div className="text-[13px] text-[#7d8590] mt-0.5">{techs.length} technicien{techs.length > 1 ? 's' : ''} · 3×8</div>
         </div>
-        <button onClick={() => { setShowForm(!showForm); setFormError(''); }}
-          style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', border: 'none', borderRadius: 10, padding: '10px 16px', color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+        <button
+          onClick={() => { setShowForm(!showForm); setFormError(''); }}
+          className="flex items-center gap-1.5 bg-gradient-to-br from-blue-600 to-blue-700 border-none rounded-[10px] px-4 py-2.5 text-white text-[13px] font-bold cursor-pointer"
+        >
           {showForm ? <X size={15} /> : <Plus size={15} />} {showForm ? 'Annuler' : 'Nouveau'}
         </button>
       </div>
 
       {/* Résumé équipes */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 20 }}>
+      <div className="grid grid-cols-3 gap-2 mb-5">
         {byEquipe.map(e => (
-          <div key={e.value} style={{ background: 'var(--bg-card)', border: `1px solid ${e.color}33`, borderRadius: 12, padding: '10px 12px', textAlign: 'center', cursor: 'pointer' }}
-            onClick={() => setFilterEquipe(filterEquipe === e.value ? 'tous' : e.value)}>
-            <div style={{ fontSize: 20, fontWeight: 800, color: e.color }}>{e.count}</div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: e.color }}>{e.label}</div>
-            <div style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{e.sub}</div>
+          <div
+            key={e.value}
+            className="bg-[#1c2128] rounded-xl py-2.5 px-3 text-center cursor-pointer"
+            style={{ border: `1px solid ${e.color}33` }}
+            onClick={() => setFilterEquipe(filterEquipe === e.value ? 'tous' : e.value)}
+          >
+            <div className="text-[20px] font-extrabold" style={{ color: e.color }}>{e.count}</div>
+            <div className="text-[11px] font-bold" style={{ color: e.color }}>{e.label}</div>
+            <div className="text-[10px] text-[#7d8590]">{e.sub}</div>
           </div>
         ))}
       </div>
 
       {showForm && (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: 20, marginBottom: 20 }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 16 }}>Nouveau technicien</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+        <div className="bg-[#1c2128] border border-[#30363d] rounded-2xl p-5 mb-5">
+          <div className="text-[15px] font-bold text-[#e6edf3] mb-4">Nouveau technicien</div>
+          <div className="grid grid-cols-2 gap-3 mb-3">
             <div>
-              <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Prénom *</label>
-              <input value={form.prenom} onChange={e => setForm(f => ({ ...f, prenom: e.target.value }))} placeholder="Marc"
-                style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', color: 'var(--text-primary)', fontSize: 14, outline: 'none', fontFamily: 'inherit' }} />
+              <label className="block text-[11px] font-semibold text-[#7d8590] uppercase mb-1.5">Prénom *</label>
+              <input
+                value={form.prenom}
+                onChange={e => setForm(f => ({ ...f, prenom: e.target.value }))}
+                placeholder="Marc"
+                className="w-full box-border bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2.5 text-[#e6edf3] text-[14px] outline-none font-[inherit]"
+              />
             </div>
             <div>
-              <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Nom *</label>
-              <input value={form.nom} onChange={e => setForm(f => ({ ...f, nom: e.target.value }))} placeholder="Dupont"
-                style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', color: 'var(--text-primary)', fontSize: 14, outline: 'none', fontFamily: 'inherit' }} />
-            </div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
-            <div>
-              <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Email</label>
-              <input value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="m.dupont@..." type="email"
-                style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', color: 'var(--text-primary)', fontSize: 14, outline: 'none', fontFamily: 'inherit' }} />
-            </div>
-            <div>
-              <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Téléphone</label>
-              <input value={form.telephone} onChange={e => setForm(f => ({ ...f, telephone: e.target.value }))} placeholder="06 12 34 56 78"
-                style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', color: 'var(--text-primary)', fontSize: 14, outline: 'none', fontFamily: 'inherit' }} />
+              <label className="block text-[11px] font-semibold text-[#7d8590] uppercase mb-1.5">Nom *</label>
+              <input
+                value={form.nom}
+                onChange={e => setForm(f => ({ ...f, nom: e.target.value }))}
+                placeholder="Dupont"
+                className="w-full box-border bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2.5 text-[#e6edf3] text-[14px] outline-none font-[inherit]"
+              />
             </div>
           </div>
-          <div style={{ marginBottom: 12 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Équipe *</label>
-            <div style={{ display: 'flex', gap: 8 }}>
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label className="block text-[11px] font-semibold text-[#7d8590] uppercase mb-1.5">Email</label>
+              <input
+                value={form.email}
+                onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                placeholder="m.dupont@..."
+                type="email"
+                className="w-full box-border bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2.5 text-[#e6edf3] text-[14px] outline-none font-[inherit]"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] font-semibold text-[#7d8590] uppercase mb-1.5">Téléphone</label>
+              <input
+                value={form.telephone}
+                onChange={e => setForm(f => ({ ...f, telephone: e.target.value }))}
+                placeholder="06 12 34 56 78"
+                className="w-full box-border bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2.5 text-[#e6edf3] text-[14px] outline-none font-[inherit]"
+              />
+            </div>
+          </div>
+          <div className="mb-3">
+            <label className="block text-[11px] font-semibold text-[#7d8590] uppercase mb-2">Équipe *</label>
+            <div className="flex gap-2">
               {EQUIPES.map(e => (
-                <button key={e.value} onClick={() => setForm(f => ({ ...f, equipe: e.value }))}
-                  style={{ flex: 1, padding: '8px', borderRadius: 8, border: `2px solid ${form.equipe === e.value ? e.color : 'var(--border)'}`, background: form.equipe === e.value ? e.color + '20' : 'var(--bg-secondary)', color: form.equipe === e.value ? e.color : 'var(--text-secondary)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
-                  {e.label}<br /><span style={{ fontSize: 10, fontWeight: 400 }}>{e.sub}</span>
+                <button
+                  key={e.value}
+                  onClick={() => setForm(f => ({ ...f, equipe: e.value }))}
+                  className="flex-1 py-2 rounded-lg text-[12px] font-bold cursor-pointer transition-all"
+                  style={{
+                    border: `2px solid ${form.equipe === e.value ? e.color : '#30363d'}`,
+                    background: form.equipe === e.value ? e.color + '20' : '#161b22',
+                    color: form.equipe === e.value ? e.color : '#7d8590',
+                  }}
+                >
+                  {e.label}<br /><span className="text-[10px] font-normal">{e.sub}</span>
                 </button>
               ))}
             </div>
           </div>
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>PIN par défaut * (4 chiffres)</label>
-            <input value={form.pin} onChange={e => setForm(f => ({ ...f, pin: e.target.value.replace(/\D/g, '').slice(0, 4) }))}
-              placeholder="Ex: 1234" maxLength={4} inputMode="numeric"
-              style={{ width: 120, background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', color: 'var(--text-primary)', fontSize: 18, letterSpacing: 6, outline: 'none', fontFamily: 'inherit' }} />
-            <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>Le technicien devra le changer à sa 1ère connexion</div>
+          <div className="mb-4">
+            <label className="block text-[11px] font-semibold text-[#7d8590] uppercase mb-1.5">PIN par défaut * (4 chiffres)</label>
+            <input
+              value={form.pin}
+              onChange={e => setForm(f => ({ ...f, pin: e.target.value.replace(/\D/g, '').slice(0, 4) }))}
+              placeholder="Ex: 1234"
+              maxLength={4}
+              inputMode="numeric"
+              className="w-[120px] bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2.5 text-[#e6edf3] text-[18px] tracking-[6px] outline-none font-[inherit]"
+            />
+            <div className="text-[11px] text-[#7d8590] mt-1">Le technicien devra le changer à sa 1ère connexion</div>
           </div>
-          {formError && <div style={{ color: '#ef4444', fontSize: 13, marginBottom: 12, padding: '8px 12px', background: '#ef444410', borderRadius: 8 }}>{formError}</div>}
-          <button onClick={handleCreate} disabled={saving}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'linear-gradient(135deg, #22c55e, #16a34a)', border: 'none', borderRadius: 10, padding: '10px 20px', color: 'white', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+          {formError && (
+            <div className="text-red-500 text-[13px] mb-3 px-3 py-2 bg-red-500/10 rounded-lg">{formError}</div>
+          )}
+          <button
+            onClick={handleCreate}
+            disabled={saving}
+            className="flex items-center gap-1.5 bg-gradient-to-br from-green-500 to-green-700 border-none rounded-[10px] px-5 py-2.5 text-white text-[14px] font-bold cursor-pointer"
+          >
             <Save size={15} /> {saving ? 'Création...' : 'Créer le technicien'}
           </button>
         </div>
       )}
 
       {loading ? (
-        <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: 40 }}>Chargement...</div>
+        <div className="text-center text-[#7d8590] py-10">Chargement...</div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div className="flex flex-col gap-2.5">
           {filtered.map(tech => (
-            <div key={tech.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px 16px', opacity: tech.disponible ? 1 : 0.5 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>{tech.prenom} {tech.nom}</span>
+            <div
+              key={tech.id}
+              className="bg-[#1c2128] border border-[#30363d] rounded-[14px] px-4 py-3.5 transition-opacity"
+              style={{ opacity: tech.disponible ? 1 : 0.5 }}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[15px] font-bold text-[#e6edf3]">{tech.prenom} {tech.nom}</span>
                     {equipeBadge(tech.equipe)}
                     {!tech.pin_changed && tech.pin && (
-                      <span style={{ fontSize: 10, fontWeight: 700, background: '#f59e0b20', color: '#f59e0b', borderRadius: 6, padding: '2px 6px' }}>PIN TEMP</span>
+                      <span className="text-[10px] font-bold bg-amber-500/15 text-amber-500 rounded-md px-1.5 py-0.5">PIN TEMP</span>
                     )}
                     {!tech.pin && (
-                      <span style={{ fontSize: 10, fontWeight: 700, background: '#ef444420', color: '#ef4444', borderRadius: 6, padding: '2px 6px' }}>SANS PIN</span>
+                      <span className="text-[10px] font-bold bg-red-500/15 text-red-500 rounded-md px-1.5 py-0.5">SANS PIN</span>
                     )}
                   </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
+                  <div className="text-[12px] text-[#7d8590] mt-0.5">
                     {tech.email || 'Pas d\'email'}{tech.telephone ? ` · ${tech.telephone}` : ''}
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => resetPin(tech)} title="Réinitialiser PIN"
-                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 8, padding: '7px 10px', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => resetPin(tech)}
+                    title="Réinitialiser PIN"
+                    className="bg-[#161b22] border border-[#30363d] rounded-lg p-1.5 text-[#7d8590] cursor-pointer flex items-center"
+                  >
                     <RefreshCw size={14} />
                   </button>
-                  <button onClick={() => toggleDisponible(tech)} title={tech.disponible ? 'Désactiver' : 'Réactiver'}
-                    style={{ background: tech.disponible ? '#ef444410' : '#22c55e10', border: `1px solid ${tech.disponible ? '#ef4444' : '#22c55e'}`, borderRadius: 8, padding: '7px 10px', color: tech.disponible ? '#ef4444' : '#22c55e', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                  <button
+                    onClick={() => toggleDisponible(tech)}
+                    title={tech.disponible ? 'Désactiver' : 'Réactiver'}
+                    className="rounded-lg p-1.5 cursor-pointer flex items-center"
+                    style={{
+                      background: tech.disponible ? '#ef444410' : '#22c55e10',
+                      border: `1px solid ${tech.disponible ? '#ef4444' : '#22c55e'}`,
+                      color: tech.disponible ? '#ef4444' : '#22c55e',
+                    }}
+                  >
                     {tech.disponible ? <UserX size={14} /> : <UserCheck size={14} />}
                   </button>
                 </div>
               </div>
               {/* Changement d'équipe */}
-              <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+              <div className="flex gap-1.5 mt-2.5">
                 {EQUIPES.map(e => (
-                  <button key={e.value} onClick={() => changeEquipe(tech, e.value)}
-                    style={{ flex: 1, padding: '5px', borderRadius: 6, border: `1px solid ${tech.equipe === e.value ? e.color : 'var(--border)'}`, background: tech.equipe === e.value ? e.color + '20' : 'transparent', color: tech.equipe === e.value ? e.color : 'var(--text-secondary)', fontSize: 11, fontWeight: tech.equipe === e.value ? 700 : 400, cursor: 'pointer' }}>
+                  <button
+                    key={e.value}
+                    onClick={() => changeEquipe(tech, e.value)}
+                    className="flex-1 py-1 rounded-md text-[11px] cursor-pointer transition-all"
+                    style={{
+                      border: `1px solid ${tech.equipe === e.value ? e.color : '#30363d'}`,
+                      background: tech.equipe === e.value ? e.color + '20' : 'transparent',
+                      color: tech.equipe === e.value ? e.color : '#7d8590',
+                      fontWeight: tech.equipe === e.value ? 700 : 400,
+                    }}
+                  >
                     {e.label}
                   </button>
                 ))}

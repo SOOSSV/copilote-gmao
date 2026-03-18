@@ -28,44 +28,29 @@ export default function ManagerLoginPage() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'var(--bg-primary)', padding: 20,
-    }}>
-      <div style={{
-        width: '100%', maxWidth: 380,
-        background: 'var(--bg-card)',
-        border: '1px solid var(--border)',
-        borderRadius: 20, padding: '36px 32px',
-      }}>
-        {/* Retour */}
-        <button onClick={() => router.push('/')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: 13, cursor: 'pointer', padding: '0 0 20px', marginLeft: -4 }}>
+    <div className="min-h-screen flex items-center justify-center bg-[#0d1117] p-5">
+      <div className="w-full max-w-[380px] bg-[#1c2128] border border-[#30363d] rounded-[20px] px-8 py-9">
+        <button
+          onClick={() => router.push('/')}
+          className="flex items-center gap-1.5 bg-transparent border-none text-[#7d8590] text-[13px] cursor-pointer pb-5 -ml-1"
+        >
           <ArrowLeft size={15} /> Accueil
         </button>
 
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{
-            width: 56, height: 56, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 14px',
-          }}>
+        <div className="text-center mb-8">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center mx-auto mb-3.5">
             <Bot size={28} color="white" />
           </div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)' }}>
-            COPILOTE
-          </div>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>Espace Responsable</div>
+          <div className="text-[22px] font-extrabold text-[#e6edf3]">COPILOTE</div>
+          <div className="text-[13px] text-[#7d8590] mt-1">Espace Responsable</div>
         </div>
 
-        {/* Champ */}
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: 8 }}>
+        <div className="mb-4">
+          <label className="block text-[12px] font-semibold text-[#7d8590] uppercase tracking-[0.5px] mb-2">
             Mot de passe
           </label>
-          <div style={{ position: 'relative' }}>
-            <Lock size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+          <div className="relative">
+            <Lock size={15} className="absolute left-[13px] top-1/2 -translate-y-1/2 text-[#7d8590]" />
             <input
               type={showPwd ? 'text' : 'password'}
               value={password}
@@ -73,32 +58,22 @@ export default function ManagerLoginPage() {
               onKeyDown={e => e.key === 'Enter' && handleLogin()}
               placeholder="••••••••"
               autoFocus
-              style={{
-                width: '100%', boxSizing: 'border-box',
-                background: 'var(--bg-secondary)',
-                border: `1px solid ${error ? 'var(--danger)' : 'var(--border)'}`,
-                borderRadius: 10, padding: '12px 42px 12px 38px',
-                color: 'var(--text-primary)', fontSize: 15, outline: 'none', fontFamily: 'inherit',
-              }}
+              className={`w-full bg-[#161b22] border rounded-[10px] pl-[38px] pr-[42px] py-3 text-[#e6edf3] text-[15px] outline-none font-[inherit] box-border ${error ? 'border-red-500' : 'border-[#30363d]'}`}
             />
-            <button onClick={() => setShowPwd(v => !v)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 0 }}>
+            <button
+              onClick={() => setShowPwd(v => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer text-[#7d8590] p-0"
+            >
               {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          {error && <div style={{ fontSize: 12, color: 'var(--danger)', marginTop: 6 }}>Mot de passe incorrect</div>}
+          {error && <div className="text-[12px] text-red-500 mt-1.5">Mot de passe incorrect</div>}
         </div>
 
-        {/* Bouton */}
         <button
           onClick={handleLogin}
           disabled={!password || loading}
-          style={{
-            width: '100%', padding: '13px',
-            background: password ? 'linear-gradient(135deg, #2563eb, #7c3aed)' : 'var(--bg-secondary)',
-            border: '1px solid var(--border)',
-            borderRadius: 12, color: 'white', fontSize: 15, fontWeight: 700,
-            cursor: password ? 'pointer' : 'default', transition: 'all 0.15s',
-          }}
+          className={`w-full py-3 border border-[#30363d] rounded-xl text-white text-[15px] font-bold transition-all ${password ? 'bg-gradient-to-br from-blue-600 to-violet-600 cursor-pointer' : 'bg-[#161b22] cursor-default'}`}
         >
           {loading ? 'Connexion...' : 'Se connecter'}
         </button>

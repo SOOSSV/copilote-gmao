@@ -79,42 +79,50 @@ export default function ManagerTicketsPage() {
   const filtreLabel = (f: string) => ({ tous: 'Tous', ouvert: 'Ouvert', en_cours: 'En cours', resolu: 'Résolu', urgente: 'Urgente', haute: 'Haute', normale: 'Normale', basse: 'Basse', ameliorative: '✦ Amélioratif' } as Record<string,string>)[f] ?? f;
 
   return (
-    <div style={{ padding: '10px 8px', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
+    <div className="px-2 py-2.5 max-w-[100vw] box-border overflow-x-hidden">
 
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} /></button>
-          <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Tous les Tickets</h1>
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-2">
+          <button onClick={() => router.back()} className="bg-transparent border-none cursor-pointer text-[#7d8590] p-1 flex items-center">
+            <ArrowLeft size={20} />
+          </button>
+          <h1 className="text-[20px] font-extrabold m-0">Tous les Tickets</h1>
         </div>
-        <button onClick={fetchTickets} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '7px 12px', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
+        <button
+          onClick={fetchTickets}
+          className="bg-[#1c2128] border border-[#30363d] rounded-lg px-3 py-1.5 cursor-pointer text-[#7d8590] flex items-center gap-1.5 text-[12px]"
+        >
           <RefreshCw size={13} /> Actualiser
         </button>
       </div>
 
       {/* Recherche */}
-      <div style={{ position: 'relative', marginBottom: 12 }}>
-        <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+      <div className="relative mb-3">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7d8590]" />
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Rechercher un ticket ou une machine..."
-          style={{ width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px 10px 34px', color: 'var(--text-primary)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+          className="w-full bg-[#1c2128] border border-[#30363d] rounded-lg py-2.5 pl-[34px] pr-3 text-[#e6edf3] text-[13px] outline-none box-border"
         />
       </div>
 
       {/* Filtres statut */}
-      <div style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>Statut</div>
-        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2, scrollbarWidth: 'none' }}>
+      <div className="mb-2.5">
+        <div className="text-[10px] font-bold text-[#7d8590] uppercase tracking-[0.5px] mb-1.5">Statut</div>
+        <div className="flex gap-1.5 overflow-x-auto pb-0.5" style={{ scrollbarWidth: 'none' }}>
           {(['tous', 'ouvert', 'en_cours', 'resolu'] as const).map(f => (
-            <button key={f} onClick={() => setFiltre(f)} style={{
-              padding: '6px 12px', borderRadius: 8, border: '1px solid', whiteSpace: 'nowrap', flexShrink: 0,
-              borderColor: filtre === f ? 'var(--accent)' : 'var(--border)',
-              background: filtre === f ? 'var(--accent)' : 'var(--bg-card)',
-              color: filtre === f ? 'white' : 'var(--text-secondary)',
-              fontSize: 12, fontWeight: 600, cursor: 'pointer',
-            }}>
+            <button
+              key={f}
+              onClick={() => setFiltre(f)}
+              className="px-3 py-1.5 rounded-lg border whitespace-nowrap shrink-0 text-[12px] font-semibold cursor-pointer transition-all"
+              style={{
+                borderColor: filtre === f ? 'var(--accent)' : '#30363d',
+                background: filtre === f ? 'var(--accent)' : '#1c2128',
+                color: filtre === f ? 'white' : '#7d8590',
+              }}
+            >
               {filtreLabel(f)}
             </button>
           ))}
@@ -122,20 +130,24 @@ export default function ManagerTicketsPage() {
       </div>
 
       {/* Filtres priorité + type */}
-      <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>Priorité & type</div>
-        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2, scrollbarWidth: 'none' }}>
+      <div className="mb-4">
+        <div className="text-[10px] font-bold text-[#7d8590] uppercase tracking-[0.5px] mb-1.5">Priorité & type</div>
+        <div className="flex gap-1.5 overflow-x-auto pb-0.5" style={{ scrollbarWidth: 'none' }}>
           {(['urgente', 'haute', 'normale', 'basse', 'ameliorative'] as const).map(f => {
             const colors: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e', ameliorative: '#7c3aed' };
             const c = colors[f];
             const active = filtre === f;
             return (
-              <button key={f} onClick={() => setFiltre(active ? 'tous' : f)} style={{
-                padding: '6px 12px', borderRadius: 8, border: `1px solid ${active ? c : 'var(--border)'}`, whiteSpace: 'nowrap', flexShrink: 0,
-                background: active ? `${c}22` : 'var(--bg-card)',
-                color: active ? c : 'var(--text-secondary)',
-                fontSize: 12, fontWeight: 600, cursor: 'pointer',
-              }}>
+              <button
+                key={f}
+                onClick={() => setFiltre(active ? 'tous' : f)}
+                className="px-3 py-1.5 rounded-lg whitespace-nowrap shrink-0 text-[12px] font-semibold cursor-pointer transition-all"
+                style={{
+                  border: `1px solid ${active ? c : '#30363d'}`,
+                  background: active ? `${c}22` : '#1c2128',
+                  color: active ? c : '#7d8590',
+                }}
+              >
                 {filtreLabel(f)}
               </button>
             );
@@ -145,9 +157,9 @@ export default function ManagerTicketsPage() {
 
       {/* Contenu */}
       {loading ? (
-        <div style={{ color: 'var(--text-secondary)', padding: 32, textAlign: 'center' }}>Chargement...</div>
+        <div className="text-[#7d8590] py-8 text-center">Chargement...</div>
       ) : filtered.length === 0 ? (
-        <div style={{ color: 'var(--text-secondary)', padding: 32, textAlign: 'center' }}>Aucun ticket trouvé</div>
+        <div className="text-[#7d8590] py-8 text-center">Aucun ticket trouvé</div>
       ) : (
         <>
           {/* Vue mobile : cartes */}
@@ -156,20 +168,30 @@ export default function ManagerTicketsPage() {
               const machineNom = (t.machines as { nom: string } | null)?.nom;
               const count = machineNom ? recurrenceMap.get(machineNom) || 0 : 0;
               return (
-                <div key={t.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 12px', marginBottom: 8 }}>
-                  {count >= 2 && <div style={{ fontSize: 10, color: '#f59e0b', fontWeight: 700, marginBottom: 4 }}>⚠️ {count} pannes en 24h</div>}
-                  <Link href={`/manager/tickets/${t.id}`} style={{ display: 'block', textDecoration: 'none', color: 'inherit', marginBottom: 8 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titre}</div>
-                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
-                      <span style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{machineNom || '—'} · {(t.technicians as { prenom: string } | null)?.prenom || '—'}</span>
+                <div key={t.id} className="bg-[#1c2128] border border-[#30363d] rounded-[10px] px-3 py-2.5 mb-2">
+                  {count >= 2 && <div className="text-[10px] text-amber-500 font-bold mb-1">⚠️ {count} pannes en 24h</div>}
+                  <Link href={`/manager/tickets/${t.id}`} className="block no-underline text-inherit mb-2">
+                    <div className="text-[13px] font-semibold mb-1.5 overflow-hidden text-ellipsis whitespace-nowrap">{t.titre}</div>
+                    <div className="flex gap-1 flex-wrap items-center">
+                      <span className="text-[10px] text-[#7d8590]">{machineNom || '—'} · {(t.technicians as { prenom: string } | null)?.prenom || '—'}</span>
                       <TypeBadge type={t.type_intervention} />
                       <PrioriteBadge priorite={t.priorite} />
-                      <span style={{ fontSize: 10, color: 'var(--text-secondary)', marginLeft: 'auto' }}>{formatDate(t.created_at)}</span>
+                      <span className="text-[10px] text-[#7d8590] ml-auto">{formatDate(t.created_at)}</span>
                     </div>
                   </Link>
-                  <div style={{ display: 'flex', gap: 6 }}>
+                  <div className="flex gap-1.5">
                     {(['ouvert', 'en_cours', 'resolu'] as const).map(s => (
-                      <button key={s} onClick={() => updateStatut(t.id, s)} style={{ flex: 1, padding: '6px 4px', borderRadius: 7, border: `1px solid ${t.statut === s ? statutColor[s] : 'var(--border)'}`, background: t.statut === s ? `${statutColor[s]}22` : 'transparent', color: t.statut === s ? statutColor[s] : 'var(--text-secondary)', fontSize: 10, fontWeight: t.statut === s ? 700 : 400, cursor: t.statut === s ? 'default' : 'pointer' }}>
+                      <button
+                        key={s}
+                        onClick={() => updateStatut(t.id, s)}
+                        className="flex-1 py-1.5 px-1 rounded-lg text-[10px] cursor-pointer transition-all"
+                        style={{
+                          border: `1px solid ${t.statut === s ? statutColor[s] : '#30363d'}`,
+                          background: t.statut === s ? `${statutColor[s]}22` : 'transparent',
+                          color: t.statut === s ? statutColor[s] : '#7d8590',
+                          fontWeight: t.statut === s ? 700 : 400,
+                        }}
+                      >
                         {statutLabel(s)}
                       </button>
                     ))}
@@ -180,39 +202,50 @@ export default function ManagerTicketsPage() {
           </div>
 
           {/* Vue desktop : tableau */}
-          <div className="tickets-desktop" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div className="tickets-desktop bg-[#1c2128] border border-[#30363d] rounded-[14px] overflow-hidden">
+            <table className="w-full border-collapse">
               <thead>
-                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                <tr className="border-b border-[#30363d]">
                   {['Titre', 'Machine', 'Technicien', 'Priorité', 'Statut', 'Date', 'Action'].map(h => (
-                    <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</th>
+                    <th key={h} className="px-4 py-3 text-left text-[11px] text-[#7d8590] font-semibold uppercase tracking-[0.5px]">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((t, i) => (
-                  <tr key={t.id} style={{ borderBottom: i < filtered.length - 1 ? '1px solid var(--border)' : 'none' }}>
-                    <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 500, maxWidth: 200 }}>
-                      <Link href={`/manager/tickets/${t.id}`} style={{ color: 'inherit', textDecoration: 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')} onMouseLeave={e => (e.currentTarget.style.color = 'inherit')}>{t.titre}</Link>
+                  <tr key={t.id} style={{ borderBottom: i < filtered.length - 1 ? '1px solid #30363d' : 'none' }}>
+                    <td className="px-4 py-3 text-[13px] font-medium max-w-[200px]">
+                      <Link
+                        href={`/manager/tickets/${t.id}`}
+                        className="text-inherit no-underline block overflow-hidden text-ellipsis whitespace-nowrap hover:text-blue-500"
+                      >
+                        {t.titre}
+                      </Link>
                       {(() => {
                         const machineNom = (t.machines as { nom: string } | null)?.nom;
                         const count = machineNom ? recurrenceMap.get(machineNom) || 0 : 0;
-                        return count >= 2 ? <span style={{ fontSize: 10, color: '#f59e0b', fontWeight: 700 }}>⚠️ {count} pannes/24h</span> : null;
+                        return count >= 2 ? <span className="text-[10px] text-amber-500 font-bold">⚠️ {count} pannes/24h</span> : null;
                       })()}
                     </td>
-                    <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-secondary)' }}>{(t.machines as { nom: string } | null)?.nom || '—'}</td>
-                    <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-secondary)' }}>{(t.technicians as { prenom: string; nom: string } | null)?.prenom || '—'}</td>
-                    <td style={{ padding: '12px 16px' }}><TypeBadge type={t.type_intervention} /></td>
-                    <td style={{ padding: '12px 16px' }}><PrioriteBadge priorite={t.priorite} /></td>
-                    <td style={{ padding: '12px 16px' }}>
-                      <span style={{ background: `${statutColor[t.statut]}22`, color: statutColor[t.statut], borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }}>
+                    <td className="px-4 py-3 text-[13px] text-[#7d8590]">{(t.machines as { nom: string } | null)?.nom || '—'}</td>
+                    <td className="px-4 py-3 text-[13px] text-[#7d8590]">{(t.technicians as { prenom: string; nom: string } | null)?.prenom || '—'}</td>
+                    <td className="px-4 py-3"><TypeBadge type={t.type_intervention} /></td>
+                    <td className="px-4 py-3"><PrioriteBadge priorite={t.priorite} /></td>
+                    <td className="px-4 py-3">
+                      <span
+                        className="rounded-md px-2 py-0.5 text-[11px] font-semibold"
+                        style={{ background: `${statutColor[t.statut]}22`, color: statutColor[t.statut] }}
+                      >
                         {statutLabel(t.statut)}
                       </span>
                     </td>
-                    <td style={{ padding: '12px 16px', fontSize: 12, color: 'var(--text-secondary)' }}>{formatDate(t.created_at)}</td>
-                    <td style={{ padding: '12px 16px' }}>
-                      <select value={t.statut} onChange={e => updateStatut(t.id, e.target.value)}
-                        style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 6, padding: '4px 8px', color: 'var(--text-primary)', fontSize: 12, cursor: 'pointer' }}>
+                    <td className="px-4 py-3 text-[12px] text-[#7d8590]">{formatDate(t.created_at)}</td>
+                    <td className="px-4 py-3">
+                      <select
+                        value={t.statut}
+                        onChange={e => updateStatut(t.id, e.target.value)}
+                        className="bg-[#161b22] border border-[#30363d] rounded-md px-2 py-1 text-[#e6edf3] text-[12px] cursor-pointer"
+                      >
                         <option value="ouvert">Ouvert</option>
                         <option value="en_cours">En cours</option>
                         <option value="resolu">Résolu</option>
@@ -226,7 +259,7 @@ export default function ManagerTicketsPage() {
         </>
       )}
 
-      <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-secondary)' }}>{filtered.length} ticket(s)</div>
+      <div className="mt-3 text-[12px] text-[#7d8590]">{filtered.length} ticket(s)</div>
     </div>
   );
 }

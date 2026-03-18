@@ -31,20 +31,20 @@ function StatCard({ label, value, icon: Icon, color, sub, href }: {
   label: string; value: number | string; icon: React.ElementType; color: string; sub?: string; href?: string;
 }) {
   const inner = (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 22px', cursor: href ? 'pointer' : 'default' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+    <div className="bg-[#1c2128] border border-[#30363d] rounded-[14px] px-[22px] py-5 cursor-pointer">
+      <div className="flex justify-between items-start">
         <div>
-          <div style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>{label}</div>
-          <div style={{ fontSize: 32, fontWeight: 800, color }}>{value}</div>
-          {sub && <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>{sub}</div>}
+          <div className="text-[12px] text-[#7d8590] font-semibold uppercase tracking-[0.5px] mb-2">{label}</div>
+          <div className="text-[32px] font-extrabold" style={{ color }}>{value}</div>
+          {sub && <div className="text-[12px] text-[#7d8590] mt-1">{sub}</div>}
         </div>
-        <div style={{ width: 42, height: 42, borderRadius: 10, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="w-[42px] h-[42px] rounded-[10px] flex items-center justify-center" style={{ background: `${color}18` }}>
           <Icon size={20} color={color} />
         </div>
       </div>
     </div>
   );
-  return href ? <Link href={href} style={{ textDecoration: 'none' }}>{inner}</Link> : inner;
+  return href ? <Link href={href} className="no-underline">{inner}</Link> : inner;
 }
 
 export default function ManagerDashboard() {
@@ -137,99 +137,107 @@ export default function ManagerDashboard() {
     <>
       {/* ===== VUE MOBILE : Menu cartes ===== */}
       <div className="mgr-mobile-home">
-        <div style={{ padding: '24px 16px 100px' }}>
+        <div className="px-4 pt-6 pb-24">
           {/* Header */}
-          <div style={{ marginBottom: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div className="mb-6">
+            <div className="flex justify-between items-start">
               <div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px', marginBottom: 2 }}>COPILOTE</div>
-                <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Espace Manager · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
+                <div className="text-[22px] font-extrabold text-[#e6edf3] tracking-[-0.5px] mb-0.5">COPILOTE</div>
+                <div className="text-[13px] text-[#7d8590]">Espace Manager · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
               </div>
             </div>
           </div>
 
           {/* Alertes urgentes */}
           {stats.urgents > 0 && (
-            <div style={{ background: '#ef444418', border: '1px solid #ef444433', borderRadius: 12, padding: '12px 16px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-2.5 flex items-center gap-2.5">
               <AlertTriangle size={18} color="#ef4444" />
-              <span style={{ color: '#ef4444', fontWeight: 600, fontSize: 14 }}>{stats.urgents} ticket{stats.urgents > 1 ? 's' : ''} urgent{stats.urgents > 1 ? 's' : ''} en attente</span>
+              <span className="text-red-500 font-semibold text-[14px]">{stats.urgents} ticket{stats.urgents > 1 ? 's' : ''} urgent{stats.urgents > 1 ? 's' : ''} en attente</span>
             </div>
           )}
           {/* Alertes stocks */}
           {stats.stockAlertes > 0 && (
-            <div style={{ background: '#f59e0b18', border: '1px solid #f59e0b33', borderRadius: 12, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 mb-5 flex items-center gap-2.5">
               <ShoppingCart size={18} color="#f59e0b" />
-              <span style={{ color: '#f59e0b', fontWeight: 600, fontSize: 14 }}>{stats.stockAlertes} pièce{stats.stockAlertes > 1 ? 's' : ''} en rupture de stock</span>
+              <span className="text-amber-500 font-semibold text-[14px]">{stats.stockAlertes} pièce{stats.stockAlertes > 1 ? 's' : ''} en rupture de stock</span>
             </div>
           )}
 
           {/* KPI rapides */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 24 }}>
+          <div className="grid grid-cols-3 gap-2.5 mb-6">
             {[
               { label: 'Ouverts', value: stats.ouverts, color: '#2563eb', filtre: 'ouvert' },
               { label: 'En cours', value: stats.en_cours, color: '#f59e0b', filtre: 'en_cours' },
               { label: 'Résolus', value: stats.fermes, color: '#22c55e', filtre: 'resolu' },
             ].map(k => (
-              <Link key={k.label} href={`/manager/tickets?filtre=${k.filtre}`} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 12px', textAlign: 'center', textDecoration: 'none', display: 'block' }}>
-                <div style={{ fontSize: 26, fontWeight: 800, color: k.color }}>{k.value}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{k.label}</div>
+              <Link
+                key={k.label}
+                href={`/manager/tickets?filtre=${k.filtre}`}
+                className="bg-[#1c2128] border border-[#30363d] rounded-xl py-3.5 px-3 text-center no-underline block"
+              >
+                <div className="text-[26px] font-extrabold" style={{ color: k.color }}>{k.value}</div>
+                <div className="text-[11px] text-[#7d8590] mt-0.5">{k.label}</div>
               </Link>
             ))}
           </div>
 
           {/* Tableau de bord + Tickets */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-            <Link href="/manager/dashboard" style={{ background: 'var(--bg-card)', border: `1px solid ${stats.urgents > 0 ? '#ef444433' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+          <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+            <Link
+              href="/manager/dashboard"
+              className="bg-[#1c2128] rounded-[14px] p-3.5 no-underline text-inherit"
+              style={{ border: `1px solid ${stats.urgents > 0 ? '#ef444433' : '#30363d'}` }}
+            >
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <BarChart3 size={14} color="#2563eb" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb' }}>Tableau de bord</span>
+                <span className="text-[12px] font-bold text-blue-500">Tableau de bord</span>
               </div>
               {stats.urgents > 0
-                ? <><div style={{ fontSize: 24, fontWeight: 800, color: '#ef4444', marginBottom: 2 }}>{stats.urgents}</div><div style={{ fontSize: 11, color: '#ef4444' }}>urgent{stats.urgents > 1 ? 's' : ''}</div></>
-                : <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>Aucune urgence</div>
+                ? <><div className="text-[24px] font-extrabold text-red-500 mb-0.5">{stats.urgents}</div><div className="text-[11px] text-red-500">urgent{stats.urgents > 1 ? 's' : ''}</div></>
+                : <div className="text-[11px] text-[#7d8590] mt-1">Aucune urgence</div>
               }
             </Link>
-            <Link href="/manager/tickets" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+            <Link href="/manager/tickets" className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-3.5 no-underline text-inherit">
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <Ticket size={14} color="#f59e0b" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b' }}>Tickets</span>
+                <span className="text-[12px] font-bold text-amber-500">Tickets</span>
               </div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#f59e0b', marginBottom: 2 }}>{stats.ouverts}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>ouverts · {stats.en_cours} en cours</div>
+              <div className="text-[24px] font-extrabold text-amber-500 mb-0.5">{stats.ouverts}</div>
+              <div className="text-[11px] text-[#7d8590]">ouverts · {stats.en_cours} en cours</div>
             </Link>
           </div>
 
           {/* Machines + Techniciens */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-            <Link href="/manager/machines" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+          <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+            <Link href="/manager/machines" className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-3.5 no-underline text-inherit">
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <Factory size={14} color="#7c3aed" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed' }}>Machines</span>
+                <span className="text-[12px] font-bold text-violet-600">Machines</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>● Actives</span>
-                  <span style={{ fontWeight: 700, color: '#22c55e' }}>{stats.machinesActives}</span>
+              <div className="flex flex-col gap-1.5">
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-[#7d8590]">● Actives</span>
+                  <span className="font-bold text-green-500">{stats.machinesActives}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>● Inactives</span>
-                  <span style={{ fontWeight: 700, color: '#f59e0b' }}>{stats.machinesInactives}</span>
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-[#7d8590]">● Inactives</span>
+                  <span className="font-bold text-amber-500">{stats.machinesInactives}</span>
                 </div>
                 {stats.machinesHorsService > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>● Hors service</span>
-                    <span style={{ fontWeight: 700, color: '#ef4444' }}>{stats.machinesHorsService}</span>
+                  <div className="flex justify-between text-[11px]">
+                    <span className="text-[#7d8590]">● Hors service</span>
+                    <span className="font-bold text-red-500">{stats.machinesHorsService}</span>
                   </div>
                 )}
               </div>
             </Link>
-            <Link href="/manager/technicians" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+            <Link href="/manager/technicians" className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-3.5 no-underline text-inherit">
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <Users size={14} color="#06b6d4" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#06b6d4' }}>Techniciens</span>
+                <span className="text-[12px] font-bold text-cyan-500">Techniciens</span>
               </div>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#06b6d4', marginBottom: 4 }}>{stats.techniciens}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+              <div className="text-[28px] font-extrabold text-cyan-500 mb-1">{stats.techniciens}</div>
+              <div className="text-[11px] text-[#7d8590]">
                 {stats.en_cours} intervention{stats.en_cours > 1 ? 's' : ''} en cours
               </div>
             </Link>
@@ -237,24 +245,32 @@ export default function ManagerDashboard() {
 
           {/* Barre IA suggestion */}
           {suggestion && !loading && (
-            <div style={{ background: 'rgba(37,99,235,0.08)', border: '1px solid rgba(37,99,235,0.25)', borderRadius: 14, padding: '14px', marginBottom: 12 }}>
-              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 12 }}>
-                <span style={{ fontSize: 20, flexShrink: 0 }}>🤖</span>
-                <div style={{ fontSize: 13, lineHeight: 1.5 }}>
+            <div className="bg-blue-500/8 border border-blue-500/25 rounded-[14px] p-3.5 mb-3">
+              <div className="flex gap-2.5 items-start mb-3">
+                <span className="text-[20px] shrink-0">🤖</span>
+                <div className="text-[13px] leading-relaxed text-[#7d8590]">
                   Je suggère d&apos;assigner{' '}
-                  <strong style={{ color: 'var(--text-primary)' }}>{suggestion.tech?.prenom} {suggestion.tech?.nom}</strong>
+                  <strong className="text-[#e6edf3]">{suggestion.tech?.prenom} {suggestion.tech?.nom}</strong>
                   {' '}au ticket urgent :{' '}
-                  <span style={{ color: 'var(--text-secondary)' }}>&quot;{suggestion.ticket?.titre}&quot;</span>
+                  <span>&quot;{suggestion.ticket?.titre}&quot;</span>
                   {suggestion.ticket?.machines && (
-                    <span style={{ color: 'var(--text-secondary)' }}> — {(suggestion.ticket.machines as { nom: string }).nom}</span>
+                    <span> — {(suggestion.ticket.machines as { nom: string }).nom}</span>
                   )}
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={applySuggestion} disabled={applyingSuggestion} style={{ flex: 1, background: '#2563eb', border: 'none', borderRadius: 8, padding: '9px', color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: applyingSuggestion ? 0.7 : 1 }}>
+              <div className="flex gap-2">
+                <button
+                  onClick={applySuggestion}
+                  disabled={applyingSuggestion}
+                  className="flex-1 bg-blue-600 border-none rounded-lg py-2 text-white text-[13px] font-bold cursor-pointer"
+                  style={{ opacity: applyingSuggestion ? 0.7 : 1 }}
+                >
                   {applyingSuggestion ? 'Assignation...' : '✓ Assigner'}
                 </button>
-                <button onClick={() => setSuggestion(null)} style={{ padding: '9px 14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-secondary)', fontSize: 13, cursor: 'pointer' }}>
+                <button
+                  onClick={() => setSuggestion(null)}
+                  className="px-3.5 py-2 bg-[#1c2128] border border-[#30363d] rounded-lg text-[#7d8590] text-[13px] cursor-pointer"
+                >
                   Ignorer
                 </button>
               </div>
@@ -262,130 +278,148 @@ export default function ManagerDashboard() {
           )}
 
           {/* Stocks + Rapports IA */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-            <Link href="/manager/stocks" style={{ background: 'var(--bg-card)', border: `1px solid ${stats.stockAlertes > 0 ? '#f59e0b44' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+          <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+            <Link
+              href="/manager/stocks"
+              className="bg-[#1c2128] rounded-[14px] p-3.5 no-underline text-inherit"
+              style={{ border: `1px solid ${stats.stockAlertes > 0 ? '#f59e0b44' : '#30363d'}` }}
+            >
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <Package size={14} color="#f59e0b" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b' }}>Stocks</span>
+                <span className="text-[12px] font-bold text-amber-500">Stocks</span>
               </div>
               {stats.stockAlertes > 0
-                ? <><div style={{ fontSize: 24, fontWeight: 800, color: '#f59e0b', marginBottom: 2 }}>{stats.stockAlertes}</div><div style={{ fontSize: 11, color: '#f59e0b' }}>rupture{stats.stockAlertes > 1 ? 's' : ''} détectée{stats.stockAlertes > 1 ? 's' : ''}</div></>
-                : <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>Niveaux OK</div>
+                ? <><div className="text-[24px] font-extrabold text-amber-500 mb-0.5">{stats.stockAlertes}</div><div className="text-[11px] text-amber-500">rupture{stats.stockAlertes > 1 ? 's' : ''} détectée{stats.stockAlertes > 1 ? 's' : ''}</div></>
+                : <div className="text-[11px] text-[#7d8590] mt-1">Niveaux OK</div>
               }
             </Link>
-            <Link href="/manager/rapports" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+            <Link href="/manager/rapports" className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-3.5 no-underline text-inherit">
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <BarChart3 size={14} color="#22c55e" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#22c55e' }}>Rapports IA</span>
+                <span className="text-[12px] font-bold text-green-500">Rapports IA</span>
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Analyses & recommandations</div>
+              <div className="text-[11px] text-[#7d8590]">Analyses & recommandations</div>
             </Link>
           </div>
 
           {/* Préventif + Chat IA */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-            <Link href="/manager/preventif" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+          <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+            <Link href="/manager/preventif" className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-3.5 no-underline text-inherit">
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <CheckCircle size={14} color="#06b6d4" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#06b6d4' }}>Préventif</span>
+                <span className="text-[12px] font-bold text-cyan-500">Préventif</span>
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Plans maintenance</div>
+              <div className="text-[11px] text-[#7d8590]">Plans maintenance</div>
             </Link>
-            <Link href="/manager/chat" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+            <Link href="/manager/chat" className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-3.5 no-underline text-inherit">
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <MessageCircle size={14} color="#0ea5e9" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#0ea5e9' }}>Chat IA</span>
+                <span className="text-[12px] font-bold text-sky-500">Chat IA</span>
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Copilote assistant</div>
+              <div className="text-[11px] text-[#7d8590]">Copilote assistant</div>
             </Link>
           </div>
 
           {/* Pannes récurrentes + Amélioratif */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-            <Link href="/manager/recurrentes" style={{ background: nbPannesRecurrentes > 0 ? '#ef444412' : 'var(--bg-card)', border: `1px solid ${nbPannesRecurrentes > 0 ? '#ef444433' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+          <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+            <Link
+              href="/manager/recurrentes"
+              className="rounded-[14px] p-3.5 no-underline text-inherit"
+              style={{ background: nbPannesRecurrentes > 0 ? '#ef444412' : '#1c2128', border: `1px solid ${nbPannesRecurrentes > 0 ? '#ef444433' : '#30363d'}` }}
+            >
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <Repeat2 size={14} color="#ef4444" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#ef4444' }}>Récurrentes</span>
+                <span className="text-[12px] font-bold text-red-500">Récurrentes</span>
               </div>
-              <div style={{ fontSize: 20, fontWeight: 800, color: nbPannesRecurrentes > 0 ? '#ef4444' : 'var(--text-secondary)' }}>{nbPannesRecurrentes}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>machine{nbPannesRecurrentes > 1 ? 's' : ''} à risque</div>
+              <div className="text-[20px] font-extrabold" style={{ color: nbPannesRecurrentes > 0 ? '#ef4444' : '#7d8590' }}>{nbPannesRecurrentes}</div>
+              <div className="text-[11px] text-[#7d8590] mt-0.5">machine{nbPannesRecurrentes > 1 ? 's' : ''} à risque</div>
             </Link>
-            <Link href="/manager/amelioratif" style={{ background: nbAmelioratifs > 0 ? '#7c3aed12' : 'var(--bg-card)', border: `1px solid ${nbAmelioratifs > 0 ? '#7c3aed33' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+            <Link
+              href="/manager/amelioratif"
+              className="rounded-[14px] p-3.5 no-underline text-inherit"
+              style={{ background: nbAmelioratifs > 0 ? '#7c3aed12' : '#1c2128', border: `1px solid ${nbAmelioratifs > 0 ? '#7c3aed33' : '#30363d'}` }}
+            >
+              <div className="flex items-center gap-1.5 mb-2.5">
                 <Sparkles size={14} color="#7c3aed" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed' }}>Amélioratif</span>
+                <span className="text-[12px] font-bold text-violet-600">Amélioratif</span>
               </div>
-              <div style={{ fontSize: 20, fontWeight: 800, color: nbAmelioratifs > 0 ? '#7c3aed' : 'var(--text-secondary)' }}>{nbAmelioratifs}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>en cours</div>
+              <div className="text-[20px] font-extrabold" style={{ color: nbAmelioratifs > 0 ? '#7c3aed' : '#7d8590' }}>{nbAmelioratifs}</div>
+              <div className="text-[11px] text-[#7d8590] mt-0.5">en cours</div>
             </Link>
           </div>
 
           {/* Techniciens */}
-          <div style={{ marginBottom: 10 }}>
-            <Link href="/manager/technicians" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit', display: 'block' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div className="mb-2.5">
+            <Link href="/manager/technicians" className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-3.5 no-underline text-inherit block">
+              <div className="flex items-center gap-1.5">
                 <HardHat size={14} color="#2563eb" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb' }}>Gérer les techniciens</span>
+                <span className="text-[12px] font-bold text-blue-500">Gérer les techniciens</span>
               </div>
             </Link>
           </div>
 
           {/* Nouveau ticket */}
-          <div style={{ marginBottom: 10 }}>
-            <Link href="/manager/nouveau" style={{ background: '#10b98112', border: '1px solid #10b98133', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit', display: 'block' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div className="mb-2.5">
+            <Link href="/manager/nouveau" className="bg-emerald-500/8 border border-emerald-500/20 rounded-[14px] p-3.5 no-underline text-inherit block">
+              <div className="flex items-center gap-1.5">
                 <PlusCircle size={14} color="#10b981" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#10b981' }}>Nouveau ticket</span>
-                <span style={{ marginLeft: 'auto', fontSize: 13, color: '#10b981', fontWeight: 700 }}>+ Créer</span>
+                <span className="text-[12px] font-bold text-emerald-500">Nouveau ticket</span>
+                <span className="ml-auto text-[13px] text-emerald-500 font-bold">+ Créer</span>
               </div>
             </Link>
           </div>
 
           {/* Notifications */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', marginBottom: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+          <div className="bg-[#1c2128] border border-[#30363d] rounded-[14px] p-3.5 mb-2.5">
+            <div className="flex items-center gap-1.5 mb-2">
               <Bell size={14} color="#2563eb" />
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb' }}>Notifications push</span>
+              <span className="text-[12px] font-bold text-blue-500">Notifications push</span>
             </div>
             <PushNotifSetup role="manager" fullCard={false} />
           </div>
 
           {/* Déconnexion */}
-          <button onClick={handleLogout} style={{ width: '100%', marginTop: 20, padding: '14px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--text-secondary)', fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <button
+            onClick={handleLogout}
+            className="w-full mt-5 py-3.5 bg-transparent border border-[#30363d] rounded-xl text-[#7d8590] text-[14px] cursor-pointer flex items-center justify-center gap-2"
+          >
             <LogOut size={16} /> Déconnexion
           </button>
         </div>
       </div>
 
       {/* ===== VUE DESKTOP : Dashboard classique ===== */}
-      <div className="mgr-desktop-home" style={{ padding: '28px 32px' }}>
-        <div style={{ marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="mgr-desktop-home px-8 py-7">
+        <div className="mb-7 flex justify-between items-start">
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Tableau de bord</h1>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+            <h1 className="text-[22px] font-extrabold mb-1">Tableau de bord</h1>
+            <div className="text-[13px] text-[#7d8590]">
               {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span className="mgr-refresh-info" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+          <div className="flex items-center gap-2.5">
+            <span className="mgr-refresh-info text-[12px] text-[#7d8590]">
               Mis à jour à {lastRefresh.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </span>
-            <button onClick={load} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <button
+              onClick={load}
+              className="bg-[#1c2128] border border-[#30363d] rounded-lg px-3 py-1.5 cursor-pointer text-[#7d8590] text-[12px] flex items-center gap-1.5"
+            >
               <Activity size={13} /> Rafraîchir
             </button>
           </div>
         </div>
 
         {!loading && stats.stockAlertes > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 12, padding: '14px 18px', marginBottom: 20 }}>
+          <div className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/30 rounded-xl px-[18px] py-3.5 mb-5">
             <ShoppingCart size={20} color="#f59e0b" />
             <div>
-              <span style={{ fontWeight: 700, color: '#f59e0b' }}>{stats.stockAlertes} pièce{stats.stockAlertes > 1 ? 's' : ''} en rupture</span>
-              <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}> — stock sous le seuil minimum</span>
+              <span className="font-bold text-amber-500">{stats.stockAlertes} pièce{stats.stockAlertes > 1 ? 's' : ''} en rupture</span>
+              <span className="text-[#7d8590] text-[13px]"> — stock sous le seuil minimum</span>
             </div>
           </div>
         )}
-        {loading ? <div style={{ color: 'var(--text-secondary)' }}>Chargement...</div> : (
+        {loading ? <div className="text-[#7d8590]">Chargement...</div> : (
           <>
             <div className="mgr-grid-4">
               <StatCard label="Tickets ouverts" value={stats.ouverts}  icon={Clock}         color="#2563eb" href="/manager/tickets?filtre=ouvert" />
@@ -397,29 +431,29 @@ export default function ManagerDashboard() {
               <StatCard label="Machines actives" value={stats.machines}    icon={Wrench}      color="#7c3aed" />
               <StatCard label="Techniciens"       value={stats.techniciens} icon={CheckCircle} color="#06b6d4" />
             </div>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 700, fontSize: 14 }}>Tickets récents</div>
+            <div className="bg-[#1c2128] border border-[#30363d] rounded-[14px] overflow-hidden">
+              <div className="px-5 py-4 border-b border-[#30363d] font-bold text-[14px]">Tickets récents</div>
               <div className="mgr-table-wrap">
-                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
+                <table className="w-full border-collapse" style={{ minWidth: 500 }}>
                   <thead>
-                    <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    <tr className="border-b border-[#30363d]">
                       {['Titre', 'Machine', 'Priorité', 'Statut', 'Date'].map(h => (
-                        <th key={h} style={{ padding: '10px 20px', textAlign: 'left', fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</th>
+                        <th key={h} className="px-5 py-2.5 text-left text-[11px] text-[#7d8590] font-semibold uppercase tracking-[0.5px]">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {recents.map((t, i) => (
-                      <tr key={t.id} style={{ borderBottom: i < recents.length - 1 ? '1px solid var(--border)' : 'none' }}>
-                        <td style={{ padding: '12px 20px', fontSize: 13, fontWeight: 500, maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titre}</td>
-                        <td style={{ padding: '12px 20px', fontSize: 13, color: 'var(--text-secondary)' }}>{t.machines?.nom || '—'}</td>
-                        <td style={{ padding: '12px 20px' }}>
-                          <span style={{ background: `${prioriteColor[t.priorite]}22`, color: prioriteColor[t.priorite], border: `1px solid ${prioriteColor[t.priorite]}44`, borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600, textTransform: 'uppercase' }}>{t.priorite}</span>
+                      <tr key={t.id} style={{ borderBottom: i < recents.length - 1 ? '1px solid #30363d' : 'none' }}>
+                        <td className="px-5 py-3 text-[13px] font-medium max-w-[220px] overflow-hidden text-ellipsis whitespace-nowrap">{t.titre}</td>
+                        <td className="px-5 py-3 text-[13px] text-[#7d8590]">{t.machines?.nom || '—'}</td>
+                        <td className="px-5 py-3">
+                          <span className="rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase" style={{ background: `${prioriteColor[t.priorite]}22`, color: prioriteColor[t.priorite], border: `1px solid ${prioriteColor[t.priorite]}44` }}>{t.priorite}</span>
                         </td>
-                        <td style={{ padding: '12px 20px' }}>
-                          <span style={{ background: t.statut === 'resolu' ? '#22c55e22' : t.statut === 'en_cours' ? '#f59e0b22' : '#2563eb22', color: t.statut === 'resolu' ? '#22c55e' : t.statut === 'en_cours' ? '#f59e0b' : '#2563eb', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600, textTransform: 'capitalize' }}>{t.statut.replace('_', ' ')}</span>
+                        <td className="px-5 py-3">
+                          <span className="rounded-md px-2 py-0.5 text-[11px] font-semibold capitalize" style={{ background: t.statut === 'resolu' ? '#22c55e22' : t.statut === 'en_cours' ? '#f59e0b22' : '#2563eb22', color: t.statut === 'resolu' ? '#22c55e' : t.statut === 'en_cours' ? '#f59e0b' : '#2563eb' }}>{t.statut.replace('_', ' ')}</span>
                         </td>
-                        <td style={{ padding: '12px 20px', fontSize: 12, color: 'var(--text-secondary)' }}>{formatDate(t.created_at)}</td>
+                        <td className="px-5 py-3 text-[12px] text-[#7d8590]">{formatDate(t.created_at)}</td>
                       </tr>
                     ))}
                   </tbody>

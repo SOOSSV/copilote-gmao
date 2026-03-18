@@ -43,63 +43,72 @@ export default function AmelioratifPage() {
   }
 
   return (
-    <div style={{ padding: '16px', paddingBottom: 32 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}>
+    <div className="p-4 pb-8">
+      <div className="flex items-center gap-3 mb-5">
+        <button onClick={() => router.back()} className="bg-transparent border-none cursor-pointer text-[#7d8590] p-1 flex items-center">
           <ArrowLeft size={22} />
         </button>
-        <div style={{ flex: 1 }}>
-          <h1 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: '#7c3aed' }}>Amélioratif</h1>
-          <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{tickets.length} intervention{tickets.length > 1 ? 's' : ''} au total</div>
+        <div className="flex-1">
+          <h1 className="text-[18px] font-extrabold m-0 text-violet-600">Amélioratif</h1>
+          <div className="text-[12px] text-[#7d8590]">{tickets.length} intervention{tickets.length > 1 ? 's' : ''} au total</div>
         </div>
-        <button onClick={load} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <button
+          onClick={load}
+          className="bg-[#1c2128] border border-[#30363d] rounded-lg px-3 py-1.5 cursor-pointer text-[#7d8590] text-[12px] flex items-center gap-1.5"
+        >
           <RefreshCw size={13} /> Actualiser
         </button>
       </div>
 
       {/* Filtres statut */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+      <div className="flex gap-1.5 mb-4">
         {(['tous', 'ouvert', 'en_cours', 'resolu'] as const).map(f => (
-          <button key={f} onClick={() => setFiltre(f)} style={{
-            padding: '6px 12px', borderRadius: 8, border: '1px solid', whiteSpace: 'nowrap', flexShrink: 0,
-            borderColor: filtre === f ? '#7c3aed' : 'var(--border)',
-            background: filtre === f ? '#7c3aed' : 'var(--bg-card)',
-            color: filtre === f ? 'white' : 'var(--text-secondary)',
-            fontSize: 12, fontWeight: 600, cursor: 'pointer',
-          }}>
+          <button
+            key={f}
+            onClick={() => setFiltre(f)}
+            className="px-3 py-1.5 rounded-lg border whitespace-nowrap shrink-0 text-[12px] font-semibold cursor-pointer transition-all"
+            style={{
+              borderColor: filtre === f ? '#7c3aed' : '#30363d',
+              background: filtre === f ? '#7c3aed' : '#1c2128',
+              color: filtre === f ? 'white' : '#7d8590',
+            }}
+          >
             {f === 'tous' ? 'Tous' : f === 'en_cours' ? 'En cours' : f.charAt(0).toUpperCase() + f.slice(1)}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <div style={{ color: 'var(--text-secondary)', padding: 32, textAlign: 'center' }}>Chargement...</div>
+        <div className="text-[#7d8590] py-8 text-center">Chargement...</div>
       ) : filtered.length === 0 ? (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '32px 16px', textAlign: 'center' }}>
-          <Sparkles size={32} color="#7c3aed" style={{ marginBottom: 12 }} />
-          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>Aucune intervention améliorative</div>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Créez un ticket de type "Amélioratif" pour suivre les upgrades machines.</div>
+        <div className="bg-[#1c2128] border border-[#30363d] rounded-[14px] px-4 py-8 text-center">
+          <Sparkles size={32} color="#7c3aed" className="mx-auto mb-3" />
+          <div className="text-[15px] font-bold mb-1.5">Aucune intervention améliorative</div>
+          <div className="text-[13px] text-[#7d8590]">Créez un ticket de type &quot;Amélioratif&quot; pour suivre les upgrades machines.</div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div className="flex flex-col gap-2.5">
           {filtered.map(t => (
-            <Link key={t.id} href={`/manager/tickets/${t.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ background: 'var(--bg-card)', border: '1px solid #7c3aed33', borderRadius: 12, padding: '14px 16px' }}>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6, lineHeight: 1.4 }}>{t.titre}</div>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+            <Link key={t.id} href={`/manager/tickets/${t.id}`} className="no-underline text-inherit">
+              <div className="bg-[#1c2128] border border-violet-600/20 rounded-xl px-4 py-3.5">
+                <div className="text-[13px] font-bold mb-1.5 leading-snug">{t.titre}</div>
+                <div className="flex gap-2 items-center flex-wrap">
+                  <span className="text-[11px] text-[#7d8590]">
                     {(t.machines as unknown as { nom: string } | null)?.nom || '—'}
                   </span>
                   {t.technicians && (
-                    <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+                    <span className="text-[11px] text-[#7d8590]">
                       · {(t.technicians as unknown as { prenom: string }).prenom}
                     </span>
                   )}
                   <PrioriteBadge priorite={t.priorite} />
-                  <span style={{ background: `${statutColor[t.statut]}22`, color: statutColor[t.statut], borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }}>
+                  <span
+                    className="rounded-md px-2 py-0.5 text-[11px] font-semibold"
+                    style={{ background: `${statutColor[t.statut]}22`, color: statutColor[t.statut] }}
+                  >
                     {statutLabel[t.statut]}
                   </span>
-                  <span style={{ fontSize: 11, color: 'var(--text-secondary)', marginLeft: 'auto' }}>{formatDate(t.created_at)}</span>
+                  <span className="text-[11px] text-[#7d8590] ml-auto">{formatDate(t.created_at)}</span>
                 </div>
               </div>
             </Link>

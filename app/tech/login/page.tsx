@@ -76,33 +76,44 @@ export default function TechLoginPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', padding: 20 }}>
-      <div style={{ width: '100%', maxWidth: 380, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '36px 32px' }}>
-        <button onClick={() => step !== 'select' ? (setStep('select'), setError('')) : router.push('/')}
-          style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: 13, cursor: 'pointer', padding: '0 0 20px', marginLeft: -4 }}>
+    <div className="min-h-screen flex items-center justify-center bg-[#0d1117] p-5">
+      <div className="w-full max-w-[380px] bg-[#1c2128] border border-[#30363d] rounded-[20px] px-8 py-9">
+        <button
+          onClick={() => step !== 'select' ? (setStep('select'), setError('')) : router.push('/')}
+          className="flex items-center gap-1.5 bg-transparent border-none text-[#7d8590] text-[13px] cursor-pointer pb-5 -ml-1"
+        >
           <ArrowLeft size={15} /> {step !== 'select' ? 'Retour' : 'Accueil'}
         </button>
 
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'linear-gradient(135deg, #22c55e, #16a34a)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+        <div className="text-center mb-8">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center mx-auto mb-3.5">
             <HardHat size={28} color="white" />
           </div>
-          <div style={{ fontSize: 22, fontWeight: 800, background: 'linear-gradient(135deg, #22c55e, #16a34a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>COPILOTE</div>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>Espace Technicien</div>
+          <div className="text-[22px] font-extrabold bg-gradient-to-br from-green-500 to-green-700 bg-clip-text text-transparent">COPILOTE</div>
+          <div className="text-[13px] text-[#7d8590] mt-1">Espace Technicien</div>
         </div>
 
         {step === 'select' && (
           <>
-            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: 8 }}>Qui êtes-vous ?</label>
-            <select value={selectedId} onChange={e => setSelectedId(e.target.value)} autoFocus
-              style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 16px', color: selectedId ? 'var(--text-primary)' : 'var(--text-secondary)', fontSize: 15, outline: 'none', fontFamily: 'inherit', marginBottom: 16, cursor: 'pointer' }}>
+            <label className="block text-[12px] font-semibold text-[#7d8590] uppercase tracking-[0.5px] mb-2">
+              Qui êtes-vous ?
+            </label>
+            <select
+              value={selectedId}
+              onChange={e => setSelectedId(e.target.value)}
+              autoFocus
+              className="w-full bg-[#161b22] border border-[#30363d] rounded-[10px] px-4 py-3 text-[15px] outline-none font-[inherit] mb-4 cursor-pointer text-[#e6edf3]"
+            >
               <option value="">— Sélectionner votre nom —</option>
               {technicians.map(t => (
                 <option key={t.id} value={t.id}>{t.prenom} {t.nom}</option>
               ))}
             </select>
-            <button onClick={handleSelect} disabled={!selectedId}
-              style={{ width: '100%', padding: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: selectedId ? 'linear-gradient(135deg, #22c55e, #16a34a)' : 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 12, color: selectedId ? 'white' : 'var(--text-secondary)', fontSize: 15, fontWeight: 700, cursor: selectedId ? 'pointer' : 'default' }}>
+            <button
+              onClick={handleSelect}
+              disabled={!selectedId}
+              className={`w-full py-3 flex items-center justify-center gap-2 border border-[#30363d] rounded-xl text-[15px] font-bold cursor-pointer transition-all ${selectedId ? 'bg-gradient-to-br from-green-500 to-green-700 text-white' : 'bg-[#161b22] text-[#7d8590]'}`}
+            >
               Continuer <ArrowRight size={16} />
             </button>
           </>
@@ -110,22 +121,37 @@ export default function TechLoginPage() {
 
         {step === 'pin' && (
           <>
-            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
+            <div className="text-[15px] font-bold text-[#e6edf3] mb-1">
               Bonjour, {selected?.prenom} 👋
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>Entrez votre PIN à 4 chiffres</div>
-            <div style={{ position: 'relative', marginBottom: 16 }}>
-              <input type={showPin ? 'text' : 'password'} value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+            <div className="text-[13px] text-[#7d8590] mb-5">Entrez votre PIN à 4 chiffres</div>
+            <div className="relative mb-4">
+              <input
+                type={showPin ? 'text' : 'password'}
+                value={pin}
+                onChange={e => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
                 onKeyDown={e => e.key === 'Enter' && pin.length === 4 && handleLogin()}
-                placeholder="••••" maxLength={4} autoFocus inputMode="numeric"
-                style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 44px 12px 16px', color: 'var(--text-primary)', fontSize: 22, letterSpacing: 8, outline: 'none', fontFamily: 'inherit' }} />
-              <button onClick={() => setShowPin(!showPin)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 4 }}>
+                placeholder="••••"
+                maxLength={4}
+                autoFocus
+                inputMode="numeric"
+                className="w-full bg-[#161b22] border border-[#30363d] rounded-[10px] pl-4 pr-11 py-3 text-[#e6edf3] text-[22px] tracking-[8px] outline-none font-[inherit] box-border"
+              />
+              <button
+                onClick={() => setShowPin(!showPin)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none text-[#7d8590] cursor-pointer p-1"
+              >
                 {showPin ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-            {error && <div style={{ color: '#ef4444', fontSize: 13, marginBottom: 12, padding: '8px 12px', background: '#ef444410', borderRadius: 8 }}>{error}</div>}
-            <button onClick={handleLogin} disabled={pin.length !== 4 || loading}
-              style={{ width: '100%', padding: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: pin.length === 4 ? 'linear-gradient(135deg, #22c55e, #16a34a)' : 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 12, color: pin.length === 4 ? 'white' : 'var(--text-secondary)', fontSize: 15, fontWeight: 700, cursor: pin.length === 4 ? 'pointer' : 'default' }}>
+            {error && (
+              <div className="text-red-500 text-[13px] mb-3 px-3 py-2 bg-red-500/10 rounded-lg">{error}</div>
+            )}
+            <button
+              onClick={handleLogin}
+              disabled={pin.length !== 4 || loading}
+              className={`w-full py-3 flex items-center justify-center gap-2 border border-[#30363d] rounded-xl text-[15px] font-bold cursor-pointer transition-all ${pin.length === 4 ? 'bg-gradient-to-br from-green-500 to-green-700 text-white' : 'bg-[#161b22] text-[#7d8590]'}`}
+            >
               {loading ? 'Connexion...' : 'Accéder'} <ArrowRight size={16} />
             </button>
           </>
@@ -133,27 +159,52 @@ export default function TechLoginPage() {
 
         {step === 'create_pin' && (
           <>
-            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
+            <div className="text-[15px] font-bold text-[#e6edf3] mb-1">
               Bienvenue, {selected?.prenom} !
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>Première connexion — choisissez votre PIN à 4 chiffres</div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: 8 }}>Votre PIN</label>
-            <div style={{ position: 'relative', marginBottom: 12 }}>
-              <input type={showPin ? 'text' : 'password'} value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                placeholder="••••" maxLength={4} autoFocus inputMode="numeric"
-                style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 44px 12px 16px', color: 'var(--text-primary)', fontSize: 22, letterSpacing: 8, outline: 'none', fontFamily: 'inherit' }} />
-              <button onClick={() => setShowPin(!showPin)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 4 }}>
+            <div className="text-[13px] text-[#7d8590] mb-5">Première connexion — choisissez votre PIN à 4 chiffres</div>
+            <label className="block text-[12px] font-semibold text-[#7d8590] uppercase tracking-[0.5px] mb-2">
+              Votre PIN
+            </label>
+            <div className="relative mb-3">
+              <input
+                type={showPin ? 'text' : 'password'}
+                value={pin}
+                onChange={e => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                placeholder="••••"
+                maxLength={4}
+                autoFocus
+                inputMode="numeric"
+                className="w-full bg-[#161b22] border border-[#30363d] rounded-[10px] pl-4 pr-11 py-3 text-[#e6edf3] text-[22px] tracking-[8px] outline-none font-[inherit] box-border"
+              />
+              <button
+                onClick={() => setShowPin(!showPin)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none text-[#7d8590] cursor-pointer p-1"
+              >
                 {showPin ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: 8 }}>Confirmer le PIN</label>
-            <input type={showPin ? 'text' : 'password'} value={confirmPin} onChange={e => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+            <label className="block text-[12px] font-semibold text-[#7d8590] uppercase tracking-[0.5px] mb-2">
+              Confirmer le PIN
+            </label>
+            <input
+              type={showPin ? 'text' : 'password'}
+              value={confirmPin}
+              onChange={e => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
               onKeyDown={e => e.key === 'Enter' && handleCreatePin()}
-              placeholder="••••" maxLength={4} inputMode="numeric"
-              style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 16px', color: 'var(--text-primary)', fontSize: 22, letterSpacing: 8, outline: 'none', fontFamily: 'inherit', marginBottom: 16 }} />
-            {error && <div style={{ color: '#ef4444', fontSize: 13, marginBottom: 12, padding: '8px 12px', background: '#ef444410', borderRadius: 8 }}>{error}</div>}
-            <button onClick={handleCreatePin} disabled={pin.length !== 4 || confirmPin.length !== 4 || loading}
-              style={{ width: '100%', padding: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: pin.length === 4 && confirmPin.length === 4 ? 'linear-gradient(135deg, #22c55e, #16a34a)' : 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 12, color: pin.length === 4 && confirmPin.length === 4 ? 'white' : 'var(--text-secondary)', fontSize: 15, fontWeight: 700, cursor: pin.length === 4 && confirmPin.length === 4 ? 'pointer' : 'default' }}>
+              placeholder="••••"
+              maxLength={4}
+              inputMode="numeric"
+              className="w-full bg-[#161b22] border border-[#30363d] rounded-[10px] px-4 py-3 text-[#e6edf3] text-[22px] tracking-[8px] outline-none font-[inherit] mb-4 box-border"
+            />
+            {error && (
+              <div className="text-red-500 text-[13px] mb-3 px-3 py-2 bg-red-500/10 rounded-lg">{error}</div>
+            )}
+            <button
+              onClick={handleCreatePin}
+              disabled={pin.length !== 4 || confirmPin.length !== 4 || loading}
+              className={`w-full py-3 flex items-center justify-center gap-2 border border-[#30363d] rounded-xl text-[15px] font-bold cursor-pointer transition-all ${pin.length === 4 && confirmPin.length === 4 ? 'bg-gradient-to-br from-green-500 to-green-700 text-white' : 'bg-[#161b22] text-[#7d8590]'}`}
+            >
               {loading ? 'Création...' : 'Créer mon PIN'} <ArrowRight size={16} />
             </button>
           </>
