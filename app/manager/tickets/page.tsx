@@ -127,37 +127,31 @@ export default function ManagerTicketsPage() {
         <>
           {/* Vue mobile : cartes */}
           <div className="tickets-mobile">
-            {filtered.map(t => (
-              <Link key={t.id} href={`/manager/tickets/${t.id}`} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 7, padding: '6px 8px', marginBottom: 5, overflow: 'hidden', minWidth: 0, display: 'block', textDecoration: 'none', color: 'inherit' }}>
-                {(() => {
-                  const machineNom = (t.machines as { nom: string } | null)?.nom;
-                  const count = machineNom ? recurrenceMap.get(machineNom) || 0 : 0;
-                  return count >= 2 ? (
-                    <div style={{ fontSize: 10, color: '#f59e0b', fontWeight: 700, marginBottom: 3 }}>
-                      ⚠️ {count} pannes en 24h sur cette machine
+            {filtered.map(t => {
+              const machineNom = (t.machines as { nom: string } | null)?.nom;
+              const count = machineNom ? recurrenceMap.get(machineNom) || 0 : 0;
+              return (
+                <div key={t.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 12px', marginBottom: 8 }}>
+                  {count >= 2 && <div style={{ fontSize: 10, color: '#f59e0b', fontWeight: 700, marginBottom: 4 }}>⚠️ {count} pannes en 24h</div>}
+                  <Link href={`/manager/tickets/${t.id}`} style={{ display: 'block', textDecoration: 'none', color: 'inherit', marginBottom: 8 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titre}</div>
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
+                      <span style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{machineNom || '—'} · {(t.technicians as { prenom: string } | null)?.prenom || '—'}</span>
+                      <TypeBadge type={t.type_intervention} />
+                      <PrioriteBadge priorite={t.priorite} />
+                      <span style={{ fontSize: 10, color: 'var(--text-secondary)', marginLeft: 'auto' }}>{formatDate(t.created_at)}</span>
                     </div>
-                  ) : null;
-                })()}
-                <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titre}</div>
-                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 5, alignItems: 'center' }}>
-                  <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{(t.machines as { nom: string } | null)?.nom || '—'} · {(t.technicians as { prenom: string } | null)?.prenom || '—'}</span>
-                  <TypeBadge type={t.type_intervention} />
-                  <PrioriteBadge priorite={t.priorite} />
-                  <span style={{ background: `${statutColor[t.statut]}22`, color: statutColor[t.statut], borderRadius: 4, padding: '1px 5px', fontSize: 9, fontWeight: 600 }}>{statutLabel(t.statut)}</span>
-                  <span style={{ fontSize: 9, color: 'var(--text-secondary)', marginLeft: 'auto' }}>{formatDate(t.created_at)}</span>
+                  </Link>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    {(['ouvert', 'en_cours', 'resolu'] as const).map(s => (
+                      <button key={s} onClick={() => updateStatut(t.id, s)} style={{ flex: 1, padding: '6px 4px', borderRadius: 7, border: `1px solid ${t.statut === s ? statutColor[s] : 'var(--border)'}`, background: t.statut === s ? `${statutColor[s]}22` : 'transparent', color: t.statut === s ? statutColor[s] : 'var(--text-secondary)', fontSize: 10, fontWeight: t.statut === s ? 700 : 400, cursor: t.statut === s ? 'default' : 'pointer' }}>
+                        {statutLabel(s)}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <select
-                  value={t.statut}
-                  onChange={e => updateStatut(t.id, e.target.value)}
-                  style={{ width: '100%', maxWidth: '100%', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 5, padding: '4px 6px', color: 'var(--text-primary)', fontSize: 11, cursor: 'pointer', boxSizing: 'border-box' }}
-                  onClick={e => e.stopPropagation()}
-                >
-                  <option value="ouvert">Ouvert</option>
-                  <option value="en_cours">En cours</option>
-                  <option value="resolu">Résolu</option>
-                </select>
-              </Link>
-            ))}
+              );
+            })}
           </div>
 
           {/* Vue desktop : tableau */}
