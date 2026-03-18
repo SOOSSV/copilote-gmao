@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { AlertTriangle, CheckCircle, Clock, Wrench, TrendingUp, Activity, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut, Bell, Package, ShoppingCart } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, Wrench, TrendingUp, Activity, Ticket, Factory, Users, BarChart3, MessageCircle, PlusCircle, LogOut, Bell, Package, ShoppingCart, Repeat2, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import PushNotifSetup from '@/components/PushNotifSetup';
 
@@ -55,6 +55,8 @@ export default function ManagerDashboard() {
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
   const [applyingSuggestion, setApplyingSuggestion] = useState(false);
+  const [nbPannesRecurrentes, setNbPannesRecurrentes] = useState(0);
+  const [nbAmelioratifs, setNbAmelioratifs] = useState(0);
 
   async function load() {
     const [tickets, machines, techniciens, stocks] = await Promise.all([
@@ -82,6 +84,14 @@ export default function ManagerDashboard() {
       .select('id, titre, priorite, statut, created_at, machines(nom)')
       .order('created_at', { ascending: false }).limit(8);
     setRecents((r as unknown as TicketRecent[]) || []);
+
+    // Pannes récurrentes + Amélioratifs
+    const [{ data: pr }, { data: amelio }] = await Promise.all([
+      supabase.rpc('get_pannes_recurrentes', { seuil: 3, jours: 30 }),
+      supabase.from('tickets').select('id').eq('type_intervention', 'ameliorative').in('statut', ['ouvert', 'en_cours']),
+    ]);
+    setNbPannesRecurrentes((pr as unknown[])?.length || 0);
+    setNbAmelioratifs((amelio as unknown[])?.length || 0);
 
     // Suggestion IA : ticket urgent non assigné + tech le moins chargé
     const [{ data: ticketNA }, { data: techData }] = await Promise.all([
@@ -287,6 +297,26 @@ export default function ManagerDashboard() {
                 <span style={{ fontSize: 12, fontWeight: 700, color: '#0ea5e9' }}>Chat IA</span>
               </div>
               <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Copilote assistant</div>
+            </Link>
+          </div>
+
+          {/* Pannes récurrentes + Amélioratif */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+            <Link href="/manager/dashboard" style={{ background: nbPannesRecurrentes > 0 ? '#ef444412' : 'var(--bg-card)', border: `1px solid ${nbPannesRecurrentes > 0 ? '#ef444433' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <Repeat2 size={14} color="#ef4444" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#ef4444' }}>Récurrentes</span>
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: nbPannesRecurrentes > 0 ? '#ef4444' : 'var(--text-secondary)' }}>{nbPannesRecurrentes}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>machine{nbPannesRecurrentes > 1 ? 's' : ''} à risque</div>
+            </Link>
+            <Link href="/manager/tickets?filtre=ameliorative" style={{ background: nbAmelioratifs > 0 ? '#7c3aed12' : 'var(--bg-card)', border: `1px solid ${nbAmelioratifs > 0 ? '#7c3aed33' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <Sparkles size={14} color="#7c3aed" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed' }}>Amélioratif</span>
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: nbAmelioratifs > 0 ? '#7c3aed' : 'var(--text-secondary)' }}>{nbAmelioratifs}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>en cours</div>
             </Link>
           </div>
 

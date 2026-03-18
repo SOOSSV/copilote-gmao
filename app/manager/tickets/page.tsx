@@ -67,7 +67,7 @@ export default function ManagerTicketsPage() {
   const filtered = tickets.filter(t => {
     const matchSearch = t.titre.toLowerCase().includes(search.toLowerCase()) ||
       (t.machines as { nom: string } | undefined)?.nom?.toLowerCase().includes(search.toLowerCase());
-    const matchFiltre = filtre === 'tous' || t.statut === filtre || t.priorite === filtre;
+    const matchFiltre = filtre === 'tous' || t.statut === filtre || t.priorite === filtre || t.type_intervention === filtre;
     return matchSearch && matchFiltre;
   });
 
@@ -75,8 +75,8 @@ export default function ManagerTicketsPage() {
     return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
   }
 
-  const filtres = ['tous', 'ouvert', 'en_cours', 'resolu', 'urgente', 'haute'];
-  const filtreLabel = (f: string) => f === 'en_cours' ? 'En Cours' : f === 'resolu' ? 'Résolu' : f.charAt(0).toUpperCase() + f.slice(1);
+  const filtres = ['tous', 'ouvert', 'en_cours', 'resolu', 'urgente', 'haute', 'ameliorative'];
+  const filtreLabel = (f: string) => ({ tous: 'Tous', ouvert: 'Ouvert', en_cours: 'En cours', resolu: 'Résolu', urgente: 'Urgent', haute: 'Haute', ameliorative: '✦ Amélioratif' } as Record<string,string>)[f] ?? f;
 
   return (
     <div style={{ padding: '10px 8px', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
