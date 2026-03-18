@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Search, RefreshCw, ArrowLeft } from 'lucide-react';
+import TypeBadge from '@/components/TypeBadge';
 import { useRouter } from 'next/navigation';
 
 type Ticket = {
@@ -107,6 +108,7 @@ export default function DirecteurTicketsPage() {
                   <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titre}</div>
                   <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
                     <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{(t.machines as { nom: string } | null)?.nom || '—'} · {(t.technicians as { prenom: string } | null)?.prenom || '—'}</span>
+                    <TypeBadge type={t.type_intervention} />
                     <span style={{ background: `${pc}22`, color: pc, border: `1px solid ${pc}44`, borderRadius: 4, padding: '1px 5px', fontSize: 9, fontWeight: 700 }}>{t.priorite}</span>
                     <span style={{ background: `${sc}22`, color: sc, borderRadius: 4, padding: '1px 5px', fontSize: 9, fontWeight: 600 }}>{statutLabel(t.statut)}</span>
                     <span style={{ fontSize: 9, color: 'var(--text-secondary)', marginLeft: 'auto' }}>{formatDate(t.created_at)}</span>
@@ -141,6 +143,7 @@ export default function DirecteurTicketsPage() {
                       </td>
                       <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-secondary)' }}>{(t.machines as { nom: string } | null)?.nom || '—'}</td>
                       <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-secondary)' }}>{(t.technicians as { prenom: string } | null)?.prenom || '—'}</td>
+                      <td style={{ padding: '12px 16px' }}><TypeBadge type={t.type_intervention} /></td>
                       <td style={{ padding: '12px 16px' }}>
                         <span style={{ background: `${pc}22`, color: pc, border: `1px solid ${pc}44`, borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{t.priorite}</span>
                       </td>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { ArrowLeft, Wrench, MapPin, Calendar, AlertTriangle, CheckCircle, Clock, Package, Plus, X, Bot, Loader2 } from 'lucide-react';
+import TypeBadge from '@/components/TypeBadge';
 
 type Ticket = {
   id: string; titre: string; description: string; priorite: string;
@@ -99,7 +100,7 @@ export default function TechTicketDetail() {
         ticket_id: params.id,
         machine_id: await getMachineId(),
         technicien_id: techId,
-        type_action: ticket.type_intervention === 'preventive' ? 'inspection' : 'intervention',
+        type_action: ticket.type_intervention === 'preventive' ? 'inspection' : ticket.type_intervention === 'ameliorative' ? 'amelioration' : 'intervention',
         description: notes || ticket.description,
         pieces_changees: pieces.length > 0 ? pieces : [],
         observations: pieces.length > 0 ? `Pièces utilisées: ${pieces.map(p => `${p.quantite} ${p.unite} ${p.nom}`).join(', ')}` : null,
@@ -154,7 +155,7 @@ export default function TechTicketDetail() {
       {/* Badges */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
         <span style={{ background: `${pc}22`, color: pc, border: `1px solid ${pc}44`, borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>{ticket.priorite}</span>
-        <span style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, padding: '3px 10px', fontSize: 12, color: 'var(--text-secondary)' }}>{ticket.type_intervention === 'preventive' ? 'Préventif' : 'Correctif'}</span>
+        <TypeBadge type={ticket.type_intervention} />
       </div>
 
       {/* Description */}

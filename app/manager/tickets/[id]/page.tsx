@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { ArrowLeft, Wrench, MapPin, User, Calendar, AlertTriangle, CheckCircle, Clock, UserCheck, Bot, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import TypeBadge from '@/components/TypeBadge';
 
 type Ticket = {
   id: string;
@@ -149,9 +150,7 @@ export default function TicketDetailPage() {
         <span style={{ background: `${sColor}22`, color: sColor, border: `1px solid ${sColor}44`, borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>
           {ticket.statut === 'en_cours' ? 'En cours' : ticket.statut === 'resolu' ? 'Résolu' : 'Ouvert'}
         </span>
-        <span style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, padding: '3px 10px', fontSize: 12, color: 'var(--text-secondary)' }}>
-          {ticket.type_intervention === 'preventive' ? 'Préventif' : 'Correctif'}
-        </span>
+        <TypeBadge type={ticket.type_intervention} />
         {ticket.classification && (
           <span style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, padding: '3px 10px', fontSize: 12, color: 'var(--text-secondary)' }}>
             {ticket.classification}

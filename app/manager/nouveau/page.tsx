@@ -132,6 +132,7 @@ export default function NouveauTicketPage() {
             <select value={form.type_intervention} onChange={e => set('type_intervention', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
               <option value="corrective">Corrective</option>
               <option value="preventive">Préventive</option>
+              <option value="ameliorative">Améliorative</option>
             </select>
           </div>
           <div>

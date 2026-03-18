@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { supabase, Ticket } from '@/lib/supabase';
 import PrioriteBadge from '@/components/PrioriteBadge';
+import TypeBadge from '@/components/TypeBadge';
 import { Search, RefreshCw, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -140,6 +141,7 @@ export default function ManagerTicketsPage() {
                 <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titre}</div>
                 <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 5, alignItems: 'center' }}>
                   <span style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{(t.machines as { nom: string } | null)?.nom || '—'} · {(t.technicians as { prenom: string } | null)?.prenom || '—'}</span>
+                  <TypeBadge type={t.type_intervention} />
                   <PrioriteBadge priorite={t.priorite} />
                   <span style={{ background: `${statutColor[t.statut]}22`, color: statutColor[t.statut], borderRadius: 4, padding: '1px 5px', fontSize: 9, fontWeight: 600 }}>{statutLabel(t.statut)}</span>
                   <span style={{ fontSize: 9, color: 'var(--text-secondary)', marginLeft: 'auto' }}>{formatDate(t.created_at)}</span>
@@ -181,6 +183,7 @@ export default function ManagerTicketsPage() {
                     </td>
                     <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-secondary)' }}>{(t.machines as { nom: string } | null)?.nom || '—'}</td>
                     <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-secondary)' }}>{(t.technicians as { prenom: string; nom: string } | null)?.prenom || '—'}</td>
+                    <td style={{ padding: '12px 16px' }}><TypeBadge type={t.type_intervention} /></td>
                     <td style={{ padding: '12px 16px' }}><PrioriteBadge priorite={t.priorite} /></td>
                     <td style={{ padding: '12px 16px' }}>
                       <span style={{ background: `${statutColor[t.statut]}22`, color: statutColor[t.statut], borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }}>

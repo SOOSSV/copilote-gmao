@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { ArrowLeft, Wrench, MapPin, User, Calendar, Bot, Loader2 } from 'lucide-react';
+import TypeBadge from '@/components/TypeBadge';
 
 type Ticket = {
   id: string; titre: string; description: string; priorite: string; statut: string;
@@ -99,9 +100,7 @@ export default function DirecteurTicketDetailPage() {
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
         <span style={{ background: `${pc}22`, color: pc, border: `1px solid ${pc}44`, borderRadius: 6, padding: '4px 12px', fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>{ticket.priorite}</span>
         <span style={{ background: `${sc}22`, color: sc, border: `1px solid ${sc}44`, borderRadius: 6, padding: '4px 12px', fontSize: 12, fontWeight: 600 }}>{statutLabel}</span>
-        <span style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, padding: '4px 12px', fontSize: 12, color: 'var(--text-secondary)' }}>
-          {ticket.type_intervention === 'preventive' ? 'Préventif' : 'Correctif'}
-        </span>
+        <TypeBadge type={ticket.type_intervention} />
         {ticket.classification && (
           <span style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, padding: '4px 12px', fontSize: 12, color: 'var(--text-secondary)' }}>{ticket.classification}</span>
         )}

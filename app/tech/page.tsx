@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { AlertTriangle, Clock, CheckCircle, Wrench } from 'lucide-react';
+import TypeBadge from '@/components/TypeBadge';
 
 type Ticket = {
   id: string;
@@ -133,7 +134,10 @@ export default function TechDashboard() {
               <Link key={t.id} href={`/tech/tickets/${t.id}`} style={{ background: 'var(--bg-card)', border: `1px solid ${t.priorite === 'urgente' ? '#ef444433' : 'var(--border)'}`, borderRadius: 14, padding: '16px', textDecoration: 'none', display: 'block' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', flex: 1, paddingRight: 8 }}>{t.titre}</div>
-                  <span style={{ background: `${pc}22`, color: pc, border: `1px solid ${pc}44`, borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{t.priorite}</span>
+                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                    <TypeBadge type={t.type_intervention} />
+                    <span style={{ background: `${pc}22`, color: pc, border: `1px solid ${pc}44`, borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{t.priorite}</span>
+                  </div>
                 </div>
                 {t.machines && (
                   <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 8 }}>
