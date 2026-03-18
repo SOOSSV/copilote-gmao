@@ -147,82 +147,128 @@ export default function ChatPage() {
     });
   }
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg-primary)' }}>
-      {/* Header */}
-      <div style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-        <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <Bot size={18} color="white" />
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 700, fontSize: '14px' }}>
-            COPILOTE{prenom ? ` · ${prenom}` : ''}
-          </div>
-          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {current?.title || 'Nouvelle conversation'}
-          </div>
-        </div>
-        <button onClick={() => router.back()} title="Retour" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 6 }}>
-          <ArrowLeft size={18} />
-        </button>
-        <button onClick={() => setShowHistory(true)} title="Historique" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 6 }}>
-          <Clock size={18} />
-        </button>
-        <button onClick={newConversation} title="Nouvelle conversation" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', padding: 6 }}>
-          <Plus size={18} />
-        </button>
-      </div>
-
-      {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px', paddingBottom: '140px' }}>
-        {messages.map(msg => (
-          <div key={msg.id} style={{ display: 'flex', flexDirection: msg.role === 'user' ? 'row-reverse' : 'row', gap: '8px', alignItems: 'flex-end' }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: msg.role === 'assistant' ? 'var(--accent)' : 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {msg.role === 'assistant' ? <Bot size={14} color="white" /> : <User size={14} color="var(--text-secondary)" />}
+  // Sous-composant liste des sessions (réutilisé dans sidebar et drawer)
+  function SessionList() {
+    return (
+      <div style={{ flex: 1, overflowY: 'auto', padding: '8px' }}>
+        {sessions.map(s => (
+          <div key={s.id} onClick={() => switchSession(s.id)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 10, marginBottom: 3, cursor: 'pointer', background: s.id === currentId ? 'rgba(99,102,241,0.15)' : 'transparent', border: `1px solid ${s.id === currentId ? 'rgba(99,102,241,0.4)' : 'transparent'}` }}>
+            <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <MessageCircle size={13} color={s.id === currentId ? 'var(--accent)' : 'var(--text-secondary)'} />
             </div>
-            <div style={{ maxWidth: '78%' }}>
-              <div style={{ background: msg.role === 'assistant' ? 'var(--bg-card)' : 'var(--accent)', border: msg.role === 'assistant' ? '1px solid var(--border)' : 'none', borderRadius: msg.role === 'assistant' ? '14px 14px 14px 4px' : '14px 14px 4px 14px', padding: '10px 13px', fontSize: '14px', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
-                {msg.content}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: s.id === currentId ? 600 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: s.id === currentId ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                {s.title}
               </div>
-              <div style={{ fontSize: '10px', color: 'var(--text-secondary)', marginTop: 3, textAlign: msg.role === 'user' ? 'right' : 'left' }}>
-                {formatDate(msg.timestamp)}
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
+                {formatDate(s.createdAt)} · {s.messages.length} msg
               </div>
             </div>
+            <button onClick={e => { e.stopPropagation(); deleteSession(s.id); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, flexShrink: 0, opacity: 0.5 }}>
+              <Trash2 size={13} />
+            </button>
           </div>
         ))}
-        {messages.length === 1 && !loading && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, paddingLeft: 36 }}>
-            {['Bruit anormal sur une machine', 'Panne électrique', 'Fuite hydraulique', 'Vibrations anormales'].map(s => (
-              <button key={s} onClick={() => setInput(s)} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '6px 13px', fontSize: 13, color: 'var(--text-secondary)', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                {s}
-              </button>
-            ))}
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg-primary)' }}>
+
+      {/* Sidebar historique DESKTOP (≥1025px) */}
+      <div className="chat-desktop-sidebar">
+        <div style={{ padding: '16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <MessageCircle size={15} color="var(--accent)" />
+            <span style={{ fontWeight: 700, fontSize: 14 }}>Historique</span>
+            <span style={{ fontSize: 11, color: 'var(--text-secondary)', background: 'var(--bg-card)', borderRadius: 20, padding: '1px 8px' }}>{sessions.length}</span>
           </div>
-        )}
-        {loading && (
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Bot size={14} color="white" />
-            </div>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px 14px 14px 4px', padding: '12px 16px', display: 'flex', gap: 4 }}>
-              {[0,1,2].map(i => <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--text-secondary)', animation: `pulse 1.2s ease-in-out ${i*0.2}s infinite`, display: 'inline-block' }} />)}
-            </div>
-          </div>
-        )}
-        <div ref={bottomRef} />
+          <button onClick={newConversation} style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'var(--accent)', border: 'none', borderRadius: 8, padding: '5px 10px', color: 'white', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
+            <Plus size={12} /> Nouvelle
+          </button>
+        </div>
+        <SessionList />
       </div>
 
-      {/* Input */}
-      <div style={{ position: 'fixed', bottom: 64, left: 0, right: 0, background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)', padding: '10px 14px', display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
-        <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} placeholder="Décrivez la panne ou posez une question..." rows={1} style={{ flex: 1, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '14px', resize: 'none', outline: 'none', maxHeight: '100px', fontFamily: 'inherit', lineHeight: '1.5' }} />
-        <button onClick={sendMessage} disabled={!input.trim() || loading} style={{ width: 40, height: 40, borderRadius: '50%', background: input.trim() ? 'var(--accent)' : 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: input.trim() ? 'pointer' : 'default', flexShrink: 0 }}>
-          {loading ? <Loader2 size={16} color="white" style={{ animation: 'spin 1s linear infinite' }} /> : <Send size={16} color={input.trim() ? 'white' : 'var(--text-secondary)'} />}
-        </button>
+      {/* Zone principale */}
+      <div className="chat-main" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+
+        {/* Header */}
+        <div style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+          <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Bot size={18} color="white" />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 700, fontSize: '14px' }}>
+              COPILOTE{prenom ? ` · ${prenom}` : ''}
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {current?.title || 'Nouvelle conversation'}
+            </div>
+          </div>
+          <button onClick={() => router.back()} title="Retour" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 6 }}>
+            <ArrowLeft size={18} />
+          </button>
+          <button className="chat-history-btn" onClick={() => setShowHistory(true)} title="Historique" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 6 }}>
+            <Clock size={18} />
+          </button>
+          <button onClick={newConversation} title="Nouvelle conversation" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', padding: 6 }}>
+            <Plus size={18} />
+          </button>
+        </div>
+
+        {/* Messages */}
+        <div className="chat-messages" style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px', paddingBottom: '140px' }}>
+          {messages.map(msg => (
+            <div key={msg.id} style={{ display: 'flex', flexDirection: msg.role === 'user' ? 'row-reverse' : 'row', gap: '8px', alignItems: 'flex-end' }}>
+              <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: msg.role === 'assistant' ? 'var(--accent)' : 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {msg.role === 'assistant' ? <Bot size={14} color="white" /> : <User size={14} color="var(--text-secondary)" />}
+              </div>
+              <div style={{ maxWidth: '75%' }}>
+                <div style={{ background: msg.role === 'assistant' ? 'var(--bg-card)' : 'var(--accent)', border: msg.role === 'assistant' ? '1px solid var(--border)' : 'none', borderRadius: msg.role === 'assistant' ? '14px 14px 14px 4px' : '14px 14px 4px 14px', padding: '10px 13px', fontSize: '14px', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
+                  {msg.content}
+                </div>
+                <div style={{ fontSize: '10px', color: 'var(--text-secondary)', marginTop: 3, textAlign: msg.role === 'user' ? 'right' : 'left' }}>
+                  {formatDate(msg.timestamp)}
+                </div>
+              </div>
+            </div>
+          ))}
+          {messages.length === 1 && !loading && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, paddingLeft: 36 }}>
+              {['Bruit anormal sur une machine', 'Panne électrique', 'Fuite hydraulique', 'Vibrations anormales'].map(s => (
+                <button key={s} onClick={() => setInput(s)} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '6px 13px', fontSize: 13, color: 'var(--text-secondary)', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
+          {loading && (
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Bot size={14} color="white" />
+              </div>
+              <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px 14px 14px 4px', padding: '12px 16px', display: 'flex', gap: 4 }}>
+                {[0,1,2].map(i => <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--text-secondary)', animation: `pulse 1.2s ease-in-out ${i*0.2}s infinite`, display: 'inline-block' }} />)}
+              </div>
+            </div>
+          )}
+          <div ref={bottomRef} />
+        </div>
+
+        {/* Input */}
+        <div className="chat-input-bar" style={{ position: 'fixed', left: 0, right: 0, background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)', padding: '10px 14px', display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+          <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} placeholder="Décrivez la panne ou posez une question..." rows={1} style={{ flex: 1, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '14px', resize: 'none', outline: 'none', maxHeight: '100px', fontFamily: 'inherit', lineHeight: '1.5' }} />
+          <button onClick={sendMessage} disabled={!input.trim() || loading} style={{ width: 40, height: 40, borderRadius: '50%', background: input.trim() ? 'var(--accent)' : 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: input.trim() ? 'pointer' : 'default', flexShrink: 0 }}>
+            {loading ? <Loader2 size={16} color="white" style={{ animation: 'spin 1s linear infinite' }} /> : <Send size={16} color={input.trim() ? 'white' : 'var(--text-secondary)'} />}
+          </button>
+        </div>
+
+        <BottomNav />
       </div>
 
-      <BottomNav />
-
-      {/* Drawer Historique */}
+      {/* Drawer Historique MOBILE */}
       {showHistory && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex' }}>
           <div onClick={() => setShowHistory(false)} style={{ flex: 1, background: 'rgba(0,0,0,0.6)' }} />
@@ -242,26 +288,7 @@ export default function ChatPage() {
                 </button>
               </div>
             </div>
-            <div style={{ flex: 1, overflowY: 'auto', padding: '8px' }}>
-              {sessions.map(s => (
-                <div key={s.id} onClick={() => switchSession(s.id)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 10, marginBottom: 3, cursor: 'pointer', background: s.id === currentId ? 'rgba(99,102,241,0.15)' : 'transparent', border: `1px solid ${s.id === currentId ? 'rgba(99,102,241,0.4)' : 'transparent'}` }}>
-                  <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <MessageCircle size={13} color={s.id === currentId ? 'var(--accent)' : 'var(--text-secondary)'} />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: s.id === currentId ? 600 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: s.id === currentId ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-                      {s.title}
-                    </div>
-                    <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
-                      {formatDate(s.createdAt)} · {s.messages.length} msg
-                    </div>
-                  </div>
-                  <button onClick={e => { e.stopPropagation(); deleteSession(s.id); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, flexShrink: 0, opacity: 0.5 }}>
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              ))}
-            </div>
+            <SessionList />
           </div>
         </div>
       )}
@@ -270,6 +297,7 @@ export default function ChatPage() {
         @keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
         @keyframes spin{to{transform:rotate(360deg)}}
         textarea::placeholder{color:var(--text-secondary);}
+        @media (min-width: 1025px) { .chat-input-bar { left: 260px !important; } }
       `}</style>
     </div>
   );

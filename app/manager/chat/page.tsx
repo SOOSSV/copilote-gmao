@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Loader2, Trash2, Plus, Clock, X, MessageCircle, ArrowLeft } from 'lucide-react';
-import BottomNav from '@/components/BottomNav';
 import { useRouter } from 'next/navigation';
 
 type Message = {
@@ -190,14 +189,12 @@ export default function ChatPage() {
       </div>
 
       {/* Input */}
-      <div style={{ position: 'fixed', bottom: 64, left: 0, right: 0, background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)', padding: '10px 14px', display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)', padding: '10px 14px', display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
         <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} placeholder="Décrivez la panne ou posez une question..." rows={1} style={{ flex: 1, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '14px', resize: 'none', outline: 'none', maxHeight: '100px', fontFamily: 'inherit', lineHeight: '1.5' }} />
         <button onClick={sendMessage} disabled={!input.trim() || loading} style={{ width: 40, height: 40, borderRadius: '50%', background: input.trim() ? 'var(--accent)' : 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: input.trim() ? 'pointer' : 'default', flexShrink: 0 }}>
           {loading ? <Loader2 size={16} color="white" style={{ animation: 'spin 1s linear infinite' }} /> : <Send size={16} color={input.trim() ? 'white' : 'var(--text-secondary)'} />}
         </button>
       </div>
-
-      <BottomNav />
 
       {/* Drawer Historique */}
       {showHistory && (

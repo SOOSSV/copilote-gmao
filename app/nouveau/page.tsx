@@ -87,13 +87,14 @@ export default function NouveauTicketPage() {
         borderBottom: '1px solid var(--border)',
         padding: '16px 20px',
         display: 'flex', alignItems: 'center', gap: 10,
+        position: 'sticky', top: 0, zIndex: 10,
       }}>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} /></button>
         <PlusCircle size={20} color="var(--accent)" />
         <span style={{ fontWeight: 700, fontSize: 16 }}>Nouveau Ticket</span>
       </div>
 
-      <div style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <div style={{ padding: '20px 16px', maxWidth: 700, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 18 }}>
 
         {/* Machine */}
         <div>

@@ -15,14 +15,13 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav style={{
+    <nav className="tech-bottom-nav" style={{
       position: 'fixed',
       bottom: 0,
       left: 0,
       right: 0,
       background: 'var(--bg-secondary)',
       borderTop: '1px solid var(--border)',
-      display: 'flex',
       zIndex: 50,
       paddingBottom: 'env(safe-area-inset-bottom)',
     }}>

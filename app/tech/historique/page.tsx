@@ -42,7 +42,7 @@ export default function TechHistorique() {
   const totalResolus = tickets.length;
 
   return (
-    <div className="p-4">
+    <div className="p-4 tech-page-wrap">
       <div className="flex items-center gap-2 mb-1">
         <button onClick={() => router.back()} className="bg-transparent border-none cursor-pointer text-[#7d8590] p-1 flex items-center">
           <ArrowLeft size={20} />

@@ -77,7 +77,7 @@ export default function TechDashboard() {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-4 tech-page-wrap">
       {/* Bonjour */}
       <div className="mb-5">
         <div className="text-[20px] font-extrabold mb-0.5">Bonjour {prenom} 👋</div>

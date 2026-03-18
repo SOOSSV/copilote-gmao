@@ -77,8 +77,8 @@ export default function TicketsPage() {
         ))}
       </div>
 
-      {/* Liste */}
-      <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {/* Vue mobile — cartes */}
+      <div className="tickets-mobile" style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>Chargement...</div>
         ) : filtered.length === 0 ? (
@@ -86,33 +86,58 @@ export default function TicketsPage() {
         ) : (
           filtered.map(ticket => (
             <Link key={ticket.id} href={`/tech/tickets/${ticket.id}`} style={{ textDecoration: 'none' }}>
-              <div style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                borderLeft: `3px solid ${statutColor[ticket.statut] || 'var(--border)'}`,
-                borderRadius: 12,
-                padding: '14px 16px',
-                display: 'flex', alignItems: 'center', gap: 12,
-                cursor: 'pointer',
-              }}>
+              <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderLeft: `3px solid ${statutColor[ticket.statut] || 'var(--border)'}`, borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 6 }}>
-                    {ticket.titre}
-                  </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 8 }}>
-                    {ticket.machines?.nom || 'Machine inconnue'}
-                  </div>
+                  <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 6 }}>{ticket.titre}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 8 }}>{ticket.machines?.nom || 'Machine inconnue'}</div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                     <PrioriteBadge priorite={ticket.priorite} />
-                    <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
-                      {formatDate(ticket.created_at)}
-                    </span>
+                    <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{formatDate(ticket.created_at)}</span>
                   </div>
                 </div>
                 <ChevronRight size={16} color="var(--text-secondary)" />
               </div>
             </Link>
           ))
+        )}
+      </div>
+
+      {/* Vue desktop — table */}
+      <div className="tickets-desktop" style={{ padding: '0 20px' }}>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>Chargement...</div>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>Aucun ticket</div>
+        ) : (
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  {['Titre', 'Machine', 'Priorité', 'Statut', 'Date'].map(h => (
+                    <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((ticket, i) => (
+                  <tr key={ticket.id} style={{ borderBottom: i < filtered.length - 1 ? '1px solid var(--border)' : 'none', cursor: 'pointer' }}
+                    onClick={() => router.push(`/tech/tickets/${ticket.id}`)}>
+                    <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 600, maxWidth: 280 }}>
+                      <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ticket.titre}</span>
+                    </td>
+                    <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-secondary)' }}>{ticket.machines?.nom || '—'}</td>
+                    <td style={{ padding: '12px 16px' }}><PrioriteBadge priorite={ticket.priorite} /></td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <span style={{ background: `${statutColor[ticket.statut]}22`, color: statutColor[ticket.statut], borderRadius: 6, padding: '3px 10px', fontSize: 11, fontWeight: 600 }}>
+                        {ticket.statut === 'en_cours' ? 'En cours' : ticket.statut === 'resolu' ? 'Résolu' : 'Ouvert'}
+                      </span>
+                    </td>
+                    <td style={{ padding: '12px 16px', fontSize: 12, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{formatDate(ticket.created_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 

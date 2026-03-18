@@ -66,6 +66,35 @@ body {
 ::-webkit-scrollbar-track { background: var(--bg-primary); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+/* ===== TECH RESPONSIVE ===== */
+.tech-bottom-nav { display: flex; }
+.tech-nav-desktop { display: none; }
+.chat-input-bar { bottom: 64px; }
+
+@media (min-width: 1025px) {
+  .tech-bottom-nav { display: none !important; }
+  .tech-nav-desktop { display: flex; gap: 2px; }
+  .tech-content { padding-bottom: 0 !important; }
+  .chat-input-bar { bottom: 0 !important; }
+  .chat-messages { padding-bottom: 80px !important; }
+  .tech-page-wrap { max-width: 860px; margin: 0 auto; }
+  /* Chat desktop sidebar */
+  .chat-desktop-sidebar { display: flex !important; }
+  .chat-history-btn { display: none !important; }
+  .chat-main { margin-left: 260px; }
+}
+.chat-desktop-sidebar {
+  display: none;
+  width: 260px;
+  position: fixed;
+  top: 0; bottom: 0; left: 0;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  flex-direction: column;
+  z-index: 10;
+  overflow: hidden;
+}
+
 /* ===== MANAGER RESPONSIVE ===== */
 .mgr-sidebar {
   width: 220px;

@@ -56,7 +56,7 @@ export default function ProfilPage() {
         <div style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 4 }}>Technicien</div>
       </div>
 
-      <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ padding: '0 16px', maxWidth: 600, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {/* Push notifications */}
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Notifications</span>

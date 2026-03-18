@@ -70,13 +70,31 @@ export default function TechLayout({ children }: { children: React.ReactNode }) 
   ];
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', paddingBottom: 80 }}>
+    <div className="tech-content" style={{ minHeight: '100vh', background: 'var(--bg-primary)', paddingBottom: 80 }}>
       {/* Top bar */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 100, background: 'var(--bg-card)', borderBottom: '1px solid var(--border)', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 100, background: 'var(--bg-card)', borderBottom: '1px solid var(--border)', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <div style={{ fontSize: 16, fontWeight: 800, background: 'linear-gradient(135deg, #22c55e, #16a34a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>COPILOTE</div>
           <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Espace Technicien</div>
         </div>
+
+        {/* Nav desktop (visible uniquement ≥1025px) */}
+        <div className="tech-nav-desktop" style={{ alignItems: 'center' }}>
+          {nav.map(({ href, icon: Icon, label }) => {
+            const active = pathname === href || (href !== '/tech' && pathname.startsWith(href));
+            const badge = href === '/tech' && ticketActifs > 0 ? ticketActifs : 0;
+            return (
+              <Link key={href} href={href} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, textDecoration: 'none', fontSize: 13, fontWeight: active ? 700 : 400, color: active ? '#22c55e' : 'var(--text-secondary)', background: active ? '#22c55e14' : 'transparent', position: 'relative' }}>
+                <div style={{ position: 'relative', display: 'inline-flex' }}>
+                  <Icon size={16} />
+                  {badge > 0 && <span style={{ position: 'absolute', top: -5, right: -7, background: '#ef4444', color: '#fff', borderRadius: 8, padding: '0 4px', fontSize: 9, fontWeight: 700, minWidth: 14, textAlign: 'center' }}>{badge}</span>}
+                </div>
+                {label}
+              </Link>
+            );
+          })}
+        </div>
+
         <button onClick={logout} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
           <LogOut size={16} /> Quitter
         </button>
@@ -85,8 +103,8 @@ export default function TechLayout({ children }: { children: React.ReactNode }) 
       {/* Content */}
       <main>{children}</main>
 
-      {/* Bottom nav */}
-      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--bg-card)', borderTop: '1px solid var(--border)', display: 'flex', zIndex: 100 }}>
+      {/* Bottom nav (mobile uniquement) */}
+      <nav className="tech-bottom-nav" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--bg-card)', borderTop: '1px solid var(--border)', zIndex: 100 }}>
         {nav.map(({ href, icon: Icon, label }) => {
           const active = pathname === href || (href !== '/tech' && pathname.startsWith(href));
           const badge = href === '/tech' && ticketActifs > 0 ? ticketActifs : 0;
