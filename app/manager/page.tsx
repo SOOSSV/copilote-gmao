@@ -302,7 +302,7 @@ export default function ManagerDashboard() {
 
           {/* Pannes récurrentes + Amélioratif */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-            <Link href="/manager/dashboard" style={{ background: nbPannesRecurrentes > 0 ? '#ef444412' : 'var(--bg-card)', border: `1px solid ${nbPannesRecurrentes > 0 ? '#ef444433' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+            <Link href="/manager/recurrentes" style={{ background: nbPannesRecurrentes > 0 ? '#ef444412' : 'var(--bg-card)', border: `1px solid ${nbPannesRecurrentes > 0 ? '#ef444433' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
                 <Repeat2 size={14} color="#ef4444" />
                 <span style={{ fontSize: 12, fontWeight: 700, color: '#ef4444' }}>Récurrentes</span>
