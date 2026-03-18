@@ -310,7 +310,7 @@ export default function ManagerDashboard() {
               <div style={{ fontSize: 20, fontWeight: 800, color: nbPannesRecurrentes > 0 ? '#ef4444' : 'var(--text-secondary)' }}>{nbPannesRecurrentes}</div>
               <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>machine{nbPannesRecurrentes > 1 ? 's' : ''} à risque</div>
             </Link>
-            <Link href="/manager/tickets?filtre=ameliorative" style={{ background: nbAmelioratifs > 0 ? '#7c3aed12' : 'var(--bg-card)', border: `1px solid ${nbAmelioratifs > 0 ? '#7c3aed33' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+            <Link href="/manager/amelioratif" style={{ background: nbAmelioratifs > 0 ? '#7c3aed12' : 'var(--bg-card)', border: `1px solid ${nbAmelioratifs > 0 ? '#7c3aed33' : 'var(--border)'}`, borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
                 <Sparkles size={14} color="#7c3aed" />
                 <span style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed' }}>Amélioratif</span>
