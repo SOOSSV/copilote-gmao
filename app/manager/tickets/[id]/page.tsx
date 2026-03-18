@@ -312,30 +312,31 @@ export default function TicketDetailPage() {
 
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
-      {/* Changer statut */}
-      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px' }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 12 }}>Changer le statut</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {[
-            { value: 'ouvert',   label: 'Ouvert',   icon: AlertTriangle, color: '#2563eb' },
-            { value: 'en_cours', label: 'En cours', icon: Clock,         color: '#f59e0b' },
-            { value: 'resolu',   label: 'Résolu',   icon: CheckCircle,   color: '#22c55e' },
-          ].map(({ value, label, icon: Icon, color }) => (
-            <button key={value} onClick={() => updateStatut(value)} disabled={saving || ticket.statut === value} style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              padding: '12px 16px', borderRadius: 10, border: '1px solid',
-              borderColor: ticket.statut === value ? color : 'var(--border)',
-              background: ticket.statut === value ? `${color}18` : 'transparent',
-              color: ticket.statut === value ? color : 'var(--text-secondary)',
-              cursor: ticket.statut === value ? 'default' : 'pointer',
-              fontWeight: ticket.statut === value ? 700 : 400, fontSize: 14,
-            }}>
-              <Icon size={16} />
-              {label}
-              {ticket.statut === value && <span style={{ marginLeft: 'auto', fontSize: 11 }}>✓ Actuel</span>}
-            </button>
-          ))}
-        </div>
+      {/* Padding pour la barre sticky */}
+      <div style={{ height: 80 }} />
+
+      {/* Barre sticky statut */}
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--bg-card)', borderTop: '1px solid var(--border)', padding: '12px 16px', zIndex: 50, display: 'flex', gap: 8, maxWidth: '100vw', boxSizing: 'border-box' }}>
+        {ticket.statut !== 'ouvert' && (
+          <button onClick={() => updateStatut('ouvert')} disabled={saving} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px', borderRadius: 10, border: '1px solid #2563eb44', background: '#2563eb15', color: '#2563eb', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+            <AlertTriangle size={15} /> Réouvrir
+          </button>
+        )}
+        {ticket.statut !== 'en_cours' && (
+          <button onClick={() => updateStatut('en_cours')} disabled={saving} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px', borderRadius: 10, border: '1px solid #f59e0b44', background: '#f59e0b15', color: '#f59e0b', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+            <Clock size={15} /> En cours
+          </button>
+        )}
+        {ticket.statut !== 'resolu' && (
+          <button onClick={() => updateStatut('resolu')} disabled={saving} style={{ flex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px', borderRadius: 10, border: 'none', background: '#22c55e', color: 'white', cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+            <CheckCircle size={15} /> Marquer résolu
+          </button>
+        )}
+        {ticket.statut === 'resolu' && (
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px', borderRadius: 10, background: '#22c55e18', color: '#22c55e', fontSize: 13, fontWeight: 700 }}>
+            <CheckCircle size={15} /> Résolu
+          </div>
+        )}
       </div>
     </div>
   );

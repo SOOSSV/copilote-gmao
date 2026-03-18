@@ -291,24 +291,27 @@ export default function TechTicketDetail() {
         </div>
       )}
 
-      {/* Changer statut */}
-      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px' }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 12 }}>Statut</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {[
-            { value: 'en_cours', label: 'Prendre en charge', icon: Clock, color: '#f59e0b' },
-            { value: 'resolu',   label: 'Marquer résolu',   icon: CheckCircle, color: '#22c55e' },
-          ].filter(s => s.value !== ticket.statut).map(({ value, label, icon: Icon, color }) => (
-            <button key={value} onClick={() => updateStatut(value)} disabled={saving} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px', borderRadius: 10, border: `1px solid ${color}44`, background: `${color}18`, color, cursor: 'pointer', fontWeight: 700, fontSize: 14, opacity: saving ? 0.6 : 1 }}>
-              <Icon size={18} /> {label}
+      {/* Padding barre sticky */}
+      <div style={{ height: 80 }} />
+
+      {/* Barre sticky statut */}
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--bg-card)', borderTop: '1px solid var(--border)', padding: '12px 16px', zIndex: 50, display: 'flex', gap: 8, boxSizing: 'border-box' }}>
+        {ticket.statut === 'resolu' ? (
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px', borderRadius: 10, background: '#22c55e18', color: '#22c55e', fontSize: 13, fontWeight: 700 }}>
+            <CheckCircle size={15} /> Ticket résolu ✓
+          </div>
+        ) : (
+          <>
+            {ticket.statut !== 'en_cours' && (
+              <button onClick={() => updateStatut('en_cours')} disabled={saving} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px', borderRadius: 10, border: '1px solid #f59e0b44', background: '#f59e0b15', color: '#f59e0b', cursor: 'pointer', fontWeight: 600, fontSize: 13, opacity: saving ? 0.6 : 1 }}>
+                <Clock size={15} /> Prendre en charge
+              </button>
+            )}
+            <button onClick={() => updateStatut('resolu')} disabled={saving} style={{ flex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px', borderRadius: 10, border: 'none', background: '#22c55e', color: 'white', cursor: 'pointer', fontWeight: 700, fontSize: 13, opacity: saving ? 0.6 : 1 }}>
+              <CheckCircle size={15} /> Marquer résolu
             </button>
-          ))}
-          {ticket.statut === 'resolu' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px', borderRadius: 10, border: '1px solid #22c55e44', background: '#22c55e18', color: '#22c55e', fontWeight: 700, fontSize: 14 }}>
-              <CheckCircle size={18} /> Ticket résolu ✓
-            </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );
