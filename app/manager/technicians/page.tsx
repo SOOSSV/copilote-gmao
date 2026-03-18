@@ -217,7 +217,7 @@ export default function TechniciansPage() {
       {loading ? (
         <div className="text-center text-[#7d8590] py-10">Chargement...</div>
       ) : (
-        <div className="flex flex-col gap-2.5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2.5">
           {filtered.map(tech => (
             <div
               key={tech.id}
