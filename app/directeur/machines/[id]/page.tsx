@@ -29,6 +29,7 @@ export default function DirecteurMachineDetailPage() {
       supabase.from('machines').select('*').eq('id', params.id).single(),
       supabase.from('tickets').select('id, titre, priorite, statut, created_at').eq('machine_id', params.id).order('created_at', { ascending: false }).limit(20),
     ]).then(([{ data: m }, { data: t }]) => {
+      if (!m) { setLoading(false); return; }
       setMachine(m as Machine);
       setTickets((t as Ticket[]) || []);
       setLoading(false);

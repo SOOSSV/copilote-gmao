@@ -61,6 +61,7 @@ export default function MachineDetailPage() {
         supabase.from('preventive_plans').select('id, nom, description, frequence_jours, prochaine_exec, technicians(prenom, nom)')
           .eq('machine_id', params.id).eq('actif', true).order('prochaine_exec'),
       ]);
+      if (!m) { setLoading(false); return; }
       setMachine(m as Machine);
       setCoutEdit(m?.cout_heure_arret != null ? String(m.cout_heure_arret) : '');
       setTickets((t as unknown as Ticket[]) || []);
