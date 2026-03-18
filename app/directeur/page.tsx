@@ -197,7 +197,7 @@ export default function DirecteurDashboard() {
       </div>
 
       {/* ===== VUE DESKTOP ===== */}
-      <div className="dir-desktop-home px-9 py-8" style={{ maxWidth: 960 }}>
+      <div className="dir-desktop-home px-9 py-8">
         <div className="mb-8">
           <h1 className="text-[18px] font-extrabold mb-1">Vue synthèse</h1>
           <div className="text-[13px] text-[#7d8590]">

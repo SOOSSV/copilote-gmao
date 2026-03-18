@@ -79,7 +79,7 @@ export default function ManagerTicketsPage() {
   const filtreLabel = (f: string) => ({ tous: 'Tous', ouvert: 'Ouvert', en_cours: 'En cours', resolu: 'Résolu', urgente: 'Urgente', haute: 'Haute', normale: 'Normale', basse: 'Basse', ameliorative: '✦ Amélioratif' } as Record<string,string>)[f] ?? f;
 
   return (
-    <div className="px-2 py-2.5 max-w-[100vw] box-border overflow-x-hidden">
+    <div className="px-4 md:px-8 py-5 max-w-[100vw] box-border overflow-x-hidden">
 
       {/* Header */}
       <div className="flex justify-between items-center mb-4">

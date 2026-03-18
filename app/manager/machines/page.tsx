@@ -58,7 +58,7 @@ export default function MachinesPage() {
   const filtered = filtre === 'tous' ? machines : machines.filter(m => m.criticite === filtre);
 
   return (
-    <div className="px-4 py-5 max-w-[100vw] box-border overflow-x-hidden">
+    <div className="px-4 md:px-8 py-5 max-w-[100vw] box-border overflow-x-hidden">
       <div className="flex items-center gap-2.5 mb-5">
         <button onClick={() => router.back()} className="bg-transparent border-none cursor-pointer text-[#7d8590] p-1 flex items-center">
           <ArrowLeft size={20} />
