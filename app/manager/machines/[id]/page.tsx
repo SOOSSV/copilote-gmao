@@ -49,6 +49,7 @@ export default function MachineDetailPage() {
   const [plans, setPlans] = useState<PlanPreventif[]>([]);
   const [coutEdit, setCoutEdit] = useState('');
   const [savingCout, setSavingCout] = useState(false);
+  const [metrics, setMetrics] = useState<{ mtbf_jours: number | null; mttr_heures: number | null; taux_resolution: number | null } | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -63,6 +64,8 @@ export default function MachineDetailPage() {
       ]);
       if (!m) { setLoading(false); return; }
       setMachine(m as Machine);
+      const { data: mx } = await supabase.rpc('get_machine_metrics', { p_machine_id: params.id });
+      if (mx && mx[0]) setMetrics(mx[0]);
       setCoutEdit(m?.cout_heure_arret != null ? String(m.cout_heure_arret) : '');
       setTickets((t as unknown as Ticket[]) || []);
       setHistory((h as unknown as HistEntry[]) || []);
@@ -132,6 +135,36 @@ export default function MachineDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Métriques MTBF / MTTR */}
+      {metrics && (
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 14px', marginBottom: 14 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 10 }}>Fiabilité machine</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 20, fontWeight: 800, color: metrics.mtbf_jours ? '#22c55e' : 'var(--text-secondary)' }}>
+                {metrics.mtbf_jours != null ? `${metrics.mtbf_jours}j` : '—'}
+              </div>
+              <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>MTBF</div>
+              <div style={{ fontSize: 9, color: 'var(--text-secondary)' }}>moy. entre pannes</div>
+            </div>
+            <div style={{ textAlign: 'center', borderLeft: '1px solid var(--border)', borderRight: '1px solid var(--border)' }}>
+              <div style={{ fontSize: 20, fontWeight: 800, color: metrics.mttr_heures != null && metrics.mttr_heures > 24 ? '#ef4444' : '#f59e0b' }}>
+                {metrics.mttr_heures != null ? `${metrics.mttr_heures}h` : '—'}
+              </div>
+              <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>MTTR</div>
+              <div style={{ fontSize: 9, color: 'var(--text-secondary)' }}>moy. résolution</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 20, fontWeight: 800, color: '#2563eb' }}>
+                {metrics.taux_resolution != null ? `${metrics.taux_resolution}%` : '—'}
+              </div>
+              <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>Résolution</div>
+              <div style={{ fontSize: 9, color: 'var(--text-secondary)' }}>taux global</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Coût arrêt */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 14px', marginBottom: 14 }}>
