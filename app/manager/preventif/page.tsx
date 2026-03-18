@@ -424,7 +424,7 @@ export default function PreventifPage() {
 
               <div>
                 <label style={lbl}>Description</label>
-                <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} style={{ ...inp, resize: 'vertical' }} />
+                <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={3} placeholder="Détails de l'opération..." style={{ ...inp, resize: 'vertical', color: '#f1f5f9', background: '#1e293b', lineHeight: 1.5 }} />
               </div>
             </div>
 
