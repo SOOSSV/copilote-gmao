@@ -103,19 +103,44 @@ export default function ManagerTicketsPage() {
         />
       </div>
 
-      {/* Filtres — scroll horizontal */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'none' }}>
-        {filtres.map(f => (
-          <button key={f} onClick={() => setFiltre(f)} style={{
-            padding: '7px 14px', borderRadius: 8, border: '1px solid', whiteSpace: 'nowrap', flexShrink: 0,
-            borderColor: filtre === f ? 'var(--accent)' : 'var(--border)',
-            background: filtre === f ? 'var(--accent)' : 'var(--bg-card)',
-            color: filtre === f ? 'white' : 'var(--text-secondary)',
-            fontSize: 12, fontWeight: 600, cursor: 'pointer',
-          }}>
-            {filtreLabel(f)}
-          </button>
-        ))}
+      {/* Filtres statut */}
+      <div style={{ marginBottom: 10 }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>Statut</div>
+        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2, scrollbarWidth: 'none' }}>
+          {(['tous', 'ouvert', 'en_cours', 'resolu'] as const).map(f => (
+            <button key={f} onClick={() => setFiltre(f)} style={{
+              padding: '6px 12px', borderRadius: 8, border: '1px solid', whiteSpace: 'nowrap', flexShrink: 0,
+              borderColor: filtre === f ? 'var(--accent)' : 'var(--border)',
+              background: filtre === f ? 'var(--accent)' : 'var(--bg-card)',
+              color: filtre === f ? 'white' : 'var(--text-secondary)',
+              fontSize: 12, fontWeight: 600, cursor: 'pointer',
+            }}>
+              {filtreLabel(f)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Filtres priorité + type */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>Priorité & type</div>
+        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2, scrollbarWidth: 'none' }}>
+          {(['urgente', 'haute', 'ameliorative'] as const).map(f => {
+            const colors: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', ameliorative: '#7c3aed' };
+            const c = colors[f];
+            const active = filtre === f;
+            return (
+              <button key={f} onClick={() => setFiltre(active ? 'tous' : f)} style={{
+                padding: '6px 12px', borderRadius: 8, border: `1px solid ${active ? c : 'var(--border)'}`, whiteSpace: 'nowrap', flexShrink: 0,
+                background: active ? `${c}22` : 'var(--bg-card)',
+                color: active ? c : 'var(--text-secondary)',
+                fontSize: 12, fontWeight: 600, cursor: 'pointer',
+              }}>
+                {filtreLabel(f)}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Contenu */}
