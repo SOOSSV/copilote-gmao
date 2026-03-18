@@ -223,7 +223,7 @@ export default function ManagerDashboard() {
                 )}
               </div>
             </Link>
-            <Link href="/manager/techniciens" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
+            <Link href="/manager/technicians" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px', textDecoration: 'none', color: 'inherit' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
                 <Users size={14} color="#06b6d4" />
                 <span style={{ fontSize: 12, fontWeight: 700, color: '#06b6d4' }}>Techniciens</span>
