@@ -12,6 +12,7 @@ type Stats = {
 };
 type MachineStat = { id: string; nom: string; count: number; cout_heure_arret?: number | null };
 type TechStat = { prenom: string; nom: string; resolus: number };
+type PanneRecurrente = { machine_id: string; machine_nom: string; machine_localisation: string; nb_pannes: number; derniere_panne: string };
 
 function KpiMini({ label, value, color, sub, icon: Icon }: { label: string; value: string | number; color: string; sub?: string; icon: React.ElementType }) {
   return (
@@ -31,6 +32,7 @@ export default function SynthesePage() {
   const [stats, setStats] = useState<Stats>({ total: 0, ouverts: 0, en_cours: 0, fermes: 0, urgents: 0, machines: 0, techniciens: 0 });
   const [topMachines, setTopMachines] = useState<MachineStat[]>([]);
   const [topTechs, setTopTechs] = useState<TechStat[]>([]);
+  const [pannesRecurrentes, setPannesRecurrentes] = useState<PanneRecurrente[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -80,6 +82,9 @@ export default function SynthesePage() {
       }
       setTopTechs(Object.values(techMap).sort((a, b) => b.resolus - a.resolus).slice(0, 5));
 
+      const { data: pr } = await supabase.rpc('get_pannes_recurrentes', { seuil: 3, jours: 30 });
+      setPannesRecurrentes((pr as PanneRecurrente[]) || []);
+
       setLoading(false);
     }
     load();
@@ -120,6 +125,30 @@ export default function SynthesePage() {
             <KpiMini label="Machines" value={stats.machines} color="#0ea5e9" icon={Cpu} />
             <KpiMini label="Techniciens" value={stats.techniciens} color="#7c3aed" icon={Users} />
           </div>
+
+          {/* Pannes récurrentes */}
+          {pannesRecurrentes.length > 0 && (
+            <div style={{ background: '#ef444410', border: '1px solid #ef444433', borderRadius: 14, padding: '16px', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <AlertTriangle size={15} color="#ef4444" />
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#ef4444' }}>Pannes récurrentes — 30 jours</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {pannesRecurrentes.map(p => (
+                  <Link key={p.machine_id} href={`/directeur/machines/${p.machine_id}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', textDecoration: 'none', color: 'inherit', background: 'var(--bg-card)', borderRadius: 10, padding: '10px 14px', border: '1px solid #ef444422' }}>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 700 }}>{p.machine_nom}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{p.machine_localisation} · dernière {new Date(p.derniere_panne).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}</div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: '#ef4444' }}>{p.nb_pannes}×</div>
+                      <div style={{ fontSize: 10, color: 'var(--text-secondary)' }}>pannes</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Top machines — recommandations actionnables */}
           {topMachines.length > 0 && (

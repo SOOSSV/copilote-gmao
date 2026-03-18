@@ -16,6 +16,11 @@ type TicketRecent = {
   created_at: string; machines: { nom: string } | null;
 };
 
+type PanneRecurrente = {
+  machine_id: string; machine_nom: string; machine_localisation: string;
+  nb_pannes: number; derniere_panne: string;
+};
+
 const prioriteColor: Record<string, string> = {
   urgente: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e',
 };
@@ -44,6 +49,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [stats, setStats] = useState<Stats>({ total: 0, ouverts: 0, en_cours: 0, fermes: 0, urgents: 0, machines: 0, techniciens: 0 });
   const [recents, setRecents] = useState<TicketRecent[]>([]);
+  const [pannesRecurrentes, setPannesRecurrentes] = useState<PanneRecurrente[]>([]);
   const [loading, setLoading] = useState(true);
 
   async function load() {
@@ -65,6 +71,8 @@ export default function DashboardPage() {
       .select('id, titre, priorite, statut, created_at, machines(nom)')
       .order('created_at', { ascending: false }).limit(10);
     setRecents((r as unknown as TicketRecent[]) || []);
+    const { data: pr } = await supabase.rpc('get_pannes_recurrentes', { seuil: 3, jours: 30 });
+    setPannesRecurrentes((pr as PanneRecurrente[]) || []);
     setLoading(false);
   }
 
@@ -113,6 +121,30 @@ export default function DashboardPage() {
             <StatCard label="Machines"    value={stats.machines}    icon={Wrench}       color="#7c3aed" />
             <StatCard label="Techniciens" value={stats.techniciens} icon={CheckCircle}  color="#06b6d4" />
           </div>
+
+          {/* Pannes récurrentes */}
+          {pannesRecurrentes.length > 0 && (
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                <AlertTriangle size={15} color="#ef4444" />
+                <span style={{ fontWeight: 700, fontSize: 14, color: '#ef4444' }}>Machines à risque — 30 jours</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {pannesRecurrentes.map(p => (
+                  <Link key={p.machine_id} href={`/manager/machines/${p.machine_id}`} style={{ background: '#ef444410', border: '1px solid #ef444433', borderRadius: 12, padding: '12px 16px', textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 700 }}>{p.machine_nom}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{p.machine_localisation}</div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: 20, fontWeight: 800, color: '#ef4444' }}>{p.nb_pannes}</div>
+                      <div style={{ fontSize: 10, color: 'var(--text-secondary)' }}>pannes</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Tickets récents en cartes */}
           <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>Tickets récents</div>

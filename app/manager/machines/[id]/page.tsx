@@ -86,6 +86,9 @@ export default function MachineDetailPage() {
 
   const critColor = criticiteColor[machine.criticite] || '#2563eb';
   const totalTickets = tickets.length;
+  const cutoff30j = new Date(); cutoff30j.setDate(cutoff30j.getDate() - 30);
+  const pannes30j = tickets.filter(t => t.type_intervention === 'corrective' && new Date(t.created_at) >= cutoff30j).length;
+  const isPanneRecurrente = pannes30j >= 3;
   const resolus = tickets.filter(t => t.statut === 'resolu').length;
   const ouverts = tickets.filter(t => t.statut === 'ouvert' || t.statut === 'en_cours').length;
   const urgents = tickets.filter(t => t.priorite === 'urgente').length;
@@ -104,9 +107,16 @@ export default function MachineDetailPage() {
           <h1 style={{ fontSize: 16, fontWeight: 800, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{machine.nom}</h1>
           <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{machine.external_id} · {machine.type_equipement}</div>
         </div>
-        <span style={{ background: `${critColor}22`, color: critColor, border: `1px solid ${critColor}44`, borderRadius: 6, padding: '3px 10px', fontSize: 11, fontWeight: 700, textTransform: 'capitalize', flexShrink: 0 }}>
-          {machine.criticite}
-        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end', flexShrink: 0 }}>
+          <span style={{ background: `${critColor}22`, color: critColor, border: `1px solid ${critColor}44`, borderRadius: 6, padding: '3px 10px', fontSize: 11, fontWeight: 700, textTransform: 'capitalize' }}>
+            {machine.criticite}
+          </span>
+          {isPanneRecurrente && (
+            <span style={{ background: '#ef444422', color: '#ef4444', border: '1px solid #ef444444', borderRadius: 6, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>
+              ⚠️ {pannes30j}× en 30j
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Infos */}
