@@ -75,8 +75,8 @@ export default function ManagerTicketsPage() {
     return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
   }
 
-  const filtres = ['tous', 'ouvert', 'en_cours', 'resolu', 'urgente', 'haute', 'ameliorative'];
-  const filtreLabel = (f: string) => ({ tous: 'Tous', ouvert: 'Ouvert', en_cours: 'En cours', resolu: 'Résolu', urgente: 'Urgent', haute: 'Haute', ameliorative: '✦ Amélioratif' } as Record<string,string>)[f] ?? f;
+  const filtres = ['tous', 'ouvert', 'en_cours', 'resolu', 'urgente', 'haute', 'normale', 'basse', 'ameliorative'];
+  const filtreLabel = (f: string) => ({ tous: 'Tous', ouvert: 'Ouvert', en_cours: 'En cours', resolu: 'Résolu', urgente: 'Urgente', haute: 'Haute', normale: 'Normale', basse: 'Basse', ameliorative: '✦ Amélioratif' } as Record<string,string>)[f] ?? f;
 
   return (
     <div style={{ padding: '10px 8px', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
@@ -125,8 +125,8 @@ export default function ManagerTicketsPage() {
       <div style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>Priorité & type</div>
         <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2, scrollbarWidth: 'none' }}>
-          {(['urgente', 'haute', 'ameliorative'] as const).map(f => {
-            const colors: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', ameliorative: '#7c3aed' };
+          {(['urgente', 'haute', 'normale', 'basse', 'ameliorative'] as const).map(f => {
+            const colors: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#6366f1', basse: '#22c55e', ameliorative: '#7c3aed' };
             const c = colors[f];
             const active = filtre === f;
             return (
