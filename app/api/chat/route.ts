@@ -3,6 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 const N8N_CHAT_URL = process.env.N8N_CHAT_URL || '';
 
 export async function POST(req: NextRequest) {
+  if (!N8N_CHAT_URL) {
+    return NextResponse.json({ output: '⚠️ Assistant IA non configuré sur le serveur.' }, { status: 500 });
+  }
+
   try {
     const body = await req.json();
 
