@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { HardHat, ArrowRight, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
-type Technician = { id: string; prenom: string; nom: string; email: string; pin: string | null; pin_changed: boolean };
+type Technician = { id: string; prenom: string; nom: string; email: string; pin_changed: boolean };
 
 export default function TechLoginPage() {
   const router = useRouter();
@@ -19,41 +19,55 @@ export default function TechLoginPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    supabase.from('technicians').select('id, prenom, nom, email, pin, pin_changed').order('nom')
+    supabase.from('technicians').select('id, prenom, nom, email, pin_changed').order('nom')
       .then(({ data }) => setTechnicians((data as Technician[]) || []));
   }, []);
 
   const selected = technicians.find(t => t.id === selectedId);
 
-  function handleSelect() {
+  async function handleSelect() {
     if (!selected) return;
     setError('');
     setPin('');
     setConfirmPin('');
-    if (!selected.pin) {
-      setStep('create_pin');
-    } else {
-      setStep('pin');
-    }
+
+    const res = await fetch('/api/pin/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ techId: selected.id }),
+    });
+    const data = await res.json();
+
+    setStep(data.hasPin ? 'pin' : 'create_pin');
   }
 
   async function handleLogin() {
     if (pin.length !== 4) return;
     setLoading(true);
     setError('');
-    if (pin !== selected!.pin) {
+
+    const res = await fetch('/api/pin/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ techId: selected!.id, pin }),
+    });
+    const data = await res.json();
+
+    if (!data.ok) {
       setError('PIN incorrect.');
       setLoading(false);
       return;
     }
-    // PIN temporaire → forcer le changement
-    if (!selected!.pin_changed) {
+
+    // PIN pas encore personnalisé → forcer le changement
+    if (!data.pinChanged) {
       setStep('create_pin');
       setPin('');
       setConfirmPin('');
       setLoading(false);
       return;
     }
+
     localStorage.setItem('tech_id', selected!.id);
     localStorage.setItem('tech_prenom', selected!.prenom);
     localStorage.setItem('tech_nom', selected!.nom);
@@ -66,8 +80,15 @@ export default function TechLoginPage() {
     if (pin !== confirmPin) { setError('Les PIN ne correspondent pas.'); return; }
     setLoading(true);
     setError('');
-    const { error: err } = await supabase.from('technicians').update({ pin, pin_changed: true }).eq('id', selected!.id);
-    if (err) { setError('Erreur lors de la création du PIN.'); setLoading(false); return; }
+
+    const res = await fetch('/api/pin/set', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ techId: selected!.id, pin }),
+    });
+    const data = await res.json();
+
+    if (!data.ok) { setError('Erreur lors de la création du PIN.'); setLoading(false); return; }
     localStorage.setItem('tech_id', selected!.id);
     localStorage.setItem('tech_prenom', selected!.prenom);
     localStorage.setItem('tech_nom', selected!.nom);
