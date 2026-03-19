@@ -35,6 +35,8 @@ export default function RapportsPage() {
   const [generating, setGenerating] = useState(false);
   const [selectedType, setSelectedType] = useState('rapport_hebdo');
   const [error, setError] = useState('');
+  const [applying, setApplying] = useState<string | null>(null);
+  const [applied, setApplied] = useState<Record<string, number>>({});
 
   async function deleteAnalyse(id: string) {
     if (!confirm('Supprimer ce rapport ?')) return;
@@ -55,6 +57,26 @@ export default function RapportsPage() {
   }
 
   useEffect(() => { fetchAnalyses(); }, []);
+
+  async function appliquerRecommandations(a: Analyse) {
+    if (applying) return;
+    const cfg = typeConfig[a.type_analyse] || { label: a.type_analyse, color: '#7c3aed' };
+    if (!confirm(`Créer ${a.recommandations.length} ticket(s) d'amélioration à partir de ces recommandations ?`)) return;
+    setApplying(a.id);
+    const tickets = a.recommandations.map(r => ({
+      titre: r.slice(0, 100),
+      description: `Recommandation issue du rapport IA "${cfg.label}" du ${formatDate(a.created_at)}.\n\n${r}`,
+      type_intervention: 'ameliorative',
+      priorite: 'normale',
+      statut: 'ouvert',
+      source: 'ia',
+    }));
+    const { data, error: err } = await supabase.from('tickets').insert(tickets).select('id');
+    setApplying(null);
+    if (!err && data) {
+      setApplied(prev => ({ ...prev, [a.id]: data.length }));
+    }
+  }
 
   async function generate() {
     setGenerating(true);
@@ -262,9 +284,15 @@ export default function RapportsPage() {
                             </div>
                           ))}
                         </div>
-                        <button style={{ display: 'flex', alignItems: 'center', gap: 8, background: `${cfg.color}18`, border: `1px solid ${cfg.color}44`, borderRadius: 8, padding: '10px 16px', color: cfg.color, fontSize: 13, fontWeight: 700, cursor: 'pointer', width: '100%', justifyContent: 'center' }}>
-                          ✓ Appliquer les recommandations
-                        </button>
+                        {applied[a.id] ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#22c55e18', border: '1px solid #22c55e44', borderRadius: 8, padding: '10px 16px', color: '#22c55e', fontSize: 13, fontWeight: 700, justifyContent: 'center' }}>
+                            ✓ {applied[a.id]} ticket{applied[a.id] > 1 ? 's' : ''} créé{applied[a.id] > 1 ? 's' : ''} dans Amélioratif
+                          </div>
+                        ) : (
+                          <button onClick={() => appliquerRecommandations(a)} disabled={applying === a.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: `${cfg.color}18`, border: `1px solid ${cfg.color}44`, borderRadius: 8, padding: '10px 16px', color: cfg.color, fontSize: 13, fontWeight: 700, cursor: applying ? 'not-allowed' : 'pointer', width: '100%', justifyContent: 'center', opacity: applying === a.id ? 0.6 : 1 }}>
+                            {applying === a.id ? '...' : '✓ Appliquer les recommandations'}
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
