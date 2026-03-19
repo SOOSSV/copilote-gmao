@@ -1,83 +1,78 @@
 import React from 'react';
 
-/**
- * Logo RR GMAO — R + Я entrelacés style Rolls-Royce
- * Police serif bold, RR en chrome doré, GMAO en bleu acier
- */
 export default function RRLogo({ size = 44, showText = true }: { size?: number; showText?: boolean }) {
-  const badgeW = Math.round(size * 1.5);
-  const badgeH = Math.round(size * 1.0);
+  const badgeW = Math.round(size * 1.6);
+  const badgeH = Math.round(size * 1.05);
 
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
-      <svg width={badgeW} height={badgeH} viewBox="0 0 90 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width={badgeW} height={badgeH} viewBox="0 0 100 58" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          {/* Chrome doré — reflets métalliques multiples */}
-          <linearGradient id="chromeGold" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stopColor="#6b4c00" />
-            <stop offset="15%"  stopColor="#d4a017" />
-            <stop offset="30%"  stopColor="#fff3a0" />
-            <stop offset="45%"  stopColor="#e8b820" />
-            <stop offset="60%"  stopColor="#b8880a" />
-            <stop offset="78%"  stopColor="#f0d060" />
-            <stop offset="100%" stopColor="#7a5500" />
+            <stop offset="18%"  stopColor="#d4a820" />
+            <stop offset="32%"  stopColor="#fff5b0" />
+            <stop offset="50%"  stopColor="#e0b020" />
+            <stop offset="68%"  stopColor="#a87800" />
+            <stop offset="82%"  stopColor="#f0d868" />
+            <stop offset="100%" stopColor="#6b4c00" />
           </linearGradient>
-
-          {/* Bordure badge dorée */}
-          <linearGradient id="borderGold" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%"   stopColor="#6b4c00" />
-            <stop offset="35%"  stopColor="#e8c840" />
-            <stop offset="65%"  stopColor="#fff3a0" />
-            <stop offset="100%" stopColor="#8a6400" />
+          <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%"   stopColor="#5a3d00" />
+            <stop offset="40%"  stopColor="#e8c840" />
+            <stop offset="70%"  stopColor="#fff5b0" />
+            <stop offset="100%" stopColor="#7a5800" />
           </linearGradient>
-
-          {/* GMAO — bleu acier platine */}
-          <linearGradient id="steelBlue" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#c8e0f8" />
-            <stop offset="45%"  stopColor="#5b9bd5" />
-            <stop offset="100%" stopColor="#1e5fa0" />
+          <linearGradient id="sb" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stopColor="#d0e8ff" />
+            <stop offset="50%"  stopColor="#5b9bd5" />
+            <stop offset="100%" stopColor="#1a5090" />
           </linearGradient>
         </defs>
 
-        {/* Fond badge noir profond */}
-        <rect x="0.5" y="0.5" width="89" height="59" rx="5" fill="#06090f" stroke="url(#borderGold)" strokeWidth="1.5"/>
-        {/* Double bordure intérieure fine */}
-        <rect x="3" y="3" width="84" height="54" rx="3.5" fill="none" stroke="#c9a23635" strokeWidth="0.6"/>
+        {/* Badge */}
+        <rect x="0.5" y="0.5" width="99" height="57" rx="5" fill="#06090f" stroke="url(#bg)" strokeWidth="1.5"/>
+        <rect x="3"   y="3"   width="94" height="52" rx="3.5" fill="none" stroke="#c9a23630" strokeWidth="0.6"/>
 
-        {/* ── R normal (gauche) ── */}
+        {/*
+          R normal  : x=24 → droite ≈ x=50 (glyph ~26px à font-size 36)
+          Я miroir  : translate(96,0) scale(-1,1)
+                      → x=24 apparaît à 96-24=72, droite x=50 → 96-50=46
+                      → Я occupe x=46 à x=72
+          Chevauchement : x=46 à x=50 (4px)
+          Centrage total : (24+72)/2 = 48 ≈ 50 ✓
+        */}
+
+        {/* R normal */}
         <text
-          x="10" y="44"
+          x="24" y="44"
           fontFamily="Georgia, 'Times New Roman', serif"
-          fontSize="38"
+          fontSize="36"
           fontWeight="700"
-          fill="url(#chromeGold)"
-          letterSpacing="-1"
+          fill="url(#cg)"
         >R</text>
 
-        {/* ── Я miroir (droite) — transform: flip horizontal ── */}
-        {/* R en Georgia 38px ≈ 26px large. On place le Я qui chevauche le R. */}
-        {/* translate(82,0) scale(-1,1) : x=10 → 82-10=72, x=36 → 82-36=46 → Я de x=46 à x=72 */}
+        {/* Я miroir */}
         <text
-          x="10" y="44"
+          x="24" y="44"
           fontFamily="Georgia, 'Times New Roman', serif"
-          fontSize="38"
+          fontSize="36"
           fontWeight="700"
-          fill="url(#chromeGold)"
-          letterSpacing="-1"
-          transform="translate(82, 0) scale(-1, 1)"
+          fill="url(#cg)"
+          transform="translate(96, 0) scale(-1, 1)"
         >R</text>
 
-        {/* Ligne séparatrice fine entre RR et GMAO */}
-        <line x1="8" y1="49" x2="82" y2="49" stroke="url(#borderGold)" strokeWidth="0.7" opacity="0.5"/>
+        {/* Séparateur */}
+        <line x1="10" y1="49" x2="90" y2="49" stroke="url(#bg)" strokeWidth="0.6" opacity="0.6"/>
 
-        {/* GMAO centré et entièrement visible */}
+        {/* GMAO centré */}
         <text
-          x="45" y="57"
+          x="50" y="56"
           textAnchor="middle"
           fontFamily="Georgia, 'Times New Roman', serif"
-          fontSize="9"
+          fontSize="8.5"
           fontWeight="700"
-          fill="url(#steelBlue)"
+          fill="url(#sb)"
           letterSpacing="4"
         >GMAO</text>
       </svg>
@@ -85,8 +80,8 @@ export default function RRLogo({ size = 44, showText = true }: { size?: number; 
       {showText && (
         <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
           <span style={{
-            fontSize: 16, fontWeight: 800,
-            background: 'linear-gradient(180deg, #fff3a0 0%, #e8b820 40%, #b8880a 100%)',
+            fontSize: 15, fontWeight: 800,
+            background: 'linear-gradient(180deg, #fff5b0 0%, #e0b020 45%, #a87800 100%)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
             letterSpacing: '1px', fontFamily: 'Georgia, serif',
           }}>RR GMAO</span>
