@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import { HardHat, BarChart3, ArrowRight, LineChart } from 'lucide-react';
-import RRLogo from '@/components/RRLogo';
 
 const roles = [
   {
@@ -45,21 +44,18 @@ export default function HomePage() {
       padding: 24,
       gap: 40,
     }}>
-      {/* Logo */}
-      <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
-        <RRLogo size={180} showText={false} />
-        <div>
-          <div style={{
-            fontSize: 36, fontWeight: 900,
-            background: 'linear-gradient(180deg, #fff7c0 0%, #f5d060 30%, #c49a20 65%, #ffe680 100%)',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            fontFamily: 'Georgia, serif', letterSpacing: '4px',
-          }}>
-            RR GMAO
-          </div>
-          <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 8, letterSpacing: '1px' }}>
-            Qui êtes-vous ?
-          </div>
+      {/* En-tête */}
+      <div style={{ textAlign: 'center' }}>
+        <div style={{
+          fontSize: 36, fontWeight: 900,
+          background: 'linear-gradient(180deg, #fff7c0 0%, #f5d060 30%, #c49a20 65%, #ffe680 100%)',
+          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+          fontFamily: 'Georgia, serif', letterSpacing: '4px',
+        }}>
+          RR GMAO
+        </div>
+        <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 8, letterSpacing: '1px' }}>
+          Qui êtes-vous ?
         </div>
       </div>
 
