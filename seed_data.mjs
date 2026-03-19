@@ -79,8 +79,50 @@ const plans = [
 for (const p of plans) await post("preventive_plans", p);
 console.log(`  ${plans.length} plans préventifs OK`);
 
+// Stocks / pièces détachées
+console.log("Stocks...");
+await fetch(`${BASE}/stocks?id=neq.00000000-0000-0000-0000-000000000000`, { method: "DELETE", headers: H });
+const stocks = [
+  { reference:"RLT-6205",  nom:"Roulement 6205-2RS",              categorie:"Roulements",   unite:"pcs",   quantite_actuelle:12, seuil_minimum:4,  emplacement:"Armoire A - E3", description:"Roulement à billes, étanche, pour pétrins",              actif:true },
+  { reference:"RLT-6208",  nom:"Roulement 6208-2RS",              categorie:"Roulements",   unite:"pcs",   quantite_actuelle:6,  seuil_minimum:4,  emplacement:"Armoire A - E4", description:"Roulement à billes pour laminoir et diviseuse",           actif:true },
+  { reference:"CRR-A25",   nom:"Courroie trapézoïdale A25",       categorie:"Courroies",    unite:"pcs",   quantite_actuelle:3,  seuil_minimum:4,  emplacement:"Armoire B - E1", description:"Courroie transmission pétrins",                          actif:true },
+  { reference:"CRR-B38",   nom:"Courroie trapézoïdale B38",       categorie:"Courroies",    unite:"pcs",   quantite_actuelle:8,  seuil_minimum:3,  emplacement:"Armoire B - E2", description:"Courroie laminoir industriel",                           actif:true },
+  { reference:"JNT-SIL10", nom:"Joint silicone haute température",categorie:"Joints",       unite:"m",     quantite_actuelle:15, seuil_minimum:5,  emplacement:"Armoire C - E1", description:"Joint porte four, résistant 300°C",                      actif:true },
+  { reference:"JNT-NBR08", nom:"Joint NBR Ø8mm",                  categorie:"Joints",       unite:"pcs",   quantite_actuelle:50, seuil_minimum:20, emplacement:"Armoire C - E2", description:"Joint pour raccords pneumatiques",                       actif:true },
+  { reference:"LUB-G500",  nom:"Graisse alimentaire NSF H1 500g", categorie:"Lubrifiants",  unite:"pot",   quantite_actuelle:7,  seuil_minimum:3,  emplacement:"Armoire D - E1", description:"Graisse certifiée contact alimentaire",                  actif:true },
+  { reference:"LUB-H10L",  nom:"Huile hydraulique ISO 46 — 10L",  categorie:"Lubrifiants",  unite:"bidon", quantite_actuelle:4,  seuil_minimum:2,  emplacement:"Armoire D - E2", description:"Huile compresseur et vérins hydrauliques",               actif:true },
+  { reference:"DET-UV1",   nom:"Détecteur de flamme UV",          categorie:"Électronique", unite:"pcs",   quantite_actuelle:2,  seuil_minimum:2,  emplacement:"Armoire E - E1", description:"Détecteur pour brûleur four rotatif Siemens",            actif:true },
+  { reference:"SND-PT100", nom:"Sonde température PT100",         categorie:"Électronique", unite:"pcs",   quantite_actuelle:3,  seuil_minimum:2,  emplacement:"Armoire E - E2", description:"Sonde chambre de fermentation et fours",                 actif:true },
+  { reference:"FIL-AIR3",  nom:"Filtre à air comprimé 3/4\"",    categorie:"Pneumatique",  unite:"pcs",   quantite_actuelle:5,  seuil_minimum:3,  emplacement:"Armoire F - E1", description:"Filtre ligne air comprimé compresseur",                  actif:true },
+  { reference:"RCC-6A25",  nom:"Raccord rapide pneumatique Ø6",   categorie:"Pneumatique",  unite:"pcs",   quantite_actuelle:2,  seuil_minimum:5,  emplacement:"Armoire F - E2", description:"Raccord push-in pour flexible pneumatique",              actif:true },
+  { reference:"FUS-10A",   nom:"Fusible 10A temporisé",           categorie:"Électrique",   unite:"pcs",   quantite_actuelle:30, seuil_minimum:10, emplacement:"Armoire G - E1", description:"Fusible protection moteurs",                             actif:true },
+  { reference:"CON-3P9A",  nom:"Contacteur tripolaire 9A",        categorie:"Électrique",   unite:"pcs",   quantite_actuelle:2,  seuil_minimum:2,  emplacement:"Armoire G - E2", description:"Contacteur démarrage moteur pétrin",                     actif:true },
+  { reference:"LME-INX4",  nom:"Lame inox trancheuse",            categorie:"Consommables", unite:"pcs",   quantite_actuelle:6,  seuil_minimum:3,  emplacement:"Armoire H - E1", description:"Lame de rechange trancheuse industrielle",               actif:true },
+];
+for (const s of stocks) await post("stocks", s);
+console.log(`  ${stocks.length} articles en stock OK`);
+
+// Historique de maintenance
+console.log("Historique maintenance...");
+await fetch(`${BASE}/maintenance_history?id=neq.00000000-0000-0000-0000-000000000000`, { method: "DELETE", headers: H });
+const histories = [
+  { machine_id:m3, technicien_id:t1, type_action:"intervention", description:"Remplacement détecteur de flamme UV brûleur four rotatif #1", pieces_changees:[{nom:"Détecteur de flamme UV",quantite:1,unite:"pcs"}], observations:"Panne récurrente — 3e remplacement en 2 mois", realise_le:"2026-03-10T14:00:00+00:00" },
+  { machine_id:m3, technicien_id:t3, type_action:"intervention", description:"Remplacement thermostat chambre four rotatif #1", pieces_changees:[{nom:"Sonde température PT100",quantite:1,unite:"pcs"}], observations:"Thermostat défaillant — surchauffe 280°C", realise_le:"2026-03-01T10:00:00+00:00" },
+  { machine_id:m3, technicien_id:t2, type_action:"intervention", description:"Remplacement détecteur flamme — 2e incident", pieces_changees:[{nom:"Détecteur de flamme UV",quantite:1,unite:"pcs"},{nom:"Fusible 10A temporisé",quantite:2,unite:"pcs"}], observations:"Problème alimentation gaz identifié", realise_le:"2026-03-05T16:00:00+00:00" },
+  { machine_id:m5, technicien_id:t2, type_action:"intervention", description:"Remplacement vérin pneumatique laminoir", pieces_changees:[{nom:"Joint NBR Ø8mm",quantite:4,unite:"pcs"},{nom:"Raccord rapide pneumatique Ø6",quantite:2,unite:"pcs"}], observations:"Vérin HS — rouleau presseur bloqué", realise_le:"2026-03-15T11:30:00+00:00" },
+  { machine_id:m4, technicien_id:t1, type_action:"inspection", description:"Révision annuelle four rotatif #2", pieces_changees:[{nom:"Joint silicone haute température",quantite:2,unite:"m"},{nom:"Graisse alimentaire NSF H1 500g",quantite:1,unite:"pot"}], observations:"Révision complète OK — chariot graissé, joints remplacés", realise_le:"2026-02-20T17:00:00+00:00" },
+  { machine_id:m6, technicien_id:t4, type_action:"intervention", description:"Recalibration diviseuse automatique", pieces_changees:[], observations:"Ressort compensateur remplacé — grammage OK ±2g", realise_le:"2026-03-12T09:00:00+00:00" },
+  { machine_id:m9, technicien_id:t4, type_action:"intervention", description:"Remplacement lame trancheuse industrielle", pieces_changees:[{nom:"Lame inox trancheuse",quantite:1,unite:"pcs"}], observations:"Lame émoussée — qualité coupe restaurée", realise_le:"2026-03-08T10:00:00+00:00" },
+  { machine_id:m1, technicien_id:t2, type_action:"inspection", description:"Contrôle préventif pétrin #1 — roulements", pieces_changees:[{nom:"Graisse alimentaire NSF H1 500g",quantite:1,unite:"pot"}], observations:"Vibrations résiduelles — roulements à surveiller", realise_le:"2026-03-14T09:00:00+00:00" },
+  { machine_id:m10, technicien_id:t1, type_action:"intervention", description:"Remplacement joints raccords pneumatiques compresseur", pieces_changees:[{nom:"Joint NBR Ø8mm",quantite:8,unite:"pcs"},{nom:"Raccord rapide pneumatique Ø6",quantite:3,unite:"pcs"},{nom:"Filtre à air comprimé 3/4\"",quantite:1,unite:"pcs"}], observations:"Fuites multiples atelier façonnage — pression restaurée 7 bars", realise_le:"2026-03-17T15:00:00+00:00" },
+];
+for (const h of histories) await post("maintenance_history", h);
+console.log(`  ${histories.length} entrées historique OK`);
+
 console.log("\n✅ TERMINÉ ! Toutes les données sont insérées.");
 console.log("  - 4 techniciens");
 console.log("  - 10 machines");
 console.log(`  - ${tickets.length} tickets`);
 console.log(`  - ${plans.length} plans préventifs`);
+console.log(`  - ${stocks.length} articles en stock`);
+console.log(`  - ${histories.length} entrées historique maintenance`);

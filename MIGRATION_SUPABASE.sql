@@ -260,3 +260,22 @@ ALTER TABLE workflow_logs DISABLE ROW LEVEL SECURITY;
 -- ============================================================
 
 NOTIFY pgrst, 'reload schema';
+
+-- ============================================================
+-- TABLE ai_analyses (Rapports IA)
+-- À exécuter dans Supabase SQL Editor
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.ai_analyses (
+  id               uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  type_analyse     text NOT NULL,
+  contenu          text NOT NULL,
+  recommandations  text[] DEFAULT '{}',
+  periode_analysee text,
+  modele_llm       text DEFAULT 'n8n-ai',
+  created_at       timestamptz DEFAULT now()
+);
+
+ALTER TABLE public.ai_analyses ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role full access" ON public.ai_analyses
+  USING (true) WITH CHECK (true);
+GRANT ALL ON public.ai_analyses TO anon, authenticated, service_role;

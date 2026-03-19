@@ -1,11 +1,11 @@
 {
-  "name": "COPILOTE",
-  "short_name": "COPILOTE",
-  "description": "Assistant maintenance intelligent pour techniciens terrain",
-  "start_url": "/",
+  "name": "RR GMAO",
+  "short_name": "RR GMAO",
+  "description": "Gestion de maintenance assistée pour techniciens terrain",
+  "start_url": "/tech",
   "display": "standalone",
   "background_color": "#0f1117",
-  "theme_color": "#6366f1",
+  "theme_color": "#22c55e",
   "orientation": "portrait",
   "icons": [
     {
@@ -17,6 +17,18 @@
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nouveau ticket",
+      "url": "/nouveau",
+      "description": "Créer un ticket de panne"
+    },
+    {
+      "name": "Mes tickets",
+      "url": "/tech",
+      "description": "Voir mes interventions"
     }
   ]
 }
