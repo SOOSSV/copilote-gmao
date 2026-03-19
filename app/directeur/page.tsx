@@ -11,6 +11,12 @@ type Stats = {
   urgents: number; machines: number; techniciens: number; stockAlertes: number;
 };
 
+type TicketDetail = {
+  created_at: string;
+  statut: string;
+  machines: { nom: string } | null;
+};
+
 function KpiCard({ label, value, sub, icon: Icon, color, big, href }: {
   label: string; value: string | number; sub?: string;
   icon: React.ElementType; color: string; big?: boolean; href?: string;
@@ -48,18 +54,127 @@ function KpiMini({ label, value, color, icon: Icon, href }: { label: string; val
   return href ? <Link href={href} className="no-underline">{inner}</Link> : inner;
 }
 
+// Donut chart CSS conic-gradient
+function DonutChart({ ouverts, enCours, resolus, total, size = 120 }: {
+  ouverts: number; enCours: number; resolus: number; total: number; size?: number;
+}) {
+  const pOuv = total > 0 ? (ouverts / total) * 360 : 0;
+  const pEnC = total > 0 ? (enCours / total) * 360 : 0;
+  const pRes = total > 0 ? (resolus / total) * 360 : 0;
+  const endOuv = pOuv;
+  const endEnC = endOuv + pEnC;
+  const gradient = total > 0
+    ? `conic-gradient(#2563eb 0deg ${endOuv}deg, #f59e0b ${endOuv}deg ${endEnC}deg, #22c55e ${endEnC}deg 360deg)`
+    : `conic-gradient(#30363d 0deg 360deg)`;
+  const thickness = size * 0.2;
+  const inner = size - thickness * 2;
+
+  return (
+    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
+      <div style={{
+        width: size, height: size, borderRadius: '50%',
+        background: gradient,
+      }} />
+      <div style={{
+        position: 'absolute',
+        top: thickness, left: thickness,
+        width: inner, height: inner,
+        borderRadius: '50%',
+        background: '#161b22',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <span style={{ fontSize: size * 0.18, fontWeight: 900, color: '#e6edf3', lineHeight: 1 }}>{total}</span>
+        <span style={{ fontSize: size * 0.1, color: '#7d8590', marginTop: 2 }}>tickets</span>
+      </div>
+    </div>
+  );
+}
+
+// Bar chart 14 jours CSS flex
+function BarChart14({ ticketsDetail }: { ticketsDetail: TicketDetail[] }) {
+  const days: { label: string; count: number }[] = [];
+  const now = new Date();
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    const label = d.toLocaleDateString('fr-FR', { weekday: 'short' }).slice(0, 2);
+    const count = ticketsDetail.filter(t => t.created_at.slice(0, 10) === key).length;
+    days.push({ label, count });
+  }
+  const maxVal = Math.max(...days.map(d => d.count), 1);
+  const BAR_MAX_H = 80;
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: BAR_MAX_H + 20, width: '100%' }}>
+      {days.map((d, i) => {
+        const h = Math.max(3, Math.round((d.count / maxVal) * BAR_MAX_H));
+        return (
+          <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+            {d.count > 0 && (
+              <span style={{ fontSize: 9, color: '#7d8590', lineHeight: 1 }}>{d.count}</span>
+            )}
+            <div style={{ width: '100%', height: h, background: '#2563eb', borderRadius: '3px 3px 0 0', opacity: 0.85 }} />
+            <span style={{ fontSize: 9, color: '#7d8590', lineHeight: 1, whiteSpace: 'nowrap' }}>{d.label}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// Top 3 machines barres horizontales
+function TopMachines({ ticketsDetail, maxBars = 3 }: { ticketsDetail: TicketDetail[]; maxBars?: number }) {
+  const map = new Map<string, number>();
+  ticketsDetail.forEach(t => {
+    const nom = t.machines?.nom;
+    if (nom) map.set(nom, (map.get(nom) || 0) + 1);
+  });
+  const sorted = Array.from(map.entries()).sort((a, b) => b[1] - a[1]).slice(0, maxBars);
+  const maxVal = sorted.length > 0 ? sorted[0][1] : 1;
+
+  if (sorted.length === 0) {
+    return <div style={{ color: '#7d8590', fontSize: 12, paddingTop: 8 }}>Aucune donnée</div>;
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
+      {sorted.map(([nom, count], i) => {
+        const pct = Math.max(10, Math.round((count / maxVal) * 100));
+        const colors = ['#ef4444', '#f97316', '#f59e0b'];
+        const c = colors[i] || '#ef4444';
+        return (
+          <div key={nom}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ fontSize: 11, color: '#e6edf3', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '75%' }}>{nom}</span>
+              <span style={{ fontSize: 11, color: c, fontWeight: 700 }}>{count}</span>
+            </div>
+            <div style={{ height: 6, background: '#30363d', borderRadius: 3, overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${pct}%`, background: `linear-gradient(90deg, ${c}, ${c}88)`, borderRadius: 3, transition: 'width 0.5s' }} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function DirecteurDashboard() {
   const router = useRouter();
   const [stats, setStats] = useState<Stats>({ total: 0, ouverts: 0, en_cours: 0, fermes: 0, urgents: 0, machines: 0, techniciens: 0, stockAlertes: 0 });
   const [loading, setLoading] = useState(true);
+  const [ticketsDetail, setTicketsDetail] = useState<TicketDetail[]>([]);
 
   useEffect(() => {
     async function load() {
-      const [tickets, machines, techniciens, stocks] = await Promise.all([
+      const since14 = new Date(); since14.setDate(since14.getDate() - 14);
+
+      const [tickets, machines, techniciens, stocks, detail] = await Promise.all([
         supabase.from('tickets').select('statut, priorite'),
         supabase.from('machines').select('id').eq('statut', 'actif'),
         supabase.from('technicians').select('id'),
         supabase.from('stocks').select('quantite_actuelle, seuil_minimum').eq('actif', true),
+        supabase.from('tickets').select('created_at, statut, machines(nom)').gte('created_at', since14.toISOString()),
       ]);
       const t = tickets.data || [];
       const stockAlertes = (stocks.data || []).filter(s => s.quantite_actuelle <= s.seuil_minimum).length;
@@ -72,6 +187,7 @@ export default function DirecteurDashboard() {
         techniciens: techniciens.data?.length || 0,
         stockAlertes,
       });
+      setTicketsDetail((detail.data as unknown as TicketDetail[]) || []);
       setLoading(false);
     }
     load();
@@ -99,6 +215,32 @@ export default function DirecteurDashboard() {
             <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-4 flex items-center gap-2.5">
               <AlertTriangle size={16} color="#ef4444" />
               <span className="text-red-500 font-semibold text-[13px]">{stats.urgents} ticket{stats.urgents > 1 ? 's' : ''} urgent{stats.urgents > 1 ? 's' : ''}</span>
+            </div>
+          )}
+
+          {/* Donut compact mobile */}
+          {!loading && (
+            <div className="bg-[#1c2128] border border-[#30363d] rounded-xl p-3 mb-3 flex items-center gap-4">
+              <DonutChart
+                ouverts={stats.ouverts}
+                enCours={stats.en_cours}
+                resolus={stats.fermes}
+                total={stats.total}
+                size={90}
+              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {[
+                  { label: 'Ouvert', color: '#2563eb', val: stats.ouverts },
+                  { label: 'En cours', color: '#f59e0b', val: stats.en_cours },
+                  { label: 'Résolu', color: '#22c55e', val: stats.fermes },
+                ].map(item => (
+                  <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: item.color, flexShrink: 0 }} />
+                    <span style={{ fontSize: 11, color: '#7d8590' }}>{item.label}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: item.color, marginLeft: 'auto' }}>{item.val}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -217,15 +359,49 @@ export default function DirecteurDashboard() {
 
         {loading ? <div className="text-[#7d8590]">Chargement...</div> : (
           <>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <KpiCard label="Taux de résolution" value={`${tauxResolution}%`} sub={`${stats.fermes} résolus sur ${stats.total} au total`} icon={TrendingUp} color="#22c55e" big href="/directeur/synthese" />
-              <KpiCard label="Charge en cours" value={`${charge}%`} sub={`${stats.ouverts} ouverts · ${stats.en_cours} en traitement`} icon={Zap} color="#2563eb" big href="/directeur/tickets" />
+            {/* === GRAPHIQUES desktop — 3 colonnes === */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr 1fr', gap: 16, marginBottom: 20 }}>
+
+              {/* 1. Donut chart */}
+              <div style={{ background: '#1c2128', border: '1px solid #30363d', borderRadius: 14, padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#7d8590', textTransform: 'uppercase', letterSpacing: '0.5px', alignSelf: 'flex-start' }}>Répartition statuts</div>
+                <DonutChart
+                  ouverts={stats.ouverts}
+                  enCours={stats.en_cours}
+                  resolus={stats.fermes}
+                  total={stats.total}
+                  size={120}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+                  {[
+                    { label: 'Ouvert', color: '#2563eb', val: stats.ouverts },
+                    { label: 'En cours', color: '#f59e0b', val: stats.en_cours },
+                    { label: 'Résolu', color: '#22c55e', val: stats.fermes },
+                  ].map(item => (
+                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ width: 10, height: 10, borderRadius: '50%', background: item.color, flexShrink: 0 }} />
+                      <span style={{ fontSize: 12, color: '#7d8590', flex: 1 }}>{item.label}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: item.color }}>{item.val}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 2. Bar chart 14 jours */}
+              <div style={{ background: '#1c2128', border: '1px solid #30363d', borderRadius: 14, padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#7d8590', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Tickets créés — 14 derniers jours</div>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end' }}>
+                  <BarChart14 ticketsDetail={ticketsDetail} />
+                </div>
+              </div>
+
+              {/* 3. Top 3 machines */}
+              <div style={{ background: '#1c2128', border: '1px solid #30363d', borderRadius: 14, padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#7d8590', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Top 3 machines</div>
+                <TopMachines ticketsDetail={ticketsDetail} maxBars={3} />
+              </div>
             </div>
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              <KpiCard label="Tickets urgents"  value={stats.urgents}     icon={AlertTriangle} color="#ef4444" href="/directeur/tickets?filtre=urgente" />
-              <KpiCard label="Machines actives" value={stats.machines}    icon={CheckCircle2}  color="#0ea5e9" href="/directeur/machines" />
-              <KpiCard label="Techniciens"       value={stats.techniciens} icon={Clock}         color="#7c3aed" href="/directeur/techniciens" />
-            </div>
+
             {/* Nav dense desktop */}
             <div className="grid grid-cols-3 gap-3">
               {[
