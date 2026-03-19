@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Lock, Eye, EyeOff, Bot, ArrowLeft } from 'lucide-react';
+import { Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { RRLogoBadge } from '@/components/RRLogo';
 
 const DIRECTEUR_PASSWORD = process.env.NEXT_PUBLIC_DIRECTOR_PASSWORD || 'directeur2024';
 
@@ -38,8 +39,8 @@ export default function DirecteurLoginPage() {
         </button>
 
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center mx-auto mb-3.5">
-            <Bot size={28} color="white" />
+          <div className="flex justify-center mb-2">
+            <RRLogoBadge size={72} />
           </div>
           <div className="text-[22px] font-extrabold text-[#e6edf3]">RR GMAO</div>
           <div className="text-[13px] text-[#7d8590] mt-1">Espace Directeur</div>
