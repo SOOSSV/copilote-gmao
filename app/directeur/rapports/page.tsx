@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { BarChart3, Brain, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
+import { BarChart3, Brain, ChevronDown, ChevronUp, ArrowLeft, Download } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 type Analyse = {
@@ -77,6 +77,42 @@ export default function DirecteurRapportsPage() {
     return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
   }
 
+  function exportPDF(a: Analyse) {
+    const cfg = typeConfig[a.type_analyse] || { label: a.type_analyse, color: '#7c3aed' };
+    const win = window.open('', '_blank');
+    if (!win) return;
+    win.document.write(`<!DOCTYPE html><html lang="fr"><head>
+      <meta charset="UTF-8"/>
+      <title>Rapport RR GMAO — ${cfg.label}</title>
+      <style>
+        body { font-family: Georgia, serif; color: #111; background: #fff; margin: 0; padding: 40px; max-width: 800px; margin: 0 auto; }
+        h1 { font-size: 22px; color: ${cfg.color}; margin-bottom: 4px; }
+        .meta { font-size: 12px; color: #666; margin-bottom: 24px; border-bottom: 1px solid #eee; padding-bottom: 16px; }
+        .badge { display: inline-block; background: ${cfg.color}22; color: ${cfg.color}; border-radius: 4px; padding: 2px 10px; font-size: 12px; font-weight: 600; margin-right: 8px; }
+        h2 { font-size: 14px; color: #333; margin-top: 24px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        p { font-size: 13px; line-height: 1.7; color: #333; margin: 4px 0; }
+        .reco { background: #f8f8f8; border-left: 3px solid ${cfg.color}; padding: 10px 14px; margin-bottom: 8px; font-size: 13px; line-height: 1.6; border-radius: 0 6px 6px 0; }
+        .footer { margin-top: 40px; font-size: 11px; color: #999; border-top: 1px solid #eee; padding-top: 12px; }
+        @media print { body { padding: 20px; } }
+      </style>
+    </head><body>
+      <h1>${cfg.label}</h1>
+      <div class="meta"><span class="badge">RR GMAO</span>${a.periode_analysee || ''} · Généré le ${formatDate(a.created_at)}</div>
+      <h2>Analyse</h2>
+      ${a.contenu.split('\n').filter(l => l.trim()).map(l => {
+        const t = l.trim();
+        if (t.startsWith('**') && t.endsWith('**')) return `<h2>${t.replace(/\*\*/g,'')}</h2>`;
+        if (t.startsWith('#')) return `<h2>${t.replace(/^#+\s*/,'')}</h2>`;
+        if (t.startsWith('- ') || t.startsWith('• ')) return `<p>• ${t.slice(2)}</p>`;
+        return `<p>${t}</p>`;
+      }).join('')}
+      ${a.recommandations?.length ? `<h2>Recommandations</h2>${a.recommandations.map((r,i) => `<div class="reco"><strong>${i+1}.</strong> ${r}</div>`).join('')}` : ''}
+      <div class="footer">RR GMAO · Rapport généré automatiquement · ${new Date().toLocaleDateString('fr-FR')}</div>
+    </body></html>`);
+    win.document.close();
+    setTimeout(() => { win.print(); }, 400);
+  }
+
   return (
     <div style={{ padding: '16px', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
@@ -106,16 +142,18 @@ export default function DirecteurRapportsPage() {
                 borderLeft: `3px solid ${cfg.color}`,
                 borderRadius: 12, overflow: 'hidden',
               }}>
-                <div
-                  onClick={() => setOuvert(isOpen ? null : a.id)}
-                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', cursor: 'pointer' }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px' }}>
+                  <div onClick={() => setOuvert(isOpen ? null : a.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, cursor: 'pointer' }}>
                     <span style={{ background: `${cfg.color}22`, color: cfg.color, borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>{cfg.label}</span>
                     <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{formatDate(a.created_at)}</span>
                     {a.periode_analysee && <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>— {a.periode_analysee}</span>}
+                    {isOpen ? <ChevronUp size={16} color="var(--text-secondary)" style={{ marginLeft: 'auto' }} /> : <ChevronDown size={16} color="var(--text-secondary)" style={{ marginLeft: 'auto' }} />}
                   </div>
-                  {isOpen ? <ChevronUp size={16} color="var(--text-secondary)" /> : <ChevronDown size={16} color="var(--text-secondary)" />}
+                  <button onClick={() => exportPDF(a)} title="Exporter PDF" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: '4px', marginLeft: 8, flexShrink: 0 }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#0ea5e9')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}>
+                    <Download size={15} />
+                  </button>
                 </div>
 
                 {isOpen && (
