@@ -23,10 +23,10 @@ await del("technicians");
 
 // Techniciens
 console.log("Techniciens...");
-const t1 = await post("technicians", { external_id:"T001", nom:"Dupont", prenom:"Marc", disponible:true, charge_actuelle:2, email:"m.dupont@boulangerie-europe.fr", telephone:"06 12 34 56 78" });
-const t2 = await post("technicians", { external_id:"T002", nom:"Martin", prenom:"Julien", disponible:true, charge_actuelle:1, email:"j.martin@boulangerie-europe.fr", telephone:"06 23 45 67 89" });
-const t3 = await post("technicians", { external_id:"T003", nom:"Leroy", prenom:"Sophie", disponible:false, charge_actuelle:3, email:"s.leroy@boulangerie-europe.fr", telephone:"06 34 56 78 90" });
-const t4 = await post("technicians", { external_id:"T004", nom:"Bernard", prenom:"Thomas", disponible:true, charge_actuelle:0, email:"t.bernard@boulangerie-europe.fr", telephone:"06 45 67 89 01" });
+const t1 = await post("technicians", { external_id:"T001", nom:"Dupont", prenom:"Marc", disponible:true, charge_actuelle:2, equipe:"matin", email:"m.dupont@rr-gmao.fr", telephone:"06 12 34 56 78" });
+const t2 = await post("technicians", { external_id:"T002", nom:"Martin", prenom:"Julien", disponible:true, charge_actuelle:1, equipe:"matin", email:"j.martin@rr-gmao.fr", telephone:"06 23 45 67 89" });
+const t3 = await post("technicians", { external_id:"T003", nom:"Leroy", prenom:"Sophie", disponible:false, charge_actuelle:3, equipe:"apres_midi", email:"s.leroy@rr-gmao.fr", telephone:"06 34 56 78 90" });
+const t4 = await post("technicians", { external_id:"T004", nom:"Bernard", prenom:"Thomas", disponible:true, charge_actuelle:0, equipe:"nuit", email:"t.bernard@rr-gmao.fr", telephone:"06 45 67 89 01" });
 console.log("  4 techniciens OK");
 
 // Machines
