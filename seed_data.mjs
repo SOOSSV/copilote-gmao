@@ -23,11 +23,15 @@ await del("technicians");
 
 // Techniciens
 console.log("Techniciens...");
-const t1 = await post("technicians", { external_id:"T001", nom:"Dupont", prenom:"Marc", disponible:true, charge_actuelle:2, equipe:"matin", email:"m.dupont@rr-gmao.fr", telephone:"06 12 34 56 78" });
-const t2 = await post("technicians", { external_id:"T002", nom:"Martin", prenom:"Julien", disponible:true, charge_actuelle:1, equipe:"matin", email:"j.martin@rr-gmao.fr", telephone:"06 23 45 67 89" });
-const t3 = await post("technicians", { external_id:"T003", nom:"Leroy", prenom:"Sophie", disponible:false, charge_actuelle:3, equipe:"apres_midi", email:"s.leroy@rr-gmao.fr", telephone:"06 34 56 78 90" });
-const t4 = await post("technicians", { external_id:"T004", nom:"Bernard", prenom:"Thomas", disponible:true, charge_actuelle:0, equipe:"nuit", email:"t.bernard@rr-gmao.fr", telephone:"06 45 67 89 01" });
-console.log("  4 techniciens OK");
+const t1 = await post("technicians", { external_id:"T001", nom:"Dupont",    prenom:"Marc",    disponible:true,  charge_actuelle:2, equipe:"matin",      email:"m.dupont@rr-gmao.fr",    telephone:"06 12 34 56 78" });
+const t2 = await post("technicians", { external_id:"T002", nom:"Martin",    prenom:"Julien",  disponible:true,  charge_actuelle:1, equipe:"matin",      email:"j.martin@rr-gmao.fr",    telephone:"06 23 45 67 89" });
+const t3 = await post("technicians", { external_id:"T003", nom:"Leroy",     prenom:"Sophie",  disponible:false, charge_actuelle:3, equipe:"apres_midi", email:"s.leroy@rr-gmao.fr",     telephone:"06 34 56 78 90" });
+const t4 = await post("technicians", { external_id:"T004", nom:"Bernard",   prenom:"Thomas",  disponible:true,  charge_actuelle:0, equipe:"nuit",       email:"t.bernard@rr-gmao.fr",   telephone:"06 45 67 89 01" });
+const t5 = await post("technicians", { external_id:"T005", nom:"Moreau",    prenom:"Lucas",   disponible:true,  charge_actuelle:1, equipe:"matin",      email:"l.moreau@rr-gmao.fr",    telephone:"06 56 78 90 12" });
+const t6 = await post("technicians", { external_id:"T006", nom:"Petit",     prenom:"Camille", disponible:true,  charge_actuelle:2, equipe:"apres_midi", email:"c.petit@rr-gmao.fr",     telephone:"06 67 89 01 23" });
+const t7 = await post("technicians", { external_id:"T007", nom:"Roux",      prenom:"Antoine", disponible:false, charge_actuelle:3, equipe:"apres_midi", email:"a.roux@rr-gmao.fr",      telephone:"06 78 90 12 34" });
+const t8 = await post("technicians", { external_id:"T008", nom:"Garnier",   prenom:"Nadia",   disponible:true,  charge_actuelle:0, equipe:"nuit",       email:"n.garnier@rr-gmao.fr",   telephone:"06 89 01 23 45" });
+console.log("  8 techniciens OK");
 
 // Machines
 console.log("Machines...");
@@ -120,7 +124,7 @@ for (const h of histories) await post("maintenance_history", h);
 console.log(`  ${histories.length} entrées historique OK`);
 
 console.log("\n✅ TERMINÉ ! Toutes les données sont insérées.");
-console.log("  - 4 techniciens");
+console.log("  - 8 techniciens");
 console.log("  - 10 machines");
 console.log(`  - ${tickets.length} tickets`);
 console.log(`  - ${plans.length} plans préventifs`);
