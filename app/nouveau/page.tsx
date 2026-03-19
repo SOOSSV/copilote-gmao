@@ -65,6 +65,22 @@ export default function NouveauTicketPage() {
       source: 'manuel',
     });
     if (error) { setStatus('error'); return; }
+
+    if (form.priorite === 'urgente') {
+      const machine = machines.find(m => m.id === form.machine_id);
+      fetch('/api/push/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-push-secret': process.env.NEXT_PUBLIC_PUSH_API_SECRET || 'copilote_push_2024' },
+        body: JSON.stringify({
+          title: '🚨 Ticket URGENT',
+          body: `${form.titre}${machine ? ` — ${machine.nom}` : ''}`,
+          url: '/manager/tickets',
+          role: 'manager',
+          tag: 'ticket-urgent',
+        }),
+      }).catch(() => {});
+    }
+
     setStatus('success');
     setTimeout(() => router.push('/tickets'), 1500);
   }
