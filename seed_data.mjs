@@ -1,3 +1,14 @@
+// ⚠️  SCRIPT DE DÉVELOPPEMENT UNIQUEMENT
+// Ce script efface et recrée toutes les données.
+// Ne jamais lancer en production avec de vraies données client.
+// Usage : node seed_data.mjs --confirme
+
+if (!process.argv.includes("--confirme")) {
+  console.error("⛔  Ce script efface TOUTES les données.");
+  console.error("    Lance avec : node seed_data.mjs --confirme");
+  process.exit(1);
+}
+
 const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ubXB6c3lnZnlhY25oeXVhb2dyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzgyNzk3MSwiZXhwIjoyMDg5NDAzOTcxfQ.ttRgPYSkMU4e883Tz0WSWT0NaQLgqHbX6H2w9DzdcLs";
 const BASE = "https://nnmpzsygfyacnhyuaogr.supabase.co/rest/v1";
 const H = { "apikey": KEY, "Authorization": `Bearer ${KEY}`, "Content-Type": "application/json", "Prefer": "return=representation" };
