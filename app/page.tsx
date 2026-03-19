@@ -50,12 +50,14 @@ export default function HomePage() {
         <RRLogo size={110} showText={false} />
         <div>
           <div style={{
-            fontSize: 36, fontWeight: 900, color: '#c9a236',
-            fontFamily: 'Georgia, serif', letterSpacing: '2px',
+            fontSize: 36, fontWeight: 900,
+            background: 'linear-gradient(180deg, #fff7c0 0%, #f5d060 30%, #c49a20 65%, #ffe680 100%)',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            fontFamily: 'Georgia, serif', letterSpacing: '4px',
           }}>
             RR GMAO
           </div>
-          <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 6 }}>
+          <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 8, letterSpacing: '1px' }}>
             Qui êtes-vous ?
           </div>
         </div>
