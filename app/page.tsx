@@ -1,7 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Bot, HardHat, BarChart3, ArrowRight, LineChart } from 'lucide-react';
+import { HardHat, BarChart3, ArrowRight, LineChart } from 'lucide-react';
+import RRLogo from '@/components/RRLogo';
 
 const roles = [
   {
@@ -45,26 +46,18 @@ export default function HomePage() {
       gap: 40,
     }}>
       {/* Logo */}
-      <div style={{ textAlign: 'center' }}>
-        <div style={{
-          width: 68, height: 68, borderRadius: '50%',
-          background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto 16px',
-          boxShadow: '0 0 40px rgba(99,102,241,0.3)',
-        }}>
-          <Bot size={34} color="white" />
-        </div>
-        <div style={{
-          fontSize: 32, fontWeight: 900,
-          background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-          letterSpacing: '-0.5px',
-        }}>
-          RR GMAO
-        </div>
-        <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 6 }}>
-          Qui êtes-vous ?
+      <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
+        <RRLogo size={110} showText={false} />
+        <div>
+          <div style={{
+            fontSize: 36, fontWeight: 900, color: '#c9a236',
+            fontFamily: 'Georgia, serif', letterSpacing: '2px',
+          }}>
+            RR GMAO
+          </div>
+          <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 6 }}>
+            Qui êtes-vous ?
+          </div>
         </div>
       </div>
 
