@@ -193,8 +193,8 @@ export default function DirecteurDashboard() {
     load();
   }, []);
 
-  function handleLogout() {
-    localStorage.removeItem('directeur_auth');
+  async function handleLogout() {
+    await supabase.auth.signOut();
     router.replace('/directeur/login');
   }
 

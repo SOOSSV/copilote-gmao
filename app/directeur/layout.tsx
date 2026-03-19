@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { LayoutDashboard, BarChart3, LogOut, Ticket, Factory, Users, Package } from 'lucide-react';
 import { RRLogoBadge } from '@/components/RRLogo';
+import { supabase } from '@/lib/supabase';
 
 const nav = [
   { href: '/directeur',               icon: LayoutDashboard, label: 'Vue synthèse' },
@@ -22,10 +23,11 @@ export default function DirecteurLayout({ children }: { children: React.ReactNod
 
   useEffect(() => {
     if (isLoginPage) return;
-    if (typeof window !== 'undefined') {
-      const auth = localStorage.getItem('directeur_auth');
-      if (auth !== 'true') router.replace('/directeur/login');
-    }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session || session.user.user_metadata?.role !== 'directeur') {
+        router.replace('/directeur/login');
+      }
+    });
   }, [isLoginPage, router]);
 
   if (isLoginPage) return <>{children}</>;
@@ -34,8 +36,8 @@ export default function DirecteurLayout({ children }: { children: React.ReactNod
     return pathname === href || (href !== '/directeur' && pathname.startsWith(href));
   }
 
-  function handleLogout() {
-    localStorage.removeItem('directeur_auth');
+  async function handleLogout() {
+    await supabase.auth.signOut();
     router.replace('/directeur/login');
   }
 

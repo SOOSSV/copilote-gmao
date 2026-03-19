@@ -35,10 +35,11 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (isLoginPage) return;
-    if (typeof window !== 'undefined') {
-      const auth = localStorage.getItem('manager_auth');
-      if (auth !== 'true') router.replace('/manager/login');
-    }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session || session.user.user_metadata?.role !== 'manager') {
+        router.replace('/manager/login');
+      }
+    });
   }, [isLoginPage, router]);
 
   useEffect(() => {
@@ -55,8 +56,8 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
     return pathname === href || (href !== '/manager' && pathname.startsWith(href));
   }
 
-  function handleLogout() {
-    localStorage.removeItem('manager_auth');
+  async function handleLogout() {
+    await supabase.auth.signOut();
     router.replace('/manager/login');
   }
 

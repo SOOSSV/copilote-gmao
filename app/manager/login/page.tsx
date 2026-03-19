@@ -4,8 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { RRLogoBadge } from '@/components/RRLogo';
-
-const MANAGER_PASSWORD = process.env.NEXT_PUBLIC_MANAGER_PASSWORD || 'copilote2024';
+import { supabase } from '@/lib/supabase';
 
 export default function ManagerLoginPage() {
   const router = useRouter();
@@ -14,18 +13,21 @@ export default function ManagerLoginPage() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  function handleLogin() {
+  async function handleLogin() {
+    if (!password) return;
     setLoading(true);
-    setTimeout(() => {
-      if (password === MANAGER_PASSWORD) {
-        localStorage.setItem('manager_auth', 'true');
-        router.push('/manager');
-      } else {
-        setError(true);
-        setLoading(false);
-        setPassword('');
-      }
-    }, 600);
+    setError(false);
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: 'manager@rr-gmao.fr',
+      password,
+    });
+    if (authError) {
+      setError(true);
+      setLoading(false);
+      setPassword('');
+    } else {
+      router.push('/manager');
+    }
   }
 
   return (

@@ -126,8 +126,8 @@ export default function ManagerDashboard() {
     return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
   }
 
-  function handleLogout() {
-    localStorage.removeItem('manager_auth');
+  async function handleLogout() {
+    await supabase.auth.signOut();
     router.replace('/manager/login');
   }
 
