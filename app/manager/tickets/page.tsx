@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { supabase, Ticket } from '@/lib/supabase';
 import PrioriteBadge from '@/components/PrioriteBadge';
 import TypeBadge from '@/components/TypeBadge';
-import { Search, RefreshCw, ArrowLeft } from 'lucide-react';
+import { Search, RefreshCw, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -24,6 +24,13 @@ export default function ManagerTicketsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filtre, setFiltre] = useState('tous');
+
+  // Filtres avancés
+  const [filtresMachineOpen, setFiltresMachineOpen] = useState(false);
+  const [filtreMachine, setFiltreMachine] = useState('');
+  const [filtreTech, setFiltreTech] = useState('');
+  const [filtreDateDu, setFiltreDateDu] = useState('');
+  const [filtreDateAu, setFiltreDateAu] = useState('');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -47,6 +54,25 @@ export default function ManagerTicketsPage() {
     return map;
   }, [tickets]);
 
+  // Listes distinctes pour les selects
+  const machinesDistinctes = useMemo(() => {
+    const set = new Set<string>();
+    tickets.forEach(t => {
+      const nom = (t.machines as { nom: string } | null)?.nom;
+      if (nom) set.add(nom);
+    });
+    return Array.from(set).sort();
+  }, [tickets]);
+
+  const techsDistincts = useMemo(() => {
+    const set = new Set<string>();
+    tickets.forEach(t => {
+      const tech = t.technicians as { prenom: string; nom: string } | null;
+      if (tech?.prenom) set.add(`${tech.prenom} ${tech.nom || ''}`.trim());
+    });
+    return Array.from(set).sort();
+  }, [tickets]);
+
   async function fetchTickets() {
     setLoading(true);
     const { data } = await supabase
@@ -65,10 +91,19 @@ export default function ManagerTicketsPage() {
   }
 
   const filtered = tickets.filter(t => {
+    const machineNom = (t.machines as { nom: string } | null)?.nom;
+    const tech = t.technicians as { prenom: string; nom: string } | null;
+    const techNomComplet = tech ? `${tech.prenom} ${tech.nom || ''}`.trim() : '';
+
     const matchSearch = t.titre.toLowerCase().includes(search.toLowerCase()) ||
-      (t.machines as { nom: string } | undefined)?.nom?.toLowerCase().includes(search.toLowerCase());
+      machineNom?.toLowerCase().includes(search.toLowerCase());
     const matchFiltre = filtre === 'tous' || t.statut === filtre || t.priorite === filtre || t.type_intervention === filtre;
-    return matchSearch && matchFiltre;
+    const matchMachine = !filtreMachine || machineNom === filtreMachine;
+    const matchTech = !filtreTech || techNomComplet === filtreTech;
+    const matchDateDu = !filtreDateDu || new Date(t.created_at) >= new Date(filtreDateDu);
+    const matchDateAu = !filtreDateAu || new Date(t.created_at) <= new Date(filtreDateAu + 'T23:59:59');
+
+    return matchSearch && matchFiltre && matchMachine && matchTech && matchDateDu && matchDateAu;
   });
 
   function formatDate(iso: string) {
@@ -77,6 +112,8 @@ export default function ManagerTicketsPage() {
 
   const filtres = ['tous', 'ouvert', 'en_cours', 'resolu', 'urgente', 'haute', 'normale', 'basse', 'ameliorative'];
   const filtreLabel = (f: string) => ({ tous: 'Tous', ouvert: 'Ouvert', en_cours: 'En cours', resolu: 'Résolu', urgente: 'Urgente', haute: 'Haute', normale: 'Normale', basse: 'Basse', ameliorative: '✦ Amélioratif' } as Record<string,string>)[f] ?? f;
+
+  const hasAdvancedFilters = filtreMachine || filtreTech || filtreDateDu || filtreDateAu;
 
   return (
     <div className="px-4 md:px-8 py-5 max-w-[100vw] box-border overflow-x-hidden">
@@ -130,7 +167,7 @@ export default function ManagerTicketsPage() {
       </div>
 
       {/* Filtres priorité + type */}
-      <div className="mb-4">
+      <div className="mb-3">
         <div className="text-[10px] font-bold text-[#7d8590] uppercase tracking-[0.5px] mb-1.5">Priorité & type</div>
         <div className="flex gap-1.5 overflow-x-auto pb-0.5" style={{ scrollbarWidth: 'none' }}>
           {(['urgente', 'haute', 'normale', 'basse', 'ameliorative'] as const).map(f => {
@@ -153,6 +190,99 @@ export default function ManagerTicketsPage() {
             );
           })}
         </div>
+      </div>
+
+      {/* Filtres avancés — collapsible */}
+      <div className="mb-4">
+        <button
+          onClick={() => setFiltresMachineOpen(v => !v)}
+          className="flex items-center gap-1.5 text-[11px] font-bold text-[#7d8590] uppercase tracking-[0.5px] bg-transparent border-none cursor-pointer px-0 py-1 mb-0"
+        >
+          {filtresMachineOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+          Filtres avancés
+          {hasAdvancedFilters && (
+            <span className="ml-1 bg-blue-500/20 text-blue-400 rounded-full px-1.5 py-0 text-[10px] font-bold normal-case tracking-normal">
+              actifs
+            </span>
+          )}
+        </button>
+
+        {filtresMachineOpen && (
+          <div className="mt-2 p-3 bg-[#161b22] border border-[#30363d] rounded-xl">
+            {/* Desktop : 2 colonnes x 2 lignes — Mobile : empilé */}
+            <div
+              style={{
+                display: 'grid',
+                gap: '10px',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              }}
+            >
+              {/* Select Machine */}
+              <div>
+                <label className="block text-[10px] font-bold text-[#7d8590] uppercase tracking-[0.4px] mb-1">Machine</label>
+                <select
+                  value={filtreMachine}
+                  onChange={e => setFiltreMachine(e.target.value)}
+                  className="w-full bg-[#1c2128] border border-[#30363d] rounded-lg py-2 px-3 text-[#e6edf3] text-[12px] outline-none box-border cursor-pointer"
+                >
+                  <option value="">Toutes les machines</option>
+                  {machinesDistinctes.map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Select Technicien */}
+              <div>
+                <label className="block text-[10px] font-bold text-[#7d8590] uppercase tracking-[0.4px] mb-1">Technicien</label>
+                <select
+                  value={filtreTech}
+                  onChange={e => setFiltreTech(e.target.value)}
+                  className="w-full bg-[#1c2128] border border-[#30363d] rounded-lg py-2 px-3 text-[#e6edf3] text-[12px] outline-none box-border cursor-pointer"
+                >
+                  <option value="">Tous les techniciens</option>
+                  {techsDistincts.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Date Du */}
+              <div>
+                <label className="block text-[10px] font-bold text-[#7d8590] uppercase tracking-[0.4px] mb-1">Du</label>
+                <input
+                  type="date"
+                  value={filtreDateDu}
+                  onChange={e => setFiltreDateDu(e.target.value)}
+                  className="w-full bg-[#1c2128] border border-[#30363d] rounded-lg py-2 px-3 text-[#e6edf3] text-[12px] outline-none box-border cursor-pointer"
+                  style={{ colorScheme: 'dark' }}
+                />
+              </div>
+
+              {/* Date Au */}
+              <div>
+                <label className="block text-[10px] font-bold text-[#7d8590] uppercase tracking-[0.4px] mb-1">Au</label>
+                <input
+                  type="date"
+                  value={filtreDateAu}
+                  onChange={e => setFiltreDateAu(e.target.value)}
+                  className="w-full bg-[#1c2128] border border-[#30363d] rounded-lg py-2 px-3 text-[#e6edf3] text-[12px] outline-none box-border cursor-pointer"
+                  style={{ colorScheme: 'dark' }}
+                />
+              </div>
+            </div>
+
+            {/* Reset filtres avancés */}
+            {hasAdvancedFilters && (
+              <button
+                onClick={() => { setFiltreMachine(''); setFiltreTech(''); setFiltreDateDu(''); setFiltreDateAu(''); }}
+                className="mt-2.5 text-[11px] text-[#7d8590] underline bg-transparent border-none cursor-pointer px-0"
+              >
+                Réinitialiser les filtres avancés
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Contenu */}
