@@ -20,21 +20,27 @@ type Session = {
 };
 
 const N8N_CHAT_URL = process.env.NEXT_PUBLIC_N8N_CHAT_URL || '';
-const SESSIONS_KEY = 'copilote_sessions';
-const CURRENT_KEY = 'copilote_current_session';
+
+function getTechId(): string {
+  if (typeof window === 'undefined') return 'anon';
+  return localStorage.getItem('tech_id') || 'anon';
+}
 
 function getTechPrenom(): string {
   if (typeof window === 'undefined') return '';
   return localStorage.getItem('tech_prenom') || '';
 }
 
+function sessionsKey(): string { return `copilote_sessions_${getTechId()}`; }
+function currentKey(): string { return `copilote_current_${getTechId()}`; }
+
 function loadSessions(): Session[] {
   if (typeof window === 'undefined') return [];
-  try { return JSON.parse(localStorage.getItem(SESSIONS_KEY) || '[]'); } catch { return []; }
+  try { return JSON.parse(localStorage.getItem(sessionsKey()) || '[]'); } catch { return []; }
 }
 
 function saveSessions(sessions: Session[]) {
-  localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+  localStorage.setItem(sessionsKey(), JSON.stringify(sessions));
 }
 
 function createNewSession(): Session {
@@ -69,7 +75,7 @@ export default function ChatPage() {
   });
   const [currentId, setCurrentId] = useState<string>(() => {
     if (typeof window === 'undefined') return '';
-    const saved = localStorage.getItem(CURRENT_KEY);
+    const saved = localStorage.getItem(currentKey());
     const s = loadSessions();
     if (saved && s.find(x => x.id === saved)) return saved;
     return s[0]?.id || '';
@@ -85,7 +91,7 @@ export default function ChatPage() {
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
   useEffect(() => { saveSessions(sessions); }, [sessions]);
-  useEffect(() => { if (currentId) localStorage.setItem(CURRENT_KEY, currentId); }, [currentId]);
+  useEffect(() => { if (currentId) localStorage.setItem(currentKey(), currentId); }, [currentId]);
 
   function updateCurrentMessages(newMessages: Message[]) {
     setSessions(prev => prev.map(s =>

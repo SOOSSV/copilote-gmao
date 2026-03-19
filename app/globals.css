@@ -77,7 +77,7 @@ body {
   .tech-content { padding-bottom: 0 !important; }
   .chat-input-bar { bottom: 0 !important; }
   .chat-messages { padding-bottom: 80px !important; }
-  .tech-page-wrap { max-width: 860px; margin: 0 auto; }
+  .tech-page-wrap { max-width: 1200px; margin: 0 auto; }
   /* Chat desktop sidebar */
   .chat-desktop-sidebar { display: flex !important; }
   .chat-history-btn { display: none !important; }

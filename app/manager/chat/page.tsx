@@ -19,8 +19,8 @@ type Session = {
 };
 
 const N8N_CHAT_URL = process.env.NEXT_PUBLIC_N8N_CHAT_URL || '';
-const SESSIONS_KEY = 'copilote_sessions';
-const CURRENT_KEY = 'copilote_current_session';
+const SESSIONS_KEY = 'copilote_sessions_manager';
+const CURRENT_KEY = 'copilote_current_manager';
 
 function loadSessions(): Session[] {
   if (typeof window === 'undefined') return [];

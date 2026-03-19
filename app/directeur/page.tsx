@@ -244,6 +244,14 @@ export default function DirecteurDashboard() {
             </div>
           )}
 
+          {/* Bar chart mobile */}
+          {!loading && (
+            <div className="bg-[#1c2128] border border-[#30363d] rounded-xl p-3 mb-3">
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#7d8590', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 10 }}>Tickets — 14 derniers jours</div>
+              <BarChart14 ticketsDetail={ticketsDetail} />
+            </div>
+          )}
+
           {/* KPI rapides */}
           <div className="grid grid-cols-3 gap-2.5 mb-2.5">
             {[
