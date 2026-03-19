@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { ArrowLeft, Wrench, MapPin, User, Calendar, AlertTriangle, CheckCircle, Clock, UserCheck, Bot, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Wrench, MapPin, User, Calendar, AlertTriangle, CheckCircle, Clock, UserCheck, Bot, Loader2, ChevronDown, ChevronUp, History } from 'lucide-react';
 import TypeBadge from '@/components/TypeBadge';
 
 type Ticket = {
@@ -30,6 +30,7 @@ type Diagnostic = {
 };
 
 type Technician = { id: string; prenom: string; nom: string; specialites: string[] };
+type HistoryEntry = { id: string; champ: string; ancienne_valeur: string | null; nouvelle_valeur: string | null; modifie_par: string; modifie_le: string; };
 
 const prioriteColor: Record<string, string> = {
   urgente: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e',
@@ -52,18 +53,21 @@ export default function TicketDetailPage() {
   const [diagExpanded, setDiagExpanded] = useState(true);
   const [diagnostic, setDiagnostic] = useState<Diagnostic | null>(null);
   const [diagError, setDiagError] = useState<string | null>(null);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
 
   useEffect(() => {
     async function load() {
-      const [{ data: t }, { data: techList }] = await Promise.all([
+      const [{ data: t }, { data: techList }, { data: hist }] = await Promise.all([
         supabase.from('tickets').select('*, machines(nom, localisation, type_equipement), technicians(prenom, nom, specialites)').eq('id', params.id).single(),
         supabase.from('technicians').select('id, prenom, nom, specialites').order('prenom'),
+        supabase.from('ticket_history').select('*').eq('ticket_id', params.id).order('modifie_le', { ascending: false }),
       ]);
       if (!t) { setLoadError(true); setLoading(false); return; }
       const ticketData = t as Ticket;
       setTicket(ticketData);
       setTechs((techList as Technician[]) || []);
       setSelectedTech(ticketData?.technicien_id || '');
+      setHistory((hist as HistoryEntry[]) || []);
       if (ticketData?.diagnostic_ia) {
         try { setDiagnostic(JSON.parse(ticketData.diagnostic_ia)); } catch { /* ignore */ }
       }
@@ -77,7 +81,16 @@ export default function TicketDetailPage() {
     const label = tech ? `${tech.prenom} ${tech.nom}` : 'retirer le technicien assigné';
     if (!window.confirm(`Confirmer : ${label} ?`)) return;
     setAssigning(true);
+    const oldTech = techs.find(t => t.id === ticket?.technicien_id);
     await supabase.from('tickets').update({ technicien_id: selectedTech || null }).eq('id', params.id as string);
+    const entry = await supabase.from('ticket_history').insert({
+      ticket_id: params.id,
+      champ: 'technicien',
+      ancienne_valeur: oldTech ? `${oldTech.prenom} ${oldTech.nom}` : null,
+      nouvelle_valeur: tech ? `${tech.prenom} ${tech.nom}` : null,
+      modifie_par: 'manager',
+    }).select('*').single();
+    if (entry.data) setHistory(prev => [entry.data as HistoryEntry, ...prev]);
     const found = tech || null;
     setTicket(prev => prev ? { ...prev, technicien_id: selectedTech || null, technicians: found } : prev);
     setAssigning(false);
@@ -108,7 +121,16 @@ export default function TicketDetailPage() {
 
   async function updateStatut(statut: string) {
     setSaving(true);
+    const oldStatut = ticket?.statut;
     await supabase.from('tickets').update({ statut }).eq('id', params.id as string);
+    const entry = await supabase.from('ticket_history').insert({
+      ticket_id: params.id,
+      champ: 'statut',
+      ancienne_valeur: oldStatut || null,
+      nouvelle_valeur: statut,
+      modifie_par: 'manager',
+    }).select('*').single();
+    if (entry.data) setHistory(prev => [entry.data as HistoryEntry, ...prev]);
     setTicket(prev => prev ? { ...prev, statut } : prev);
     setSaving(false);
   }
@@ -327,6 +349,30 @@ export default function TicketDetailPage() {
           </button>
         </div>
       </div>
+
+      {/* Historique modifications */}
+      {history.length > 0 && (
+        <div className="bg-[#1c2128] border border-[#30363d] rounded-xl px-4 py-3.5 mb-3">
+          <div className="flex items-center gap-2 mb-3">
+            <History size={13} color="#7d8590" />
+            <span className="text-[11px] font-bold text-[#7d8590] uppercase tracking-[0.5px]">Historique</span>
+          </div>
+          <div className="flex flex-col gap-2">
+            {history.map(h => (
+              <div key={h.id} className="flex items-start gap-2 text-[12px]">
+                <span className="text-[#7d8590] shrink-0 min-w-[70px]">
+                  {new Date(h.modifie_le).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                </span>
+                <span className="text-[#e6edf3]">
+                  <span className="text-[#7d8590]">{h.champ} : </span>
+                  {h.ancienne_valeur && <><span className="line-through text-[#7d8590]">{h.ancienne_valeur}</span> → </>}
+                  <span className="font-semibold">{h.nouvelle_valeur || '—'}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Padding pour la barre sticky */}
       <div className="h-20" />
