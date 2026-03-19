@@ -68,9 +68,9 @@ export default function NouveauTicketPage() {
 
     if (form.priorite === 'urgente') {
       const machine = machines.find(m => m.id === form.machine_id);
-      fetch('/api/push/send', {
+      fetch('/api/tickets/notify', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-push-secret': process.env.NEXT_PUBLIC_PUSH_API_SECRET || 'copilote_push_2024' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: '🚨 Ticket URGENT',
           body: `${form.titre}${machine ? ` — ${machine.nom}` : ''}`,

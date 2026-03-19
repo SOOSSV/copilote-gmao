@@ -113,9 +113,9 @@ export default function TechTicketDetail() {
           const newQty = Math.max(0, stock.quantite_actuelle - p.quantite);
           await supabase.from('stocks').update({ quantite_actuelle: newQty }).eq('id', p.stock_id);
           if (newQty <= stock.seuil_minimum) {
-            fetch('/api/push/send', {
+            fetch('/api/tickets/notify', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'x-push-secret': 'copilote_push_2024' },
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 title: '⚠️ Stock bas',
                 body: `${stock.nom} — ${newQty} ${stock.unite} restant${newQty <= 0 ? ' (RUPTURE)' : ''}`,
