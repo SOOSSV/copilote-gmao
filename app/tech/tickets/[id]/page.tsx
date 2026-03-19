@@ -21,7 +21,7 @@ type Diagnostic = {
   temps_estime: string;
 };
 
-type Stock = { id: string; reference: string; nom: string; unite: string; quantite_actuelle: number; };
+type Stock = { id: string; reference: string; nom: string; unite: string; quantite_actuelle: number; seuil_minimum: number; };
 type PieceUtilisee = { stock_id: string; nom: string; reference: string; unite: string; quantite: number; };
 
 const prioriteColor: Record<string, string> = { urgente: '#ef4444', haute: '#f59e0b', normale: '#2563eb', basse: '#22c55e' };
@@ -46,7 +46,7 @@ export default function TechTicketDetail() {
     async function load() {
       const [{ data: t }, { data: s }] = await Promise.all([
         supabase.from('tickets').select('*, machines(nom, localisation, type_equipement)').eq('id', params.id).single(),
-        supabase.from('stocks').select('id, reference, nom, unite, quantite_actuelle').eq('actif', true).order('nom'),
+        supabase.from('stocks').select('id, reference, nom, unite, quantite_actuelle, seuil_minimum').eq('actif', true).order('nom'),
       ]);
       if (!t) { setLoadError(true); setLoading(false); return; }
       const ticketData = t as Ticket;
@@ -106,11 +106,25 @@ export default function TechTicketDetail() {
         observations: pieces.length > 0 ? `Pièces utilisées: ${pieces.map(p => `${p.quantite} ${p.unite} ${p.nom}`).join(', ')}` : null,
         realise_le: new Date().toISOString(),
       });
-      // Décrémenter les stocks
+      // Décrémenter les stocks + alerte si rupture
       for (const p of pieces) {
         const stock = stocks.find(s => s.id === p.stock_id);
         if (stock) {
-          await supabase.from('stocks').update({ quantite_actuelle: Math.max(0, stock.quantite_actuelle - p.quantite) }).eq('id', p.stock_id);
+          const newQty = Math.max(0, stock.quantite_actuelle - p.quantite);
+          await supabase.from('stocks').update({ quantite_actuelle: newQty }).eq('id', p.stock_id);
+          if (newQty <= stock.seuil_minimum) {
+            fetch('/api/push/send', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'x-push-secret': 'copilote_push_2024' },
+              body: JSON.stringify({
+                title: '⚠️ Stock bas',
+                body: `${stock.nom} — ${newQty} ${stock.unite} restant${newQty <= 0 ? ' (RUPTURE)' : ''}`,
+                url: '/manager/stocks',
+                role: 'manager',
+                tag: `stock-${stock.id}`,
+              }),
+            }).catch(() => {});
+          }
         }
       }
     }
