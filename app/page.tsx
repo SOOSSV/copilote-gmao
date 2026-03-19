@@ -47,7 +47,7 @@ export default function HomePage() {
     }}>
       {/* Logo */}
       <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
-        <RRLogo size={110} showText={false} />
+        <RRLogo size={180} showText={false} />
         <div>
           <div style={{
             fontSize: 36, fontWeight: 900,
